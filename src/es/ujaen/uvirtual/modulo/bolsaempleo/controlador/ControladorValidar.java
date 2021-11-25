@@ -133,7 +133,9 @@ public class ControladorValidar extends HttpServlet {
 		}
 		
 		try {
-			init(bean, datos, request, response);
+			if (!init(bean, datos, request, response)) {
+				return;
+			}
 			switch (nombreAccion) {
 				case ACCION_INDEX:
 					break;
@@ -181,7 +183,7 @@ public class ControladorValidar extends HttpServlet {
 		doGet(request, response);
 	}
 	
-	private void init(VistaValidar bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+	private boolean init(VistaValidar bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		bean.setVista(JSQP_INDEX);
 		bean.setConvocatoria(ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoria());
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
@@ -202,7 +204,10 @@ public class ControladorValidar extends HttpServlet {
 			LOGGER.log(Level.SEVERE, e.toString());
 			
 			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, e.getMessage());
+			return false;
 		}
+		
+		return true;
 	}
 	
 	private void accionNodefinida(VistaValidar bean) {

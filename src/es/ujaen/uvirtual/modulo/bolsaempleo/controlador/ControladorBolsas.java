@@ -95,7 +95,9 @@ public class ControladorBolsas extends HttpServlet {
 		}
 		
 		try {			
-			init(bean, datos, request, response);
+			if (!init(bean, datos, request, response)) {
+				return;
+			}
 			switch (nombreAccion) {
 				case ACCION_INDEX:
 					bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/bolsas/index.jsp");
@@ -104,7 +106,7 @@ public class ControladorBolsas extends HttpServlet {
 					listado(bean, datos, request, response);
 					break;
 				case ACCION_BOLSA:
-					accionSobreBolsas(bean, datos, request, response);					
+					accionSobreBolsas(bean, datos, request, response);
 					break;
 				default:
 					errorFatal(bean, "Acción no contemplada");
@@ -129,7 +131,7 @@ public class ControladorBolsas extends HttpServlet {
 		}
 	}
 	
-	private void init(VistaEstadoBolsas bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+	private boolean init(VistaEstadoBolsas bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		ModeloBolsa modeloBolsa = ModeloBolsa.obtenerInstancia();
 		
 		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/bolsas/index.jsp");
@@ -150,8 +152,11 @@ public class ControladorBolsas extends HttpServlet {
 			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
 			LOGGER.log(Level.SEVERE, e.toString());
 			
-			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, e.getMessage());			
+			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, e.getMessage());
+			return false;
 		}
+		
+		return true;
 	}
 	
 	private void errorFatal(VistaEstadoBolsas bean, String mensaje) {

@@ -116,7 +116,9 @@ public class ControladorDescargaFicheros extends HttpServlet {
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
 		
 		try {
-			init(bean, datos, request, response);
+			if (!init(bean, datos, request, response)) {
+				return;
+			}
 			switch (nombreAccion) {
 				case ACCION_DESCARGAR_ACREDITACION_CANDIDATO:
 				case ACCION_DESCARGAR_HORARIO_CANDIDATO:
@@ -188,7 +190,7 @@ public class ControladorDescargaFicheros extends HttpServlet {
 		datos.getFicherosCSS().add("/css/jqueryujaen/jquery-ui-1.8.16.custom.css");
 	}
 
-	private void init(VistaDescargaFicheros bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+	private boolean init(VistaDescargaFicheros bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		
 		try {
@@ -198,7 +200,10 @@ public class ControladorDescargaFicheros extends HttpServlet {
 			LOGGER.log(Level.SEVERE, e.toString());
 			
 			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, e.getMessage());
+			return false;
 		}
+		
+		return true;
 	}
 	
 	private void accionesFicherosCandidatos(VistaDescargaFicheros bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, String nombreAccion) 

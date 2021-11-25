@@ -103,7 +103,9 @@ public class ControladorMisResultados extends HttpServlet {
 		}
 		
 		try {
-			init(bean, datos, request, response);
+			if (!init(bean, datos, request, response)) {
+				return;
+			}
 			switch (nombreAccion) {
 				case ACCION_INDEX:
 					bean.setVista(JSP_INDEX);
@@ -139,7 +141,7 @@ public class ControladorMisResultados extends HttpServlet {
 		}
 	}
 	
-	private void init(VistaMisResultados bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+	private boolean init(VistaMisResultados bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		bean.setVista(JSP_INDEX);
 		bean.setConvocatoria(ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoria());
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
@@ -154,7 +156,10 @@ public class ControladorMisResultados extends HttpServlet {
 			LOGGER.log(Level.WARNING, e.toString());
 			
 			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, e.getMessage());
-		}		
+			return false;
+		}
+		
+		return true;		
 	}
 	
 	private void errorFatal(VistaMisResultados bean, String mensaje) {

@@ -67,10 +67,8 @@ public class ControladorResultados extends HttpServlet {
 	public static final String ACCION_EXPORTAR_RESULTADOS = "exportarresultados";
 	
 	// mensajes
-	public static final String MENSAJE_ERROR_FOO = "Mensaje de error";
 	public static final String MENSAJE_ERROR_ACCION_NO_CONTEMPLADA = "Acción no contemplada";
 	public static final String MENSAJE_ERROR_SIN_PERMISO = "No tienes permiso";
-	public static final String MENSAJE_EXITO_BAR = "Mensaje de exito";
 	
 	// ruta vistas
 	public static final String RUTA_BEP_RESULTADOS = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/resultados/";
@@ -109,7 +107,9 @@ public class ControladorResultados extends HttpServlet {
 		}
 		
 		try {
-			init(bean, datos, request, response);
+			if (!init(bean, datos, request, response)) {
+				return;
+			}
 			switch (nombreAccion) {
 				case ACCION_INDEX:
 					bean.setVista(JSP_INDEX);
@@ -148,7 +148,7 @@ public class ControladorResultados extends HttpServlet {
 		}
 	}
 	
-	private void init(VistaResultados bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+	private boolean init(VistaResultados bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		bean.setVista(JSP_INDEX);
 		bean.setConvocatoria(ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoria());
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
@@ -169,7 +169,10 @@ public class ControladorResultados extends HttpServlet {
 			LOGGER.log(Level.SEVERE, e.toString());
 			
 			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, e.getMessage());
+			return false;
 		}
+		
+		return true;
 	}
 	
 	private void errorFatal(VistaResultados bean, String mensaje) {

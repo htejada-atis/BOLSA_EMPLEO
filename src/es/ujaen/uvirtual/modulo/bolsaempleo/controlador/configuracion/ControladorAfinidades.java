@@ -104,7 +104,9 @@ public class ControladorAfinidades extends HttpServlet {
 		}
 					
 		try {
-			init(bean, datos, request, response);
+			if (!init(bean, datos, request, response)) {
+				return;
+			}
 			switch (nombreAccion) {
 				case ACCION_INDEX:
 					index(bean);
@@ -147,7 +149,7 @@ public class ControladorAfinidades extends HttpServlet {
 		}
 	}
 	
-	private void init(VistaAfinidades bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+	private boolean init(VistaAfinidades bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		bean.setVista(RUTA_BEP_CON + "index.jsp");
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		try {
@@ -161,7 +163,10 @@ public class ControladorAfinidades extends HttpServlet {
 			LOGGER.log(Level.SEVERE, e.toString());
 			
 			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, e.getMessage());
+			return false;
 		}
+		
+		return true;
 	}
 	
 	private void errorFatal(VistaAfinidades bean, String mensaje) {

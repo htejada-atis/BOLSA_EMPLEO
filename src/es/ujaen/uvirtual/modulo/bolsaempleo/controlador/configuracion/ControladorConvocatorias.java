@@ -130,7 +130,9 @@ public class ControladorConvocatorias extends HttpServlet {
 		}
 		
 		try {
-			init(bean, datos, request, response);
+			if (!init(bean, datos, request, response)) {
+				return;
+			}
 			switch (nombreAccion) {
 				case ACCION_ABRIR_CONVOCATORIA:
 				case ACCION_BORRAR_CONVOCATORIA:
@@ -172,7 +174,7 @@ public class ControladorConvocatorias extends HttpServlet {
 		}
 	}	
 	
-	private void init(VistaConvocatorias bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+	private boolean init(VistaConvocatorias bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		bean.setVista(JSP_INDEX);
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		
@@ -187,7 +189,10 @@ public class ControladorConvocatorias extends HttpServlet {
 			LOGGER.log(Level.SEVERE, e.toString());
 			
 			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, e.getMessage());
+			return false;
 		}
+		
+		return true;
 	}
 	
 	private void errorFatal(VistaConvocatorias bean, String mensaje) {
