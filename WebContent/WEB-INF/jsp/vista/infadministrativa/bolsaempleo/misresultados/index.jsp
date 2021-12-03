@@ -18,7 +18,7 @@ VistaMisResultados bean = (VistaMisResultados)uvdatos.getVistas().get(VistaMisRe
 	<table class="bluetable bolsaempleo" id="tableAreasMRE">
 		<tr>
 			<th scope="col" style="width:100px" title="Código área">Cod. Area.</th>
-			<th scope="col" style="width:100%" class="area">Área</th>			
+			<th scope="col" style="width:100%" class="area">Área</th>
 			<th scope="col" style="width:100px" class="area">Puntuación</th>
 			<th scope="col" style="width:88px" class="center"></th>
 		</tr>
@@ -36,32 +36,31 @@ VistaMisResultados bean = (VistaMisResultados)uvdatos.getVistas().get(VistaMisRe
 $(document).ready(function() {
 	
 	var table = new Atis.DataTable('#tableAreasMRE', {
-	    "ajax": { url: "<%= ControladorMisResultados.URL_PATTERN_AJAX %>" },
-	    "pageSize": 10,
-	    "filterable": true,
-	    "stateSave": true,
-	    "action": "<%= ControladorMisResultados.ACCION_DATATABLE_BOLSAS %>",
-	    "columns": [
-	    	{'data': 'area.idAreaExterno', 'filter': {'type': 'number'}},
-	        {'data': 'area.descripcion', 'filter': true, 'overflow': 'auto'},
-	        {'data': 'total', 'filter': {'type': 'number'}},
-	        {'data': 'codnum', 'buttons': [{'label': 'Ver resultados', 
-	        	'onClick': function(row) {
-	        		var params = {
-	    				'a': '<%= ControladorMisResultados.ACCION_SELECCIONAR_BOLSA %>',
-	    				'<%= ControladorMisResultados.PARAM_BOLSA %>': row.codNum
-		    		};
-		    		Atis.sendForm("<%= request.getRequestURI() %>", params);
-	        	},
-	        	'visible': function(row) {
-	        		return row.fechaBaremacion != null && row.resultadoActual;
-        		},
-        		'renderNotVisible': function(row) {
-        			return row.resultadoActual ? 'Esperando resultados' : '';
-        		}
-        	}]
-        }
-	    ]
+		"ajax": { url: "<%= ControladorMisResultados.URL_PATTERN_AJAX %>" },
+		"pageSize": 10,
+		"filterable": true,
+		"stateSave": true,
+		"action": "<%= ControladorMisResultados.ACCION_DATATABLE_BOLSAS %>",
+		"columns": [
+			{'data': 'area.idAreaExterno', 'filter': {'type': 'number'}},
+			{'data': 'area.descripcion', 'filter': true, 'overflow': 'auto'},
+			{'data': 'total', 'filter': {'type': 'number'}},
+			{'data': 'codnum', 'buttons': [{'label': 'Ver resultados', 
+				'onClick': function(row) {
+					var params = {
+						'a': '<%= ControladorMisResultados.ACCION_SELECCIONAR_BOLSA %>',
+						'<%= ControladorMisResultados.PARAM_BOLSA %>': row.codNum
+					};
+					Atis.sendForm("<%= request.getRequestURI() %>", params);
+				},
+				'visible': function(row) {
+					return row.fechaBaremacion != null && row.resultadoActual;
+				},
+				'renderNotVisible': function(row) {
+					return row.resultadoActual ? 'Esperando resultados' : '';
+				}
+			}]
+		}]
 	});
 	
 }); 

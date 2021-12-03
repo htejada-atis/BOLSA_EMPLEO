@@ -159,7 +159,7 @@ public class ControladorMisResultados extends HttpServlet {
 			return false;
 		}
 		
-		return true;		
+		return true;
 	}
 	
 	private void errorFatal(VistaMisResultados bean, String mensaje) {
