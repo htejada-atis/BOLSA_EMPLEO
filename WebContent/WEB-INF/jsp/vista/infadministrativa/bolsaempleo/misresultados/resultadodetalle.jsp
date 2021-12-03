@@ -36,7 +36,7 @@ String titulaciones = BolsaEmpleoUtils.clobToString(bolsaResultado.getTitulacion
 			 Volver
 		</button>
 		<div class="col">
-			<button class="link-btn icon icon-download" id="descargar_resultados" style="float:right; padding: 1.5px 6px;">Descargar resultados</button>
+			<button class="link-btn icon icon-download" id="descargar_resultados" style="float:right">Descargar resultados</button>
 		</div>
 	</div>
 	

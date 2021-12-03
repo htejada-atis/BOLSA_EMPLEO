@@ -39,7 +39,7 @@ Bolsa bolsa = bean.getBolsa();
 	</table>
 	
 	<div class="row">
-		<button class="link-btn" id="resultados_volver" style="float:left; max-height: 25px">
+		<button class="link-btn" id="resultados_volver" style="float:left">
 			 Volver
 		</button>
 	</div>
