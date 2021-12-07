@@ -87,6 +87,7 @@ public class ControladorDescargaFicheros extends HttpServlet {
 	public static final String PARAM_ARCHIVO = "archivo";
 	public static final String PARAM_BOLSA = "bolsa";
 	public static final String PARAM_CANDIDATO = "candidato";
+	public static final String PARAM_CONVOCATORIA = "convocatoria";
 	public static final String PARAM_MENSAJE = "mensaje";
 	public static final String PARAM_MERITO = "merito";
 	public static final String PARAM_PLAZA_OFERTADA = "plazaofertada";
@@ -482,9 +483,9 @@ public class ControladorDescargaFicheros extends HttpServlet {
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	private void descargaResultadosSolicitudCandidato(VistaDescargaFicheros bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) 
-			throws SQLException, UVException, IOException {
+			throws SQLException, UVException {
 		Bolsa bolsa = ModeloBolsa.obtenerInstancia().getBolsaById(Formateador.leeParametroInteger(request.getParameter(PARAM_BOLSA)));
-		Convocatoria convocatoria = ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoria();
+		Convocatoria convocatoria = ModeloConvocatoria.obtenerInstancia().getConvocatoriaById(Formateador.leeParametroInteger(request.getParameter(PARAM_CONVOCATORIA)));
 		
 		BolsaResultado bolsaResultado = ModeloResultados.obtenerInstancia().getBolsaResultado(bolsa, bean.getUsuarioLogeado(), convocatoria);
 		bean.setBolsaResultado(bolsaResultado);
@@ -493,10 +494,10 @@ public class ControladorDescargaFicheros extends HttpServlet {
 	}
 	
 	private void descargaResultadosSolicitudPersonal(VistaDescargaFicheros bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) 
-			throws SQLException, UVException, IOException {
+			throws SQLException, UVException {
 		UsuarioBolsaEmpleo candidato = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioById(Formateador.leeParametroInteger(request.getParameter(PARAM_CANDIDATO)));
 		Bolsa bolsa = ModeloBolsa.obtenerInstancia().getBolsaById(Formateador.leeParametroInteger(request.getParameter(PARAM_BOLSA)));
-		Convocatoria convocatoria = ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoria();
+		Convocatoria convocatoria = ModeloConvocatoria.obtenerInstancia().getConvocatoriaById(Formateador.leeParametroInteger(request.getParameter(PARAM_CONVOCATORIA)));
 		
 		BolsaResultado bolsaResultado = ModeloResultados.obtenerInstancia().getBolsaResultado(bolsa, candidato, convocatoria);
 		bean.setBolsaResultado(bolsaResultado);

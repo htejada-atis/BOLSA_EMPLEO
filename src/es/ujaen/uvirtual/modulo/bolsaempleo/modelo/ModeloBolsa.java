@@ -8,7 +8,6 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Area;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
@@ -123,7 +122,7 @@ public class ModeloBolsa {
 			dataTable.setRecordsTotalFromQuery(stmtCount);
 			dataTable.setData(bolsas);
 		}
-
+		
 		return dataTable;
 	}
 	
@@ -142,7 +141,7 @@ public class ModeloBolsa {
 		
 		boolean evaluador = usuario.getRol().getValor().equals(ModeloRol.ROL_MIEMBRO_COMISION) 
 				|| usuario.getRol().getValor().equals(ModeloRol.ROL_DIRECTOR_DEPARTAMENTO);
-
+		
 		String consulta = "SELECT bepbol.*,"
 				+ "		("
 				+ "		SELECT"
@@ -158,13 +157,13 @@ public class ModeloBolsa {
 				+ (evaluador ? " INNER JOIN TBEP_EVALUADORES bepeva ON bepeva.BEPARE_CODNUM = bepare.CODNUM AND bepeva.FLGACTIVO = 'S'" : "")
 				+ "	WHERE"
 				+ (evaluador ? " bepeva.BEPUSU_CODNUM = ?" : " 1=1");
-
+		
 		dataTable.setColumn(ORDER_COLUMN_INDEX_ID_RESULTADOS, "bepbol.CODNUM", DataTableColumn.COLUMN_TYPE_NUMBER);
 		dataTable.setColumn(ORDER_COLUMN_INDEX_COD_AREA_RESULTADOS, "bepare.ID_AREA_CONOCIMIENTO");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_DESC_AREA_RESULTADOS, "bepare.DES_AREA_CONOCIMIENTO");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_FECHA_BAREMACION_RESULTADOS, "bepbol.FECHABAREMACION", DataTableColumn.COLUMN_TYPE_DATE);
 		dataTable.setQuery(consulta);
-
+		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
 				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery())) {
@@ -176,20 +175,20 @@ public class ModeloBolsa {
 				stmtCount.setInt(indexParam++, usuario.getCodNum());
 			}
 			dataTable.setFiltersParams(stmt, stmtCount, indexParam);
-
+			
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
 					bolsas.add(new BolsaResultado(this.createFromResultSet(rs), rs.getBoolean("RESULTADOS_ACTUALES")));
 				}
 			}
-
+			
 			dataTable.setRecordsTotalFromQuery(stmtCount);
 			dataTable.setData(bolsas);
 		}
-
+		
 		return dataTable;
 	}
-
+	
 	/**
 	 * Devuelve todas las bolsas del sistema.
 	 * 

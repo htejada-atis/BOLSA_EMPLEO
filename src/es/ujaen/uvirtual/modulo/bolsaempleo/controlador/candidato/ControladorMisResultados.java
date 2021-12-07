@@ -60,6 +60,7 @@ public class ControladorMisResultados extends HttpServlet {
 	public static final String PARAM_ACCION = "a";
 	public static final String PARAM_BOLSA = "bolsa";
 	public static final String PARAM_CANDIDATO = "candidato";
+	public static final String PARAM_CONVOCATORIA = "convocatoria";
 	public static final String PARAM_ENVIAR = "enviar";
 	
 	// Mensajes
@@ -108,7 +109,7 @@ public class ControladorMisResultados extends HttpServlet {
 			}
 			switch (nombreAccion) {
 				case ACCION_INDEX:
-					bean.setVista(JSP_INDEX);
+					bean.setListaConvocatorias(ModeloConvocatoria.obtenerInstancia().listaConvocatorias());
 					break;
 				case ACCION_DATATABLE_BOLSAS:
 					listadoBolsas(bean, datos, request, response);
@@ -143,8 +144,14 @@ public class ControladorMisResultados extends HttpServlet {
 	
 	private boolean init(VistaMisResultados bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		bean.setVista(JSP_INDEX);
-		bean.setConvocatoria(ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoria());
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
+		
+		Integer idConvocatoria = Formateador.leeParametroInteger(BolsaEmpleoUtils.getParamRequestOrSession(request, PARAM_CONVOCATORIA));
+		if (idConvocatoria != null) {
+			bean.setConvocatoria(ModeloConvocatoria.obtenerInstancia().getConvocatoriaById(idConvocatoria));
+		} else {
+			bean.setConvocatoria(ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoria());
+		}
 		
 		try {
 			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getAndRefreshUsuario(datos));

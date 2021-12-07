@@ -22,8 +22,8 @@ Bolsa bolsa = bean.getBolsa();
 UsuarioBolsaEmpleo candidato = bean.getCandidato();
 BolsaResultado bolsaResultado = bean.getBolsaResultado();
 MeritoPreferente meritoPreferente = bean.getMeritoPreferente();
-String acreditaciones = BolsaEmpleoUtils.clobToString(bolsaResultado.getAcreditacionesValidadas());
-String titulaciones = BolsaEmpleoUtils.clobToString(bolsaResultado.getTitulacionesValidadas());
+String acreditaciones = bolsaResultado.getAcreditacionesValidadas() != null ? BolsaEmpleoUtils.clobToString(bolsaResultado.getAcreditacionesValidadas()) : "";
+String titulaciones = bolsaResultado.getTitulacionesValidadas() != null ? BolsaEmpleoUtils.clobToString(bolsaResultado.getTitulacionesValidadas()) : "";
 %>
 
 <div class='bolsa-empleo'>
@@ -191,7 +191,8 @@ $(document).ready(function() {
 	document.getElementById("descargar_resultados").addEventListener("click", function() {
 		window.open("<%= ControladorDescargaFicheros.URL_DESCARGA_FICHEROS + "?a=" + ControladorDescargaFicheros.ACCION_DESCARGAR_RESULTADOS_SOLICITUD_PERSONAL %>"
 				+ "<%= "&" + ControladorDescargaFicheros.PARAM_CANDIDATO + "=" + bean.getCandidato().getCodNum().toString() %>"
-				+ "<%= "&" + ControladorDescargaFicheros.PARAM_BOLSA + "=" + bean.getBolsaResultado().getCodNum() %>");
+				+ "<%= "&" + ControladorDescargaFicheros.PARAM_BOLSA + "=" + bean.getBolsaResultado().getCodNum() %>"
+				+ "<%= "&" + ControladorDescargaFicheros.PARAM_CONVOCATORIA + "=" + bean.getConvocatoria().getCodNum() %>");
 	});
 });
 

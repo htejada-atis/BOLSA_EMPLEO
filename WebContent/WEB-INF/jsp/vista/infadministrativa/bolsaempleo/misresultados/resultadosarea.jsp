@@ -64,7 +64,8 @@ $(document).ready(function() {
 					'onClick': function(row) {
 						var params = {
 							'<%= ControladorMisResultados.PARAM_ACCION %>': '<%= ControladorMisResultados.ACCION_MIS_RESULTADOS %>',
-							'<%= ControladorMisResultados.PARAM_BOLSA %>': '<%= bolsa.getCodNum() %>'
+							'<%= ControladorMisResultados.PARAM_BOLSA %>': '<%= bolsa.getCodNum() %>',
+							'<%= ControladorMisResultados.PARAM_CONVOCATORIA %>': '<%= bean.getConvocatoria().getCodNum() %>'
 						};
 						Atis.sendForm("<%= request.getRequestURI() %>", params);
 					},

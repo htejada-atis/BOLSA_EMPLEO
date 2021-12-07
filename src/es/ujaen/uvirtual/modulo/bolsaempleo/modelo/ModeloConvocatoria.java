@@ -116,17 +116,15 @@ public class ModeloConvocatoria {
 		return false;
 	}
 	
-	/**
-	 * Consulta titulaciones en BBDD y las devuelve.
-	 * 
-	 * @return todas las titulaciones de la base de datos .
-	 * @throws SQLException en caso de error de base de datos
+	/** Consulta convocatorias en BBDD y las devuelve .
+	 * @return todas las convocatorias de la base de datos .
+	 * @throws SQLException en caso de error de base de datos .
 	 * @throws UVException .
 	 */
 	public List<Convocatoria> listaConvocatorias() throws SQLException {
 		List<Convocatoria> convocatorias = new ArrayList<>();
-		String consulta = "SELECT bepcon.* FROM TBEP_CONVOCATORIAS bepcon";
-
+		String consulta = "SELECT bepcon.* FROM TBEP_CONVOCATORIAS bepcon ORDER BY CODNUM";
+		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
@@ -134,7 +132,7 @@ public class ModeloConvocatoria {
 				}
 			}
 		}
-
+		
 		return convocatorias;
 	}
 

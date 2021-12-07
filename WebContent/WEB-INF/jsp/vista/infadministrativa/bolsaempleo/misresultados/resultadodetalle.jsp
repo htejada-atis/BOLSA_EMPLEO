@@ -1,6 +1,6 @@
 <%@ page trimDirectiveWhitespaces="true"%>
-<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorDescargaFicheros"%>
-<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.candidato.ControladorMisResultados"%>
+<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorDescargaFicheros" %>
+<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.candidato.ControladorMisResultados" %>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaMisResultados" %>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa" %>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaResultado" %>
@@ -8,10 +8,10 @@
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoResultado" %>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo" %>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloResultados" %>
-<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils"%>
-<%@ page import="es.ujaen.uvirtual.beans.UVDatos"%>
+<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils" %>
+<%@ page import="es.ujaen.uvirtual.beans.UVDatos" %>
 <%@ page import="es.ujaen.uvirtual.utilidades.EscapaHTML" %>
-<%@ page import="es.ujaen.uvirtual.utilidades.Formateador"%>
+<%@ page import="es.ujaen.uvirtual.utilidades.Formateador" %>
 
 <% 
 UVDatos uvdatos = (UVDatos)request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
@@ -181,14 +181,16 @@ $(document).ready(function() {
 	document.getElementById("resultados_volver").addEventListener("click", function() {
 		var params = {
 				'<%= ControladorMisResultados.PARAM_ACCION %>': '<%= ControladorMisResultados.ACCION_SELECCIONAR_BOLSA %>',
-				'<%= ControladorMisResultados.PARAM_BOLSA %>': '<%= bolsaResultado.getCodNum() %>'
+				'<%= ControladorMisResultados.PARAM_BOLSA %>': '<%= bolsaResultado.getCodNum() %>',
+				'<%= ControladorMisResultados.PARAM_CONVOCATORIA %>': '<%= bean.getConvocatoria().getCodNum() %>'
 		};
 		Atis.sendForm("<%= request.getRequestURI() %>", params);
 	});
 	
 	document.getElementById("descargar_resultados").addEventListener("click", function() {
 		window.open("<%= ControladorDescargaFicheros.URL_DESCARGA_FICHEROS + "?a=" + ControladorDescargaFicheros.ACCION_DESCARGAR_RESULTADOS_SOLICITUD_CANDIDATO %>"
-				+ "<%= "&" + ControladorDescargaFicheros.PARAM_BOLSA + "=" + bolsaResultado.getCodNum() %>");
+				+ "<%= "&" + ControladorDescargaFicheros.PARAM_BOLSA + "=" + bolsaResultado.getCodNum() %>"
+				+ "<%= "&" + ControladorDescargaFicheros.PARAM_CONVOCATORIA + "=" + bean.getConvocatoria().getCodNum() %>");
 	});
 });
 

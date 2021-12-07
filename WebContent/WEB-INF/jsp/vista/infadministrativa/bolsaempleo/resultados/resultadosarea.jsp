@@ -56,7 +56,10 @@ $(document).ready(function() {
 		"defaultOrderBy": 2,
 		"defaultOrderDirection": 'desc',
 		"action": "<%= ControladorResultados.ACCION_DATATABLE_CANDIDATOS %>",
-		"params": {'<%=ControladorResultados.PARAM_BOLSA%>': '<%= bolsa.getCodNum() %>'},
+		"params": {
+			'<%=ControladorResultados.PARAM_BOLSA%>': '<%= bolsa.getCodNum() %>',
+			'<%=ControladorResultados.PARAM_CONVOCATORIA%>': '<%= bean.getConvocatoria().getCodNum() %>'
+		},
 		"columns": [
 			{'data': 'prsnif', 'filter': true},
 			{'data': 'apellido1', 'filter': true, 'overflow': 'auto', 'render': function(row) {
@@ -69,7 +72,8 @@ $(document).ready(function() {
 						var params = {
 							'<%= ControladorResultados.PARAM_ACCION %>': '<%= ControladorResultados.ACCION_SELECCIONAR_CANDIDATO %>',
 							'<%= ControladorResultados.PARAM_BOLSA %>': '<%= bolsa.getCodNum() %>',
-							'<%= ControladorResultados.PARAM_CANDIDATO %>': row.codNum
+							'<%= ControladorResultados.PARAM_CANDIDATO %>': row.codNum,
+							'<%= ControladorResultados.PARAM_CONVOCATORIA %>': '<%= bean.getConvocatoria().getCodNum() %>'
 						};
 						Atis.sendForm("<%= request.getRequestURI() %>", params);
 					}
