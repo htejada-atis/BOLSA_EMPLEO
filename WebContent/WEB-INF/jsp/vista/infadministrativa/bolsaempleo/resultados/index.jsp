@@ -75,7 +75,10 @@ $(document).ready(function() {
 			{'data': 'codNum', 'filter': {'type': 'number'}},
 			{'data': 'area.idAreaExterno', 'filter': {'type': 'number'}},
 			{'data': 'area.descripcion', 'filter': true, 'overflow': 'auto'},
-			{'data': 'fechaBaremacion', 'filter': {'type': 'date'}},
+			{'data': 'fechaBaremacion', 'filter': {'type': 'date'}, 'render': function(row) {
+					return row.resultadoActual ? row.fechaBaremacion : '';
+				}
+			},
 			{'data': 'codnum', 'buttons': [{'label': 'Ver resultados',
 					'onClick': function(row) {
 						var params = {
