@@ -183,7 +183,8 @@ $(document).ready(function() {
 	document.getElementById("resultados_volver").addEventListener("click", function() {
 		var params = {
 				'<%= ControladorResultados.PARAM_ACCION %>': '<%= ControladorResultados.ACCION_SELECCIONAR_BOLSA %>',
-				'<%= ControladorResultados.PARAM_BOLSA %>': '<%= bolsaResultado.getCodNum() %>'
+				'<%= ControladorResultados.PARAM_BOLSA %>': '<%= bolsaResultado.getCodNum() %>',
+				'<%= ControladorResultados.PARAM_CONVOCATORIA %>': '<%= bean.getConvocatoria().getCodNum() %>'
 		};
 		Atis.sendForm("<%= request.getRequestURI() %>", params);
 	});

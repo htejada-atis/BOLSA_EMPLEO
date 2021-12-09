@@ -135,6 +135,34 @@ public class ModeloConvocatoria {
 		
 		return convocatorias;
 	}
+	
+	/** Lista de convocatorias en las que participa un candidato además de la última convocatoria .
+	 * @param candidato .
+	 * @return convocatorias .
+	 * @throws SQLException en caso de error de base de datos .
+	 * @throws UVException .
+	 */
+	public List<Convocatoria> listaConvocatoriasCandidato(UsuarioBolsaEmpleo candidato) throws SQLException {
+		List<Convocatoria> convocatorias = new ArrayList<>();
+		String consulta = "SELECT bepcon.* FROM TBEP_CONVOCATORIAS bepcon"
+				+ " LEFT JOIN TBEP_SOLICITUDES bepsol ON bepsol.BEPCON_CODNUM = bepcon.CODNUM AND bepsol.BEPUSU_CODNUM = ?"
+				+ " WHERE bepsol.CODNUM IS NOT NULL OR bepcon.CODNUM = ?"
+				+ " ORDER BY bepcon.CODNUM";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			int parameterIndex = 1;
+			stmt.setInt(parameterIndex++, candidato.getCodNum());
+			stmt.setInt(parameterIndex++, this.getUltimaConvocatoria().getCodNum());
+			
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					convocatorias.add(this.createFromResultSet(rs));
+				}
+			}
+		}
+		
+		return convocatorias;
+	}
 
 	/**
 	 * Lista de convocatorias a cerrar por fecha de cierre.
@@ -293,7 +321,7 @@ public class ModeloConvocatoria {
 			stmt.setInt(parameterIndex++, conv.getNumBolsasMaximo());
 			stmt.setInt(parameterIndex++, conv.getNumMeritosPorBloque());
 			stmt.setString(parameterIndex++, usuarioUpdate.getCodCuenta());
-			stmt.setInt(parameterIndex++, conv.getCodNum());			
+			stmt.setInt(parameterIndex++, conv.getCodNum());
 			stmt.executeUpdate();
 		}
 	}
@@ -317,7 +345,7 @@ public class ModeloConvocatoria {
 				int parameterIndex = 1;
 				stmt.setString(parameterIndex++, conv.getEstado());
 				stmt.setString(parameterIndex++, usuarioUpdate.getCodCuenta());
-				stmt.setInt(parameterIndex++, conv.getCodNum());			
+				stmt.setInt(parameterIndex++, conv.getCodNum());
 				stmt.executeUpdate();
 			}
 		}
@@ -340,7 +368,7 @@ public class ModeloConvocatoria {
 				
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia()) {
 			String consultaUpdate = "UPDATE tbep_convocatorias SET UID_USUARIO=? WHERE codnum = ?";
-			try (PreparedStatement stmt = conexion.prepareStatement(consultaUpdate)) {		
+			try (PreparedStatement stmt = conexion.prepareStatement(consultaUpdate)) {
 				int parameterIndex = 1;
 				stmt.setString(parameterIndex++, usuarioDetele.getCodCuenta());
 				stmt.setInt(parameterIndex++, conv.getCodNum());
@@ -348,7 +376,7 @@ public class ModeloConvocatoria {
 			}
 			
 			String consulta = "DELETE FROM tbep_convocatorias WHERE codnum = ?";
-			try (PreparedStatement stmt = conexion.prepareStatement(consulta)) {		
+			try (PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 				int parameterIndex = 1;
 				stmt.setInt(parameterIndex++, conv.getCodNum());
 				stmt.executeUpdate();
@@ -445,7 +473,7 @@ public class ModeloConvocatoria {
 					int parameterIndex = 1;
 					stmt.setString(parameterIndex++, CONVOCATORIA_ESTADO_CERRADA);
 					stmt.setString(parameterIndex++, usuarioUpdate);
-					stmt.setInt(parameterIndex++, conv.getCodNum());			
+					stmt.setInt(parameterIndex++, conv.getCodNum());
 					stmt.executeUpdate();
 				}
 				

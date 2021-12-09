@@ -109,7 +109,7 @@ public class ControladorMisResultados extends HttpServlet {
 			}
 			switch (nombreAccion) {
 				case ACCION_INDEX:
-					bean.setListaConvocatorias(ModeloConvocatoria.obtenerInstancia().listaConvocatorias());
+					bean.setListaConvocatorias(ModeloConvocatoria.obtenerInstancia().listaConvocatoriasCandidato(bean.getUsuarioLogeado()));
 					break;
 				case ACCION_DATATABLE_BOLSAS:
 					listadoBolsas(bean, datos, request, response);

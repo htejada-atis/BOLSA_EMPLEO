@@ -89,7 +89,7 @@ $(document).ready(function() {
 						Atis.sendForm("<%= request.getRequestURI() %>", params);
 					},
 					'visible': function(row) {
-						return row.fechaBaremacion != null;
+						return row.resultadoActual;
 					}
 				}]
 			}

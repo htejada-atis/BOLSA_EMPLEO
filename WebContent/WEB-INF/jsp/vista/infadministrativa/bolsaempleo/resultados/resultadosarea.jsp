@@ -83,12 +83,15 @@ $(document).ready(function() {
 	});
 	
 	document.getElementById("resultados_volver").addEventListener("click", function() {
-		Atis.sendForm("<%= request.getRequestURI() %>", {});
+		Atis.sendForm("<%= request.getRequestURI() %>", {'<%= ControladorResultados.PARAM_CONVOCATORIA %>': '<%= bean.getConvocatoria().getCodNum() %>'});
 	});
 	
 	$('#exportar').on('click', function() {
-		window.open("<%= request.getRequestURI() %>?<%= ControladorResultados.PARAM_ACCION %>=<%= ControladorResultados.ACCION_EXPORTAR_RESULTADOS %>&<%= ControladorResultados.PARAM_BOLSA %>=<%= bolsa.getCodNum() %>");
+		window.open("<%= request.getRequestURI() + "?" + ControladorResultados.PARAM_ACCION + "=" + ControladorResultados.ACCION_EXPORTAR_RESULTADOS %>"
+				+ "<%= "&" + ControladorResultados.PARAM_BOLSA + "=" + bolsa.getCodNum() %>"
+				+ "<%= "&" + ControladorResultados.PARAM_CONVOCATORIA +  "=" + bean.getConvocatoria().getCodNum() %>");
 	});
+	
 });
 
 </script>

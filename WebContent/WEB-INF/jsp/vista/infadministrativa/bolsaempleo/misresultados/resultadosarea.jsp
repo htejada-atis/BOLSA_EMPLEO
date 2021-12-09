@@ -51,7 +51,10 @@ $(document).ready(function() {
 		"defaultOrderDirection": 'desc',
 		"stateSave": true,
 		"action": "<%= ControladorMisResultados.ACCION_DATATABLE_CANDIDATOS %>",
-		"params": {'<%=ControladorMisResultados.PARAM_BOLSA%>': '<%= bolsa.getCodNum() %>'},
+		"params": {
+			'<%=ControladorMisResultados.PARAM_BOLSA%>': '<%= bolsa.getCodNum() %>',
+			'<%=ControladorMisResultados.PARAM_CONVOCATORIA%>': '<%= bean.getConvocatoria().getCodNum() %>'
+		},
 		"selected": <%= bean.getUsuarioLogeado().getCodNum() %> ,
 		"columns": [
 			{'data': 'prsnif', 'order': false},
@@ -78,7 +81,7 @@ $(document).ready(function() {
 	});
 	
 	document.getElementById("misresultados_volver").addEventListener("click", function() {
-		Atis.sendForm("<%= request.getRequestURI() %>", {});
+		Atis.sendForm("<%= request.getRequestURI() %>", {'<%= ControladorMisResultados.PARAM_CONVOCATORIA %>': '<%= bean.getConvocatoria().getCodNum() %>'});
 	});
 });
 
