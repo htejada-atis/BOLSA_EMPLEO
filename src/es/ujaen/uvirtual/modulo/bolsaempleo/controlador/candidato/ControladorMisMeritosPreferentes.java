@@ -113,7 +113,9 @@ public class ControladorMisMeritosPreferentes extends HttpServlet {
 		}
 		
 		try {
-			init(bean, datos, request, response);
+			if (!init(bean, datos, request, response)) {
+				return;
+			}
 			accionesMeritos(bean, datos, request, response, nombreAccion);
 		} catch (UVException e) {
 			LOGGER.log(Level.WARNING, e.toString());
@@ -138,7 +140,7 @@ public class ControladorMisMeritosPreferentes extends HttpServlet {
 		}
 	}
 	
-	private void init(VistaMeritosPreferentesCandidato bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) 
+	private boolean init(VistaMeritosPreferentesCandidato bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) 
 			throws SQLException, UVException, IOException {
 		this.index(bean);
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
@@ -155,7 +157,10 @@ public class ControladorMisMeritosPreferentes extends HttpServlet {
 			LOGGER.log(Level.WARNING, e.toString());
 			
 			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, e.getMessage());
-		}		
+			return false;
+		}
+		
+		return true;		
 	}
 	
 	private void errorFatal(VistaMeritosPreferentesCandidato bean, String mensaje) {

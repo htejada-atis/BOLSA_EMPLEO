@@ -66,7 +66,9 @@ public class ControladorConfiguracion extends HttpServlet {
 		}
 
 		try {
-			init(bean, datos, request, response);
+			if (!init(bean, datos, request, response)) {
+				return;
+			}
 			if (nombreAccion.equals(ACCION_INDEX)) {
 				index(bean);
 			} else {
@@ -92,7 +94,7 @@ public class ControladorConfiguracion extends HttpServlet {
 		}
 	}
 
-	private void init(VistaConfiguracion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+	private boolean init(VistaConfiguracion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		index(bean);
 		
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
@@ -113,7 +115,10 @@ public class ControladorConfiguracion extends HttpServlet {
 			LOGGER.log(Level.SEVERE, e.toString());
 			
 			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, e.getMessage());
-		}		
+			return false;
+		}
+		
+		return true;		
 	}
 
 	private void errorFatal(VistaConfiguracion bean, String mensaje) {

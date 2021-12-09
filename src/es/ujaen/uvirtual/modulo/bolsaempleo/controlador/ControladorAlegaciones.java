@@ -3,63 +3,75 @@ package es.ujaen.uvirtual.modulo.bolsaempleo.controlador;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.logging.Logger;
-import java.util.List;
+import java.util.stream.IntStream;
 import java.util.logging.Level;
-
-import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Area;
-import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloArea;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloParametrosConfiguracion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloRol;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
-import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaMiembrosComision;
+import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaAlegaciones;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
 import es.ujaen.uvirtual.utilidades.UVException;
 
 /**
- * Listado de bolsas y su estado.
+ * Controlador de alegaciones .
  */
 @WebServlet(
-	name = "informacionadministrativa.bolsaempleo.miembroscomision", 
-	description = "Quien ha baremabo cada area", 
+	name = "informacionadministrativa.bolsaempleo.alegaciones",
+	description = "Alegaciones",
 	urlPatterns = { 
-			"/srv/es/informacionadministrativa/bolsaempleo/miembroscomision", 
-			"/srv/en/informacionadministrativa/bolsaempleo/miembroscomision"
+			"/srv/es/informacionadministrativa/bolsaempleo/alegaciones",
+			"/srv/en/informacionadministrativa/bolsaempleo/alegaciones",
+			"/srv/es/ajax/informacionadministrativa/bolsaempleo/alegaciones",
+			"/srv/en/ajax/informacionadministrativa/bolsaempleo/alegaciones"
 	})
-public class ControladorMiembrosComision extends HttpServlet {
+public class ControladorAlegaciones extends HttpServlet {
+	
 	private static final long serialVersionUID = 1L;
-	private static final String NOMBREDEESTACLASE = ControladorMiembrosComision.class.getName();
+	private static final String NOMBREDEESTACLASE = ControladorAlegaciones.class.getName();
 	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
+	
+	// parámetros
 	public static final String PARAM_ACCION = "a";
 	
 	// acciones
-	public static final String ACCION_LISTAR = "listar";
-	public static final String ACCION_INDEX = "listarareas";
+	public static final String ACCION_INDEX = "listar";
 	
 	// mensajes
-	public static final String MENSAJE_ERROR_FOO = "Mensaje de error";
-	public static final String MENSAJE_EXITO_BAR = "Mensaje de exito"; 
-
+	public static final String MENSAJE_ERROR_ACCION_NO_CONTEMPLADA = "Acción no contemplada";
+	public static final String MENSAJE_ERROR_SIN_PERMISO = "No tienes permiso";
+	
+	// ruta vistas
+	public static final String RUTA_BEP_ALEGACIONES = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/alegaciones/";
+	public static final String JSP_INDEX = RUTA_BEP_ALEGACIONES + "index.jsp";
+	
+	// ajax
+	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/alegaciones";
+	public static final String RESPONSE_AJAX_CONTENTTYPE = "application/json";
+	public static final String RESPONSE_AJAX_ENCODING = "UTF-8";
+	public static final String RESPONSE_AJAX_ERROR = "error";
+	public static final int RESPONSE_AJAX_HTTP_CODE_ERROR = 400;
+	
+	
 	/** Peticion GET.
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	@Override
-	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		UVDatos datos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
 		datos.setDocType("<!DOCTYPE html>");
 		datos.setContentType("text/html");
 		
-		VistaMiembrosComision bean = new VistaMiembrosComision();		
+		VistaAlegaciones bean = new VistaAlegaciones();
 		Usuario usuario = datos.getUsuario();
+		
 		LOGGER.log(Level.FINEST, "usuario que ha entrado en el servlet es {0}", usuario.getUid());
 		
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
@@ -73,13 +85,10 @@ public class ControladorMiembrosComision extends HttpServlet {
 			}
 			switch (nombreAccion) {
 				case ACCION_INDEX:
-					obtenerAreas(bean);
-					break;	
-				case ACCION_LISTAR:
-					listado(datos, request, response);
+					bean.setVista(JSP_INDEX);
 					break;
 				default:
-					errorFatal(bean, "Acción no contemplada");
+					errorFatal(bean, MENSAJE_ERROR_ACCION_NO_CONTEMPLADA);
 			}
 		} catch (UVException e) {
 			LOGGER.log(Level.WARNING, e.toString());
@@ -101,15 +110,20 @@ public class ControladorMiembrosComision extends HttpServlet {
 		}
 	}
 	
-	private boolean init(VistaMiembrosComision bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
-		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/miembroscomision/index.jsp");
+	private boolean init(VistaAlegaciones bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+		bean.setVista(JSP_INDEX);
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		
 		try {
 			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getAndRefreshUsuario(datos));
 			
-			if (!bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRol.ID_ROL_SERVICIO_PERSONAL)) {
-				throw new UVException("No tienes permiso de personal");
+			// personal, comision, direccion
+			int[] rolesValidos = {ModeloRol.ID_ROL_SERVICIO_PERSONAL, ModeloRol.ID_ROL_DIRECTOR_DEPARTAMENTO, ModeloRol.ID_ROL_MIEMBRO_COMISION};
+			boolean contains = IntStream.of(rolesValidos).
+					anyMatch(x -> x == bean.getUsuarioLogeado().getRol().getCodNum());
+			
+			if (!contains) {
+				throw new UVException(MENSAJE_ERROR_SIN_PERMISO);
 			}
 		} catch (UVException e) {
 			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
@@ -122,7 +136,7 @@ public class ControladorMiembrosComision extends HttpServlet {
 		return true;
 	}
 	
-	private void errorFatal(VistaMiembrosComision bean, String mensaje) {
+	private void errorFatal(VistaAlegaciones bean, String mensaje) {
 		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/error.jsp");
 		bean.getMensajesDeError().add(mensaje);
 	}
@@ -131,23 +145,8 @@ public class ControladorMiembrosComision extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	@Override
-	public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		doGet(request, response);
 	}
-		
-	private void listado(UVDatos datos, HttpServletRequest request, HttpServletResponse response) {
-		
-	}
 	
-	/** muestra todas las areas en un select .
-	 * @param bean bean de la vista a la que poner los valores.
-	 * @throws SQLException excepcion de bbdd.
-	 */
-	private void obtenerAreas(VistaMiembrosComision bean) throws SQLException {
-		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/miembroscomision/index.jsp");
-		
-		ModeloArea modelo = ModeloArea.obtenerInstancia();
-		List<Area> areas = modelo.listaAreas();
-		bean.setAreas(areas);
-	}
 }

@@ -204,7 +204,7 @@ String justificacion = BolsaEmpleoUtils.getParamForm(request, ControladorContrat
 				<th scope="col" style="width:76px" class="center">Puntuación</th>
 				<th scope="col" style="width:76px" class="center">Confirmación</th>
 				<th scope="col" style="width:76px">Fecha confirmación</th>
-				<th scope="col" style="width:76px" class="center"></th>
+				<th scope="col" style="width:80px" class="center"></th>
 			</tr>
 			<tbody>
 			</tbody>
@@ -225,7 +225,7 @@ String justificacion = BolsaEmpleoUtils.getParamForm(request, ControladorContrat
 				<th scope="col" style="width:100px">Fecha cita</th>
 				<th scope="col" style="width:100px">Resultado cita</th>
 				<th scope="col" style="width:100px">Fecha resultado</th>
-				<th scope="col" style="width:76px" class="center"></th>
+				<th scope="col" style="width:80px" class="center"></th>
 			</tr>
 			<tbody>
 			</tbody>

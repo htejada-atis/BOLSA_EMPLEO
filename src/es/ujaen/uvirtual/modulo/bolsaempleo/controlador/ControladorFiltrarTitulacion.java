@@ -104,7 +104,9 @@ public class ControladorFiltrarTitulacion extends HttpServlet {
 		}
 		
 		try {
-			init(bean, datos, request, response);
+			if (!init(bean, datos, request, response)) {
+				return;
+			}
 			switch (nombreAccion) {
 				case ACCION_INDEX:
 					index(bean);
@@ -167,7 +169,7 @@ public class ControladorFiltrarTitulacion extends HttpServlet {
 		doGet(request, response);
 	}
 	
-	private void init(VistaFiltrar bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+	private boolean init(VistaFiltrar bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		bean.setVista(JSP_INDEX);
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		
@@ -182,7 +184,10 @@ public class ControladorFiltrarTitulacion extends HttpServlet {
 			LOGGER.log(Level.SEVERE, e.toString());
 			
 			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, e.getMessage());
+			return false;
 		}
+		
+		return true;
 	}
 	
 	private void index(VistaFiltrar bean) {

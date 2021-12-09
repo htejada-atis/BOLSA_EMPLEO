@@ -27,8 +27,10 @@ import es.ujaen.uvirtual.adm.CrearUsuario;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBolsa;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloConvocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloUsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.tareas.BaremarBolsa;
 import es.ujaen.uvirtual.utilidades.UVException;
@@ -72,6 +74,7 @@ public final class UtilsTestBolsaEmpleo {
 	 * @throws SQLException .
 	 * @throws IOException  .
 	 */
+	@SuppressWarnings({"checkstyle:JavaNCSS", "checkstyle:ExecutableStatementCount"})
 	public static void inicializaBolsaEmpleo() throws SQLException, IOException {
 		if (!cargado) {
 			// mocks esquema arcos
@@ -137,11 +140,18 @@ public final class UtilsTestBolsaEmpleo {
 			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/migraciones/27-parametroplantillaaprobacionplaza.sql");
 			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/migraciones/28-creadorplazaofertada.sql");
 			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/migraciones/29-parametrosplantillaemailcreacionplaza.sql");
+			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/migraciones/30-convocatoriafinalizada.sql");
+			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/migraciones/31-menusalegaciones.sql");
 			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/datos_desarrollo/datos_prueba_migraciones/01-im-solicitudbolsasmeritos.sql");
 			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/datos_desarrollo/datos_prueba_migraciones/02-im-prefijomeritospreferentes.sql");
 			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/datos_desarrollo/datos_prueba_migraciones/03-im-dedicaciones.sql");
 			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/datos_desarrollo/datos_prueba_migraciones/04-im-plazasofertadas.sql");
 			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/datos_desarrollo/datos_prueba_migraciones/05-im-plantillas.sql");
+			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/datos_desarrollo/datos_prueba_migraciones/06-im-convocatorias.sql");
+			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/datos_desarrollo/datos_prueba_migraciones/07-im-solicitudes.sql");
+			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/datos_desarrollo/datos_prueba_migraciones/08-im-solicitudbolsas.sql");
+			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/datos_desarrollo/datos_prueba_migraciones/09-im-solicitudbolsasmeritos.sql");
+			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/datos_desarrollo/datos_prueba_migraciones/10-im-solicitudbolsasmeritosvaloracion.sql");
 		}
 	}
 
@@ -348,14 +358,20 @@ public final class UtilsTestBolsaEmpleo {
 	
 	/** Barema una bolsa .
 	 * @param bolsa .
-	 * @throws IOException .
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	public static void baremarBolsa(Bolsa bolsa) throws SQLException, UVException, IOException {
+	public static void baremarBolsa(Bolsa bolsa) throws SQLException, UVException {
 		ModeloBolsa modeloBolsa = ModeloBolsa.obtenerInstancia();
 		bolsa.setEstado(ModeloBolsa.BOLSA_ESTADO_BLOQUEADA);
 		modeloBolsa.ponerBolsaComoPendienteBaremacion(bolsa, getUsuario("personal1"));
+		
+		// finalizamos la última convocatoria para que los resultados de la baremación aparezcan en contratación
+		ModeloConvocatoria modeloConvocatoria = ModeloConvocatoria.obtenerInstancia();
+		Convocatoria convocatoriaActual = modeloConvocatoria.getUltimaConvocatoria();
+		convocatoriaActual.setEstado(ModeloConvocatoria.CONVOCATORIA_ESTADO_FINALIZADA);
+		modeloConvocatoria.cambiaEstadoConvocatoria(convocatoriaActual, getUsuario("personal1"));
+		
 		BaremarBolsa.runFromTest();
 	}
 	

@@ -128,7 +128,9 @@ public class ControladorValidarNoAfines extends HttpServlet {
 		}
 		
 		try {
-			init(bean, datos, request, response);
+			if (!init(bean, datos, request, response)) {
+				return;
+			}
 			switch (nombreAccion) {
 				case ACCION_INDEX:
 					break;
@@ -177,7 +179,7 @@ public class ControladorValidarNoAfines extends HttpServlet {
 		doGet(request, response);
 	}
 	
-	private void init(VistaValidarNoAfines bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+	private boolean init(VistaValidarNoAfines bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		bean.setVista(JSP_INDEX);
 		bean.setConvocatoria(ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoria());
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
@@ -193,7 +195,10 @@ public class ControladorValidarNoAfines extends HttpServlet {
 			LOGGER.log(Level.SEVERE, e.toString());
 			
 			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, e.getMessage());
+			return false;
 		}
+		
+		return true;
 	}
 	
 	private void accionNodefinida(VistaValidarNoAfines bean) {

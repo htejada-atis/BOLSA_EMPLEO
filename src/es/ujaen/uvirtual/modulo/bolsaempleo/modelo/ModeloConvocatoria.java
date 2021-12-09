@@ -7,7 +7,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
@@ -25,18 +24,19 @@ import es.ujaen.uvirtual.utilidades.UVException;
 public class ModeloConvocatoria {
 	public static final int ORDER_COLUMN_INDEX_ID = 0;
 	public static final int ORDER_COLUMN_INDEX_DESCRIPCION = 1;
-	public static final int ORDER_COLUMN_INDEX_FECHACIERRE = 2;
-	public static final int ORDER_COLUMN_INDEX_ESTADO = 3;
-
+	public static final int ORDER_COLUMN_INDEX_ESTADO = 2;
+	public static final int ORDER_COLUMN_INDEX_FECHACIERRE = 3;
+	
 	public static final String CONVOCATORIA_ESTADO_ABIERTA = "ABIERTA";
 	public static final String CONVOCATORIA_ESTADO_CERRADA = "CERRADA";
-
+	public static final String CONVOCATORIA_ESTADO_FINALIZADA = "FINALIZADA";
+	
 	public static final int COLUMN_DESCRIPCION_MAXLENGTH = 150;
-
+	
 	public static final String MENSAJE_ERROR_NO_EXISTE_CONVOCATORIA = "No existe la convocatoria";
-
+	
 	protected static ModeloConvocatoria eInstancia;
-
+	
 	/**
 	 * Crea una instancia del objeto. de forma sincronizada para protegerse de
 	 * posibles problemas multi-hilo
@@ -46,7 +46,7 @@ public class ModeloConvocatoria {
 			eInstancia = new ModeloConvocatoria();
 		}
 	}
-
+	
 	/**
 	 * Obtiene una instancia de la conexión.
 	 * 
@@ -58,7 +58,7 @@ public class ModeloConvocatoria {
 		}
 		return eInstancia;
 	}
-
+	
 	/**
 	 * Listado de bolsas de convocatorias.
 	 * 
@@ -71,15 +71,16 @@ public class ModeloConvocatoria {
 			throws SQLException, UVException {
 		List<Convocatoria> data = new ArrayList<>();
 		BolsaEmpleoDataTable<Convocatoria> dataTable = new BolsaEmpleoDataTable<>(params);
-
-		String consulta = "SELECT bepcon.* FROM TBEP_CONVOCATORIAS bepcon WHERE 1=1 ";
-
+		
+		String consulta = "SELECT bepcon.*"
+				+ " FROM TBEP_CONVOCATORIAS bepcon";
+		
 		dataTable.setColumn(ORDER_COLUMN_INDEX_ID, "bepcon.CODNUM");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_DESCRIPCION, "bepcon.DESCRIPCION");
-		dataTable.setColumn(ORDER_COLUMN_INDEX_FECHACIERRE, "bepcon.FECHACIERRE");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_ESTADO, "bepcon.ESTADO");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_FECHACIERRE, "bepcon.FECHACIERRE");
 		dataTable.setQuery(consulta);
-
+		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
 				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery())) {
@@ -88,46 +89,42 @@ public class ModeloConvocatoria {
 					data.add(this.createFromResultSet(rs));
 				}
 			}
-
+			
 			dataTable.setRecordsTotalFromQuery(stmtCount);
 			dataTable.setData(data);
 		}
-
+		
 		return dataTable;
 	}
-
-	/**
-	 * Comprueba si hay convocatorias abiertas.
-	 * 
-	 * @return .
+	
+	/** Comprueba si hay convocatorias no finalizadas.
+	 * @return true o false .
 	 * @throws SQLException .
 	 */
-	public boolean hayConvocatoriaAbierta() throws SQLException {
-		String consulta = "SELECT COUNT(1) numero_convocatorias_abiertas FROM TBEP_CONVOCATORIAS bepcon WHERE bepcon.ESTADO = ?";
-
+	public boolean hayConvocatoriaNoFinalizada() throws SQLException {
+		String consulta = "SELECT COUNT(*) count_convocatorias FROM TBEP_CONVOCATORIAS bepcon WHERE bepcon.ESTADO != ?";
+		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
-			stmt.setString(1, CONVOCATORIA_ESTADO_ABIERTA);
+			stmt.setString(1, CONVOCATORIA_ESTADO_FINALIZADA);
 			try (ResultSet rs = stmt.executeQuery()) {
-				if (rs.next() && rs.getInt("numero_convocatorias_abiertas") > 0) {
-					return true;					
+				if (rs.next() && rs.getInt("count_convocatorias") > 0) {
+					return true;
 				}
 			}
 		}
-
+		
 		return false;
 	}
-
-	/**
-	 * Consulta titulaciones en BBDD y las devuelve.
-	 * 
-	 * @return todas las titulaciones de la base de datos .
-	 * @throws SQLException en caso de error de base de datos
+	
+	/** Consulta convocatorias en BBDD y las devuelve .
+	 * @return todas las convocatorias de la base de datos .
+	 * @throws SQLException en caso de error de base de datos .
 	 * @throws UVException .
 	 */
 	public List<Convocatoria> listaConvocatorias() throws SQLException {
 		List<Convocatoria> convocatorias = new ArrayList<>();
-		String consulta = "SELECT bepcon.* FROM TBEP_CONVOCATORIAS bepcon";
-
+		String consulta = "SELECT bepcon.* FROM TBEP_CONVOCATORIAS bepcon ORDER BY CODNUM";
+		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
@@ -135,7 +132,35 @@ public class ModeloConvocatoria {
 				}
 			}
 		}
-
+		
+		return convocatorias;
+	}
+	
+	/** Lista de convocatorias en las que participa un candidato además de la última convocatoria .
+	 * @param candidato .
+	 * @return convocatorias .
+	 * @throws SQLException en caso de error de base de datos .
+	 * @throws UVException .
+	 */
+	public List<Convocatoria> listaConvocatoriasCandidato(UsuarioBolsaEmpleo candidato) throws SQLException {
+		List<Convocatoria> convocatorias = new ArrayList<>();
+		String consulta = "SELECT bepcon.* FROM TBEP_CONVOCATORIAS bepcon"
+				+ " LEFT JOIN TBEP_SOLICITUDES bepsol ON bepsol.BEPCON_CODNUM = bepcon.CODNUM AND bepsol.BEPUSU_CODNUM = ?"
+				+ " WHERE bepsol.CODNUM IS NOT NULL OR bepcon.CODNUM = ?"
+				+ " ORDER BY bepcon.CODNUM";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			int parameterIndex = 1;
+			stmt.setInt(parameterIndex++, candidato.getCodNum());
+			stmt.setInt(parameterIndex++, this.getUltimaConvocatoria().getCodNum());
+			
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					convocatorias.add(this.createFromResultSet(rs));
+				}
+			}
+		}
+		
 		return convocatorias;
 	}
 
@@ -206,7 +231,9 @@ public class ModeloConvocatoria {
 	 * @throws SQLException .
 	 */
 	public Convocatoria getConvocatoriaById(int codNum) throws SQLException, UVException {
-		String consulta = "SELECT bepcon.* FROM TBEP_CONVOCATORIAS bepcon WHERE bepcon.CODNUM = ?";
+		String consulta = "SELECT bepcon.*"
+				+ " FROM TBEP_CONVOCATORIAS bepcon"
+				+ " WHERE bepcon.CODNUM = ?";
 
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			stmt.setInt(1, codNum);
@@ -215,16 +242,8 @@ public class ModeloConvocatoria {
 				if (!rs.next()) {
 					throw new UVException(MENSAJE_ERROR_NO_EXISTE_CONVOCATORIA);
 				}
-
-				Convocatoria convocatoria = new Convocatoria();
-				convocatoria.setCodNum(rs.getInt("CODNUM"));
-				convocatoria.setDescripcion(rs.getString("DESCRIPCION"));
-				convocatoria.setEstado(rs.getString("ESTADO"));
-				convocatoria.setFechaCierre(rs.getDate("FECHACIERRE"));
-				convocatoria.setNumBolsasMaximo(rs.getInt("NUMBOLSASMAXIMO"));
-				convocatoria.setNumMeritosPorBloque(rs.getInt("NUMMERITOSPORBLOQUE"));
-
-				return convocatoria;
+				
+				return createFromResultSet(rs);
 			}
 		}
 	}
@@ -238,9 +257,8 @@ public class ModeloConvocatoria {
 	 */
 	public Integer getNumSolicitudesByConvocatoriaId(int codNum) throws SQLException {
 		String consulta = "SELECT COUNT(*) AS total FROM TBEP_SOLICITUDES bepsol WHERE bepsol.BEPCON_CODNUM = ?";
-
+		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
-
 			stmt.setInt(1, codNum);
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
@@ -249,6 +267,36 @@ public class ModeloConvocatoria {
 			}
 		}
 		return null;
+	}
+	
+	/** Devuelve si una convocatoria contiene méritos sin validar .
+	 * @param convocatoria .
+	 * @return true o false .
+	 * @throws SQLException .
+	 */
+	public boolean contieneMeritosSinValidar(Convocatoria convocatoria) throws SQLException {
+		String consulta = "SELECT COUNT(*) COUNT_SIN_VALIDAR"
+				+ " FROM TBEP_SOLICITUDES bepsol"
+				+ " INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbo.BEPSOL_CODNUM = bepsol.CODNUM"
+				+ " INNER JOIN TBEP_SOL_BOL_MERITOS bepsbm ON bepsbm.BEPSBO_CODNUM = bepsbo.CODNUM"
+				+ " INNER JOIN TBEP_USUARIOS bepusu ON bepusu.CODNUM = bepsol.BEPUSU_CODNUM"
+				+ " WHERE bepsol.BEPCON_CODNUM = ?"
+				+ "     AND bepusu.ROL = " + ModeloRol.ID_ROL_CANDIDATO
+				+ "     AND bepsol.ESTADO = 'CERRADA' "
+				+ "     AND bepusu.FLGBORRADO = 'N'"
+				+ "     AND bepsbm.FLGVALIDADO = 'N'"
+				+ "     AND bepsbm.FLGEXCLUIDO = 'N'";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			stmt.setInt(1, convocatoria.getCodNum());
+			try (ResultSet rs = stmt.executeQuery()) {
+				if (rs.next() && rs.getInt("COUNT_SIN_VALIDAR") > 0) {
+					return true;
+				}
+			}
+		}
+		
+		return false;
 	}
 
 	/**
@@ -273,7 +321,7 @@ public class ModeloConvocatoria {
 			stmt.setInt(parameterIndex++, conv.getNumBolsasMaximo());
 			stmt.setInt(parameterIndex++, conv.getNumMeritosPorBloque());
 			stmt.setString(parameterIndex++, usuarioUpdate.getCodCuenta());
-			stmt.setInt(parameterIndex++, conv.getCodNum());			
+			stmt.setInt(parameterIndex++, conv.getCodNum());
 			stmt.executeUpdate();
 		}
 	}
@@ -297,7 +345,7 @@ public class ModeloConvocatoria {
 				int parameterIndex = 1;
 				stmt.setString(parameterIndex++, conv.getEstado());
 				stmt.setString(parameterIndex++, usuarioUpdate.getCodCuenta());
-				stmt.setInt(parameterIndex++, conv.getCodNum());			
+				stmt.setInt(parameterIndex++, conv.getCodNum());
 				stmt.executeUpdate();
 			}
 		}
@@ -320,7 +368,7 @@ public class ModeloConvocatoria {
 				
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia()) {
 			String consultaUpdate = "UPDATE tbep_convocatorias SET UID_USUARIO=? WHERE codnum = ?";
-			try (PreparedStatement stmt = conexion.prepareStatement(consultaUpdate)) {		
+			try (PreparedStatement stmt = conexion.prepareStatement(consultaUpdate)) {
 				int parameterIndex = 1;
 				stmt.setString(parameterIndex++, usuarioDetele.getCodCuenta());
 				stmt.setInt(parameterIndex++, conv.getCodNum());
@@ -328,14 +376,14 @@ public class ModeloConvocatoria {
 			}
 			
 			String consulta = "DELETE FROM tbep_convocatorias WHERE codnum = ?";
-			try (PreparedStatement stmt = conexion.prepareStatement(consulta)) {		
+			try (PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 				int parameterIndex = 1;
 				stmt.setInt(parameterIndex++, conv.getCodNum());
 				stmt.executeUpdate();
 			}
 		}
 	}
-
+	
 	/**
 	 * Devuelve la última convocatoria o null si no hay.
 	 * 
@@ -345,6 +393,28 @@ public class ModeloConvocatoria {
 	 */
 	public Convocatoria getUltimaConvocatoria() throws SQLException {
 		String consulta = "SELECT bepcon.* FROM TBEP_CONVOCATORIAS bepcon ORDER BY bepcon.CODNUM DESC FETCH FIRST 1 ROW ONLY";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					return this.createFromResultSet(rs);
+				}
+			}
+		}
+		
+		return null;
+	}
+	
+	/**
+	 * Devuelve la última convocatoria finalizada o null si no hay.
+	 * 
+	 * @return .
+	 * @throws UVException  .
+	 * @throws SQLException .
+	 */
+	public Convocatoria getUltimaConvocatoriaFinalizada() throws SQLException {
+		String consulta = String.format("SELECT * FROM TBEP_CONVOCATORIAS WHERE ESTADO = '%s' ORDER BY CODNUM DESC FETCH FIRST 1 ROW ONLY",
+				CONVOCATORIA_ESTADO_FINALIZADA);
 
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			try (ResultSet rs = stmt.executeQuery()) {
@@ -403,7 +473,7 @@ public class ModeloConvocatoria {
 					int parameterIndex = 1;
 					stmt.setString(parameterIndex++, CONVOCATORIA_ESTADO_CERRADA);
 					stmt.setString(parameterIndex++, usuarioUpdate);
-					stmt.setInt(parameterIndex++, conv.getCodNum());			
+					stmt.setInt(parameterIndex++, conv.getCodNum());
 					stmt.executeUpdate();
 				}
 				
@@ -433,12 +503,10 @@ public class ModeloConvocatoria {
 	 */
 	public boolean isConvocatoriaCerrada(Convocatoria c) {
 		return c.getEstado().equals(CONVOCATORIA_ESTADO_CERRADA) 
-				|| c.getFechaCierre().before(BolsaEmpleoUtils.getCurrentDateTime());				
+				|| c.getFechaCierre().before(BolsaEmpleoUtils.getCurrentDateTime());
 	}
 	
-	/**
-	 * Crea una convocatoria a partir de un resulset.
-	 * 
+	/** Crea una convocatoria a partir de un resulset.
 	 * @param rs .
 	 * @return .
 	 * @throws SQLException .
@@ -449,6 +517,7 @@ public class ModeloConvocatoria {
 		convocatoria.setCodNum(rs.getInt("CODNUM"));
 		convocatoria.setDescripcion(rs.getString("DESCRIPCION"));
 		convocatoria.setFechaCierre(rs.getDate("FECHACIERRE"));
+		convocatoria.setFechaFinalizacion(rs.getDate("FECHA_FINALIZACION"));
 		convocatoria.setEstado(rs.getString("ESTADO"));
 		convocatoria.setNumBolsasMaximo(rs.getInt("NUMBOLSASMAXIMO"));
 		convocatoria.setNumMeritosPorBloque(rs.getInt("NUMMERITOSPORBLOQUE"));

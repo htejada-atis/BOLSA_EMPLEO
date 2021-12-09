@@ -891,7 +891,7 @@ public class ModeloPlazaOfertada {
 				int idMensaje = ModeloMensajes.obtenerInstancia().nuevoMensajeConexion(mensaje, usuarioUpdate, conexion);
 				
 				// Obtenemos los candidatos disponibles y los insertamos para enviar el mensaje de la plaza
-				listaDestinatariosPlaza(plaza, idMensaje, usuarioUpdate, ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoria(), conexion);
+				listaDestinatariosPlaza(plaza, idMensaje, usuarioUpdate, ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoriaFinalizada(), conexion);
 				
 				// Actualizamos el estado del mensaje a 'ENVIANDO'
 				String consultaUpdateMsg = String.format("UPDATE TBEP_MENSAJES SET %s=?, %s=? WHERE %s=?",

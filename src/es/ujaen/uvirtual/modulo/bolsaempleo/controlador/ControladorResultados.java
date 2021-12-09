@@ -19,7 +19,6 @@ import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaResultado;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.CandidatoResultadoTable;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloConvocatoria;
@@ -39,12 +38,12 @@ import es.ujaen.uvirtual.utilidades.UVException;
  * Controlador de resultados .
  */
 @WebServlet(
-	name = "informacionadministrativa.bolsaempleo.resultados", 
-	description = "Resultado de la última baremación", 
-	urlPatterns = { 
-			"/srv/es/informacionadministrativa/bolsaempleo/resultados", 
+	name = "informacionadministrativa.bolsaempleo.resultados",
+	description = "Resultado de la última baremación",
+	urlPatterns = {
+			"/srv/es/informacionadministrativa/bolsaempleo/resultados",
 			"/srv/en/informacionadministrativa/bolsaempleo/resultados",
-			"/srv/es/ajax/informacionadministrativa/bolsaempleo/resultados", 
+			"/srv/es/ajax/informacionadministrativa/bolsaempleo/resultados",
 			"/srv/en/ajax/informacionadministrativa/bolsaempleo/resultados"
 	})
 public class ControladorResultados extends HttpServlet {
@@ -57,6 +56,7 @@ public class ControladorResultados extends HttpServlet {
 	public static final String PARAM_ACCION = "a";
 	public static final String PARAM_BOLSA = "bolsa";
 	public static final String PARAM_CANDIDATO = "candidato";
+	public static final String PARAM_CONVOCATORIA = "convocatoria";
 	
 	// acciones
 	public static final String ACCION_INDEX = "listar";
@@ -67,17 +67,15 @@ public class ControladorResultados extends HttpServlet {
 	public static final String ACCION_EXPORTAR_RESULTADOS = "exportarresultados";
 	
 	// mensajes
-	public static final String MENSAJE_ERROR_FOO = "Mensaje de error";
 	public static final String MENSAJE_ERROR_ACCION_NO_CONTEMPLADA = "Acción no contemplada";
 	public static final String MENSAJE_ERROR_SIN_PERMISO = "No tienes permiso";
-	public static final String MENSAJE_EXITO_BAR = "Mensaje de exito";
 	
 	// ruta vistas
 	public static final String RUTA_BEP_RESULTADOS = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/resultados/";
-	public static final String JSP_INDEX = RUTA_BEP_RESULTADOS + "index.jsp";	
+	public static final String JSP_INDEX = RUTA_BEP_RESULTADOS + "index.jsp";
 	public static final String JSP_RESULTADOS_AREA = RUTA_BEP_RESULTADOS + "resultadosarea.jsp";
 	public static final String JSP_RESULTADO_DETALLE = RUTA_BEP_RESULTADOS + "resultadodetalle.jsp";
-
+	
 	// ajax
 	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/resultados";
 	public static final String RESPONSE_AJAX_CONTENTTYPE = "application/json";
@@ -109,10 +107,12 @@ public class ControladorResultados extends HttpServlet {
 		}
 		
 		try {
-			init(bean, datos, request, response);
+			if (!init(bean, datos, request, response)) {
+				return;
+			}
 			switch (nombreAccion) {
 				case ACCION_INDEX:
-					bean.setVista(JSP_INDEX);
+					bean.setListaConvocatorias(ModeloConvocatoria.obtenerInstancia().listaConvocatorias());
 					break;
 				case ACCION_DATATABLE_BOLSAS:
 					listadoBolsas(bean, datos, request, response);
@@ -123,7 +123,7 @@ public class ControladorResultados extends HttpServlet {
 					accionesBolsa(bean, datos, request, response, nombreAccion);
 					break;
 				case ACCION_EXPORTAR_RESULTADOS:
-					exportarResultados(datos, request, response);
+					exportarResultados(bean, datos, request, response);
 					break;
 				default:
 					errorFatal(bean, MENSAJE_ERROR_ACCION_NO_CONTEMPLADA);
@@ -148,9 +148,16 @@ public class ControladorResultados extends HttpServlet {
 		}
 	}
 	
-	private void init(VistaResultados bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+	private boolean init(VistaResultados bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		bean.setVista(JSP_INDEX);
-		bean.setConvocatoria(ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoria());
+		
+		Integer idConvocatoria = Formateador.leeParametroInteger(BolsaEmpleoUtils.getParamRequestOrSession(request, PARAM_CONVOCATORIA));
+		if (idConvocatoria != null) {
+			bean.setConvocatoria(ModeloConvocatoria.obtenerInstancia().getConvocatoriaById(idConvocatoria));
+		} else {
+			bean.setConvocatoria(ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoria());
+		}
+		
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		
 		try {
@@ -169,7 +176,10 @@ public class ControladorResultados extends HttpServlet {
 			LOGGER.log(Level.SEVERE, e.toString());
 			
 			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, e.getMessage());
+			return false;
 		}
+		
+		return true;
 	}
 	
 	private void errorFatal(VistaResultados bean, String mensaje) {
@@ -206,7 +216,7 @@ public class ControladorResultados extends HttpServlet {
 		}
 	}
 	
-	private void seleccionarCandidato(VistaResultados bean, HttpServletRequest request) throws SQLException, UVException, IOException {
+	private void seleccionarCandidato(VistaResultados bean, HttpServletRequest request) throws SQLException, UVException {
 		ModeloResultados modeloResultados = ModeloResultados.obtenerInstancia();
 		
 		bean.setVista(JSP_RESULTADO_DETALLE);
@@ -228,12 +238,10 @@ public class ControladorResultados extends HttpServlet {
 		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
 		
-		ModeloConvocatoria modeloConvocatoria = ModeloConvocatoria.obtenerInstancia();
-		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
-				BolsaEmpleoDataTable<BolsaResultado> dataTable = modelo.listaBolsasResultadosDatatable(bean.getUsuarioLogeado(), 
-						modeloConvocatoria.getUltimaConvocatoria(), request.getParameterMap());
+				BolsaEmpleoDataTable<BolsaResultado> dataTable = modelo.listaBolsasResultadosDatatable(bean.getUsuarioLogeado(),
+						bean.getConvocatoria(), request.getParameterMap());
 				bean.setDataTableBolsas(dataTable);
 				writer.write(dataTable.toJson("dd/MM/yyyy"));
 			} catch (UVException | SQLException e) {
@@ -280,19 +288,18 @@ public class ControladorResultados extends HttpServlet {
 		}
 	}
 	
-	private void exportarResultados(UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException {
+	private void exportarResultados(VistaResultados bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException {
 		
 		Integer idBolsa = Formateador.leeParametroInteger(BolsaEmpleoUtils.getParamRequestOrSession(request, PARAM_BOLSA));
 		
 		datos.setRespuestaEnviada(true);
-		datos.setContentType(RESPONSE_CSV_CONTENTTYPE);		
+		datos.setContentType(RESPONSE_CSV_CONTENTTYPE);
 		response.setContentType(RESPONSE_CSV_CONTENTTYPE);
 		response.setCharacterEncoding(RESPONSE_CSV_ENCODING);
 		response.setHeader("Content-Disposition", "attachment; filename=\"resultados-bolsa-" + idBolsa + ".csv\"");
 		
 		Bolsa bolsa = ModeloBolsa.obtenerInstancia().getBolsaById(idBolsa);
-		Convocatoria convocatoria = ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoria();
-		List<String[]> rows = ModeloResultados.obtenerInstancia().listadoResultadosCandidatosAreaCsv(bolsa, convocatoria);
+		List<String[]> rows = ModeloResultados.obtenerInstancia().listadoResultadosCandidatosAreaCsv(bolsa, bean.getConvocatoria());
 		
 		try (ServletOutputStream stream = response.getOutputStream()) {
 			try (PrintWriter printer = new PrintWriter(stream)) {

@@ -170,7 +170,9 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		}
 		
 		try {
-			init(bean, datos, request, response);
+			if (!init(bean, datos, request, response)) {
+				return;
+			}
 			switch (nombreAccion) {
 				case ACCION_INDEX:
 					indice(bean);
@@ -247,7 +249,7 @@ public class ControladorItemsBaremacion extends HttpServlet {
 		bean.setVista(JSP_ITEM_BAREMACION);
 	}
 	
-	private void init(VistaItemsBaremacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+	private boolean init(VistaItemsBaremacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		bean.setVista(JSP_ITEM_BAREMACION);
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		
@@ -262,7 +264,10 @@ public class ControladorItemsBaremacion extends HttpServlet {
 			LOGGER.log(Level.SEVERE, e.toString());
 			
 			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, e.getMessage());
-		}		
+			return false;
+		}
+		
+		return true;		
 	}
 	
 	private void errorFatal(VistaItemsBaremacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, UVException {

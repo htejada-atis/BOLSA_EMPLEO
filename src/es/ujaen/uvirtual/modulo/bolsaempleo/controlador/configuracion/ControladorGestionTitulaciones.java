@@ -95,7 +95,9 @@ public class ControladorGestionTitulaciones extends HttpServlet {
 		}
 		
 		try {
-			init(bean, datos, request, response);
+			if (!init(bean, datos, request, response)) {
+				return;
+			}
 			switch (nombreAccion) {
 				case ACCION_INDEX:
 					bean.setVista(RUTA_BEP_CONF + "titulaciones.jsp");
@@ -131,7 +133,7 @@ public class ControladorGestionTitulaciones extends HttpServlet {
 		}
 	}
 	
-	private void init(VistaTitulaciones bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+	private boolean init(VistaTitulaciones bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		bean.setVista(RUTA_BEP_CONF + "titulaciones.jsp");
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		
@@ -146,7 +148,10 @@ public class ControladorGestionTitulaciones extends HttpServlet {
 			LOGGER.log(Level.SEVERE, e.toString());
 			
 			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, e.getMessage());
-		}		
+			return false;
+		}
+		
+		return true;		
 	}
 	
 	private void errorFatal(VistaTitulaciones bean, String mensaje) {

@@ -218,7 +218,9 @@ public class ControladorContratacion extends HttpServlet {
 		}
 		try {
 			
-			init(bean, datos, request, response);
+			if (!init(bean, datos, request, response)) {
+				return;
+			}
 			
 			switch (nombreAccion) {
 				case ACCION_COMPROBAR_CONTRATACION_PLAZA:
@@ -276,7 +278,7 @@ public class ControladorContratacion extends HttpServlet {
 		}
 	}
 	
-	private void init(VistaContratacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
+	private boolean init(VistaContratacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
 			throws SQLException, UVException, IOException {
 		bean.setVista(JSP_INDEX);
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
@@ -295,7 +297,10 @@ public class ControladorContratacion extends HttpServlet {
 		} catch (UVException e) {
 			LOGGER.log(Level.WARNING, e.toString());
 			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, e.getMessage());
+			return false;
 		}
+		
+		return true;
 	}
 	
 	private void errorFatal(VistaContratacion bean, String mensaje) {
@@ -442,7 +447,7 @@ public class ControladorContratacion extends HttpServlet {
 			}
 			
 			Solicitud solicitud = ModeloSolicitud.obtenerInstancia().getSolicitudByConvocatoriaUsuario(contratacion.getCandidato(), 
-					ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoria());
+					ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoriaFinalizada());
 			
 			List<Bolsa> listaBolsas = modeloBolsa.getBolsasByAreaDepartamentoEnSolicitud(plaza.getArea(), solicitud);
 			for (Bolsa bolsa: listaBolsas) {
@@ -666,7 +671,7 @@ public class ControladorContratacion extends HttpServlet {
 				UsuarioBolsaEmpleo candidato = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioById(idCandidato);
 				
 				List<OfertaCandidato> listaOfertas = ModeloOfertaCandidato.obtenerInstancia().listaOfertasCandidatoPreferentes(candidato,
-						modeloConvocatoria.getUltimaConvocatoria());
+						modeloConvocatoria.getUltimaConvocatoriaFinalizada());
 				bean.setListaOfertas(listaOfertas);
 				
 				writer.write(new Gson().toJson(listaOfertas));
@@ -688,7 +693,7 @@ public class ControladorContratacion extends HttpServlet {
 		response.setHeader("Content-Disposition", "attachment; filename=\"candidatos_plaza_" + plaza + ".csv\"");
 		
 		List<String[]> rows = ModeloPlazaOfertada.obtenerInstancia().listadoCandidatosCsv(bean.getPlazaOfertada(), 
-				ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoria());
+				ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoriaFinalizada());
 		
 		try (ServletOutputStream stream = response.getOutputStream()) {
 			try (PrintWriter printer = new PrintWriter(stream)) {
@@ -714,7 +719,7 @@ public class ControladorContratacion extends HttpServlet {
 		response.setHeader("Content-Disposition", "attachment; filename=\"plazas_" + current + ".csv\"");
 		
 		ModeloConvocatoria modeloConvocatoria = ModeloConvocatoria.obtenerInstancia();
-		List<String[]> rows = ModeloPlazaOfertada.obtenerInstancia().listadoPlazasCsv(modeloConvocatoria.getUltimaConvocatoria());
+		List<String[]> rows = ModeloPlazaOfertada.obtenerInstancia().listadoPlazasCsv(modeloConvocatoria.getUltimaConvocatoriaFinalizada());
 		
 		try (ServletOutputStream stream = response.getOutputStream()) {
 			try (PrintWriter printer = new PrintWriter(stream)) {
@@ -741,7 +746,7 @@ public class ControladorContratacion extends HttpServlet {
 		try (PrintWriter writer = response.getWriter()) {
 			try {
 				BolsaEmpleoDataTable<OfertaCandidato> dataTable = ModeloPlazaOfertada.obtenerInstancia().listadoCandidatosDisponibles(
-						request.getParameterMap(), bean.getPlazaOfertada(), modeloConvocatoria.getUltimaConvocatoria());
+						request.getParameterMap(), bean.getPlazaOfertada(), modeloConvocatoria.getUltimaConvocatoriaFinalizada());
 				bean.setDatatableCandidatos(dataTable);
 				writer.write(dataTable.toJson("dd/M/yyyy HH:mm:ss"));
 			} catch (UVException | SQLException e) {
@@ -770,7 +775,7 @@ public class ControladorContratacion extends HttpServlet {
 		try (PrintWriter writer = response.getWriter()) {
 			try {
 				BolsaEmpleoDataTable<CandidatoEstado> dataTable = ModeloEstadoCandidato.obtenerInstancia().listaEstadosCandidatoDisponiblesPlaza(
-						request.getParameterMap(), bean.getPlazaOfertada(), modeloConvocatoria.getUltimaConvocatoria());
+						request.getParameterMap(), bean.getPlazaOfertada(), modeloConvocatoria.getUltimaConvocatoriaFinalizada());
 				bean.setDatatableCandidatosEstado(dataTable);
 				writer.write(dataTable.toJson("dd/M/yyyy HH:mm:ss"));
 			} catch (UVException | SQLException e) {

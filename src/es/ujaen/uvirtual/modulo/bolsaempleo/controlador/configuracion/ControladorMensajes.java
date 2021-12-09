@@ -153,7 +153,9 @@ public class ControladorMensajes extends HttpServlet {
 		}
 		
 		try {
-			init(bean, datos, request, response);
+			if (!init(bean, datos, request, response)) {
+				return;
+			}
 			switch (nombreAccion) {
 				case ACCION_AGREGAR_DESTINATARIOS:
 				case ACCION_AGREGAR_EMAIL_DESTINATARIO:
@@ -199,7 +201,7 @@ public class ControladorMensajes extends HttpServlet {
 		}
 	}
 
-	private void init(VistaMensajes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+	private boolean init(VistaMensajes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		bean.setVista(JSP_INDEX);
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		
@@ -214,7 +216,10 @@ public class ControladorMensajes extends HttpServlet {
 			LOGGER.log(Level.SEVERE, e.toString());
 			
 			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, e.getMessage());
+			return false;
 		}
+		
+		return true;
 	}
 
 	private void errorFatal(VistaMensajes bean, String mensaje) {

@@ -93,7 +93,9 @@ public class ControladorFiltrarAcreditaciones extends HttpServlet {
 		}
 		
 		try {
-			init(bean, datos, request, response);
+			if (!init(bean, datos, request, response)) {
+				return;
+			}
 			switch (nombreAccion) {
 				case ACCION_ACREDITACION_DESELECCIONADA:
 				case ACCION_ACREDITACION_SELECCIONADA:
@@ -129,7 +131,7 @@ public class ControladorFiltrarAcreditaciones extends HttpServlet {
 		}
 	}
 	
-	private void init(VistaFiltrarAcreditaciones bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+	private boolean init(VistaFiltrarAcreditaciones bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		bean.setVista(JSP_INDEX);
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		
@@ -144,7 +146,10 @@ public class ControladorFiltrarAcreditaciones extends HttpServlet {
 			LOGGER.log(Level.SEVERE, e.toString());
 			
 			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, e.getMessage());
+			return false;
 		}
+		
+		return true;
 	}
 	
 	private void errorFatal(VistaFiltrarAcreditaciones bean, String mensaje) {
