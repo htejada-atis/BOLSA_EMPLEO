@@ -63,24 +63,24 @@ public class TestBEPModeloConvocatoria {
 		convocatoria.setNumMeritosPorBloque(NUM);
 		ModeloConvocatoria modelo = ModeloConvocatoria.obtenerInstancia();
 		Integer codNum = modelo.nuevaConvocatoria(convocatoria, UtilsTestBolsaEmpleo.getUsuario("personal1"));
-
+		
 		Convocatoria convocatoriaCont = modelo.getConvocatoriaById(codNum);
-		assertEquals(Formateador.formatoFecha(convocatoriaCont.getFechaCierre(), Formateador.FORMATO_FECHA_DDMMYYYY), 
+		assertEquals(Formateador.formatoFecha(convocatoriaCont.getFechaCierre(), Formateador.FORMATO_FECHA_DDMMYYYY),
 				Formateador.formatoFecha(FECHACOMISION, Formateador.FORMATO_FECHA_DDMMYYYY));
 		assertEquals(convocatoriaCont.getDescripcion(), CADENA);
 		assertEquals(convocatoriaCont.getEstado(), ESTADO);
 		assertEquals(convocatoriaCont.getNumBolsasMaximo(), NUM);
 		assertEquals(convocatoriaCont.getNumMeritosPorBloque(), NUM);
-
+		
 		List<Convocatoria> convocatorias = modelo.listaConvocatorias();
 		Boolean eje = false;
-
+		
 		for (Convocatoria conv : convocatorias) {
 			if (conv.getCodNum().equals(convocatoriaCont.getCodNum())) {
 				eje = true;
 			}
 		}
-
+		
 		assertTrue("convocatoria insertada debe ser listada", eje);
 	}
 

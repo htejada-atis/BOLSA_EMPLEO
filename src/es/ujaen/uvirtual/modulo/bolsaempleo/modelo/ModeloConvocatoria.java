@@ -12,6 +12,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
+import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable.DataTableColumn;
 import es.ujaen.uvirtual.utilidades.UVException;
 
 /**
@@ -72,18 +73,18 @@ public class ModeloConvocatoria {
 		List<Convocatoria> data = new ArrayList<>();
 		BolsaEmpleoDataTable<Convocatoria> dataTable = new BolsaEmpleoDataTable<>(params);
 		
-		String consulta = "SELECT bepcon.*"
-				+ " FROM TBEP_CONVOCATORIAS bepcon";
+		String consulta = "SELECT bepcon.* FROM TBEP_CONVOCATORIAS bepcon WHERE 1=1 ";
 		
 		dataTable.setColumn(ORDER_COLUMN_INDEX_ID, "bepcon.CODNUM");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_DESCRIPCION, "bepcon.DESCRIPCION");
-		dataTable.setColumn(ORDER_COLUMN_INDEX_ESTADO, "bepcon.ESTADO");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_ESTADO, "bepcon.ESTADO", DataTableColumn.COLUMN_TYPE_EXACT);
 		dataTable.setColumn(ORDER_COLUMN_INDEX_FECHACIERRE, "bepcon.FECHACIERRE");
 		dataTable.setQuery(consulta);
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
 				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery())) {
+			dataTable.setFiltersParams(stmt, stmtCount, 1);
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
 					data.add(this.createFromResultSet(rs));

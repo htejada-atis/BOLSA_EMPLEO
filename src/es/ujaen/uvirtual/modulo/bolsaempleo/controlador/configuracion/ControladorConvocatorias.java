@@ -60,7 +60,6 @@ public class ControladorConvocatorias extends HttpServlet {
 	public static final String ACCION_CERRAR_CONVOCATORIA = "cerrarConvocatoria";
 	public static final String ACCION_DATATABLE = "datatable";
 	public static final String ACCION_FINALIZAR_CONVOCATORIA = "finalizarconvocatoria";
-	public static final String ACCION_FORMULARIO_EDITAR_CONVOCATORIA = "formEditarConvocatoria";
 	public static final String ACCION_INDEX = "listar";
 	public static final String ACCION_MODIFICAR_CONVOCATORIA = "editConvocatoria";
 	public static final String ACCION_SELECCIONAR_CONVOCATORIA = "seleccionarconvocatoria";
@@ -72,7 +71,7 @@ public class ControladorConvocatorias extends HttpServlet {
 			"Los apartados de baremación no alcanzan el 100% de porcentaje, porfavor edite los apartados antes de abrir una convocatoria";
 	public static final String MENSAJE_ERROR_BOLSAS_BLOQUEADAS = "Debe desbloquear primero el total de las bolsas para abrir la convocatoria";
 	public static final String MENSAJE_ERROR_CONVOCATORIAS_ABIERTAS = "Ya existen convocatorias abiertas.";
-	public static final String MENSAJE_ERROR_CONVOCATORIAS_NO_FINALIZADAS = "No se puede añadir una nueva convocatoria si hay convocatorias no finalizadas";
+	public static final String MENSAJE_ERROR_EXISTE_CONVOCATORIA_NO_FINALIZADA = "No se puede añadir una nueva convocatoria si hay convocatoria no finalizada";
 	public static final String MENSAJE_ERROR_DESCRIPCION_LARGA = "La descripción no puede ser superior a %d";
 	public static final String MENSAJE_ERROR_DESCRIPCION_VACIA = "La descripción no puede estar vacia";
 	public static final String MENSAJE_ERROR_EDITAR_CONVOCATORIA_CON_SOLICITUDES = "No puede editar la convocatoria, ya existen solicitudes para ella";
@@ -224,22 +223,20 @@ public class ControladorConvocatorias extends HttpServlet {
 	private void nuevaConvocatoria(VistaConvocatorias bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
 			throws UVException, SQLException, IOException {
 		bean.setVista(JSP_FORM_CONVOCATORIA);
+		ModeloConvocatoria modelo = ModeloConvocatoria.obtenerInstancia();
 		
-		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_CONVOCATORIA_DESCRIPCION)) != null) {
+		if (modelo.hayConvocatoriaNoFinalizada()) {
+			BolsaEmpleoUtils.addMensajeDeError(MENSAJE_ERROR_EXISTE_CONVOCATORIA_NO_FINALIZADA, bean, request);
+			datos.setRespuestaEnviada(true);
+			response.sendRedirect(request.getServletPath());
+		} else if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_CONVOCATORIA_DESCRIPCION)) != null) {
 			Convocatoria convocatoria = this.validateConvocatoria(request);
-			ModeloConvocatoria modelo = ModeloConvocatoria.obtenerInstancia();
 			
-			if (modelo.hayConvocatoriaNoFinalizada()) {
-				BolsaEmpleoUtils.addMensajeDeError(MENSAJE_ERROR_CONVOCATORIAS_NO_FINALIZADAS, bean, request);
-			} else {
-				// creamos convocatoria, por defecto cerrada
-				
-				convocatoria.setEstado(ModeloConvocatoria.CONVOCATORIA_ESTADO_CERRADA);
-				modelo.nuevaConvocatoria(convocatoria, bean.getUsuarioLogeado());
-				
-				BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_INSERTAR_CONVOCATORIA, bean, request);
-			}
+			// creamos convocatoria, por defecto cerrada
+			convocatoria.setEstado(ModeloConvocatoria.CONVOCATORIA_ESTADO_CERRADA);
+			modelo.nuevaConvocatoria(convocatoria, bean.getUsuarioLogeado());
 			
+			BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_INSERTAR_CONVOCATORIA, bean, request);
 			datos.setRespuestaEnviada(true);
 			response.sendRedirect(request.getServletPath());
 		}
