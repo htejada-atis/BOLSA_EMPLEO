@@ -134,7 +134,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	@Override
-	@SuppressWarnings({"checkstyle:CyclomaticComplexity","checkstyle:JavaNCSS"})
+	@SuppressWarnings({"checkstyle:CyclomaticComplexity", "checkstyle:JavaNCSS"})
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		UVDatos datos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
 		datos.setDocType("<!DOCTYPE html>");

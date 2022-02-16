@@ -194,6 +194,10 @@ String justificacion = BolsaEmpleoUtils.getParamForm(request, ControladorContrat
 	
 <%	if ((mostrarCandidatos || estadoCerrada) && personal) { %>
 		<button class="link-btn" id="exportar_candidatos" title="Exportar candidatos a csv">Exportar candidatos a csv</button>
+		
+		<% if (estadoCerrada) { %>
+			<button class="link-btn" id="reabrir_plaza" title="Reabrir plaza">Reabrir plaza</button>
+		<% } %>
 <%	} %>
 	
 <%	if (mostrarCandidatos) { %>
@@ -746,6 +750,25 @@ $(document).ready(function() {
 			
 		});
 <%	} %>
+	
+<% if (estadoCerrada && personal) { %>
+	document.getElementById("reabrir_plaza").addEventListener("click", function(e) {
+		e.preventDefault();
+		Atis.confirmDialog("Reabrir plaza", "La plaza se volverá a abrir. Pasará a estado 'Contratación'.<br/>El estado de contratación del candidato pasará a disponible para las áreas del departamento.<br/>¿Continuar?", {
+			'Si': function() {
+				var params = {
+					"<%= ControladorContratacion.PARAM_ACCION %>": "<%=ControladorContratacion.ACCION_REABRIR_PLAZA_OFERTADA%>",
+					"<%= ControladorContratacion.PARAM_PLAZA_OFERTADA %>": <%= bean.getPlazaOfertada().getCodNum() %>
+				};
+				Atis.sendForm("<%= request.getRequestURI() %>", params);
+				$(this).dialog("close");
+			},
+			'No': function() {
+				$(this).dialog("close");
+			}
+		});
+	});
+<% } %>
 	
 });
 
