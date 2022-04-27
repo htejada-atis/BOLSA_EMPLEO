@@ -69,6 +69,7 @@ public class ModeloPlazaOfertada {
 	public static final String MENSAJE_ERROR_PLANTILLA_APROBACION_PLAZA_NO_EXISTE = "La plantilla de aprobación de plaza no existe";
 	public static final String MENSAJE_ERROR_PLANTILLA_CIERRE_PLAZA_NO_EXISTE = "La plantilla de cierre de plaza no existe";
 	public static final String MENSAJE_ERROR_PLANTILLA_CREACION_PLAZA_NO_EXISTE = "La plantilla de creación de plaza no existe";
+	public static final String MENSAJE_ERROR_PLAZA_NO_CERRADA = "La plaza no está cerrada";
 	
 	public static final String ABIERTA_VIGENTE = "ABIERTA_VIGENTE";
 	public static final String BEPARE_CODNUM = "BEPARE_CODNUM";
@@ -614,6 +615,20 @@ public class ModeloPlazaOfertada {
 		this.cambiarEstadoPlaza(plaza, usuarioUpdate, PLAZA_ESTADO_CERRADA);
 	}
 	
+	/**
+	 * Pasa de cerrada a contratación en la plaza.
+	 * @param plaza .
+	 * @param usuarioUpdate .
+	 * @throws SQLException .
+	 * @throws UVException . 
+	 */
+	public void reabirPlazaOfertada(PlazaOfertada plaza, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
+		if (!plaza.getEstado().equals(PLAZA_ESTADO_CERRADA)) {
+			throw new UVException(MENSAJE_ERROR_PLAZA_NO_CERRADA);
+		}
+		this.cambiarEstadoPlaza(plaza, usuarioUpdate, PLAZA_ESTADO_CONTRATACION);
+	}
+	
 	/** cambia el estado de una plaza a contratación .
 	 * @param plaza .
 	 * @param usuarioUpdate .
@@ -652,6 +667,11 @@ public class ModeloPlazaOfertada {
 		
 		if (estado.equals(PLAZA_ESTADO_CERRADA)) {
 			consulta = "UPDATE TBEP_PLAZAS_OFERTADAS SET %s=?, %s=?, %s=? WHERE %s=?";
+			consulta = String.format(consulta, ESTADO, FECHA_CERRADA, "UID_USUARIO", CODNUM);
+		}
+		
+		if (estado.equals(PLAZA_ESTADO_CONTRATACION)) {
+			consulta = "UPDATE TBEP_PLAZAS_OFERTADAS SET %s=?, %s=NULL, %s=? WHERE %s=?";
 			consulta = String.format(consulta, ESTADO, FECHA_CERRADA, "UID_USUARIO", CODNUM);
 		}
 		

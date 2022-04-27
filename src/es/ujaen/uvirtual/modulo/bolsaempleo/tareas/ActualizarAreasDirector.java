@@ -3,7 +3,7 @@ package es.ujaen.uvirtual.modulo.bolsaempleo.tareas;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloArea;
+// import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloArea;
 import es.ujaen.uvirtual.utilidades.Formateador;
 import es.ujaen.uvirtual.utilidades.UVException;
 
@@ -41,7 +41,7 @@ public final class ActualizarAreasDirector {
 	}
 	
 	private static void actualizarAreas() throws SQLException, UVException {
-		ModeloArea modeloArea = ModeloArea.obtenerInstancia();
+		// ModeloArea modeloArea = ModeloArea.obtenerInstancia();
 		
 		
 	}
