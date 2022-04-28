@@ -28,6 +28,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaSolicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaSolicitudTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Merito;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoPreferenteUsuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitudTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Solicitud;
@@ -40,6 +41,8 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacionItems;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloConvocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMerito;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMeritosPreferentes;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMeritosPreferentesCandidato;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloParametrosConfiguracion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloRol;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloSolicitud;
@@ -838,6 +841,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		
 		ModeloSolicitud modeloSolicitud = ModeloSolicitud.obtenerInstancia();
 		ModeloTitulacion modeloTitulacion = ModeloTitulacion.obtenerInstancia();
+		ModeloMeritosPreferentesCandidato modeloMeritoPreferentes = ModeloMeritosPreferentesCandidato.obtenerInstancia(); 
 		
 		Solicitud solicitud = this.getSolicitud(bean, request);
 		bean.setSolicitud(solicitud);
@@ -845,6 +849,9 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		List<TitulacionUsuario> titulaciones = modeloTitulacion.listaTitulacionesCandidato(bean.getUsuarioLogeado().getCodNum(), false);
 		bean.setListaTitulaciones(titulaciones);
 		
+		List<MeritoPreferenteUsuario> preferentes = modeloMeritoPreferentes.listaMeritosPreferentesCandidato(bean.getUsuarioLogeado());
+		bean.setListaMeritosPreferentes(preferentes);
+						
 		// comprobamos que el total de méritos sea mayor que 0
 		Integer totalMeritos = modeloSolicitud.obtenerTotalMeritosSolicitud(solicitud);
 		
