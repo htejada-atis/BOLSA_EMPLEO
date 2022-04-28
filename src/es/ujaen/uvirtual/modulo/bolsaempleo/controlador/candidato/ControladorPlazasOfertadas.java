@@ -3,6 +3,7 @@ package es.ujaen.uvirtual.modulo.bolsaempleo.controlador.candidato;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -17,6 +18,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.OfertaCandidato;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.PlazaOfertada;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloContratacion;
@@ -191,8 +193,15 @@ public class ControladorPlazasOfertadas extends HttpServlet {
 	
 	private void index(VistaPlazasOfertadas bean) throws SQLException, UVException {
 		ModeloConvocatoria modeloConvocatoria = ModeloConvocatoria.obtenerInstancia();
-		bean.setListaOfertasCandidatos(ModeloOfertaCandidato.obtenerInstancia().listaOfertasCandidatoPreferentes(bean.getUsuarioLogeado(),
-				modeloConvocatoria.getUltimaConvocatoriaFinalizada()));
+		ModeloOfertaCandidato modeloOferta = ModeloOfertaCandidato.obtenerInstancia();
+
+		Convocatoria c = modeloConvocatoria.getUltimaConvocatoriaFinalizada();
+
+		if (c != null) {
+			bean.setListaOfertasCandidatos(modeloOferta.listaOfertasCandidatoPreferentes(bean.getUsuarioLogeado(), c));
+		} else {
+			bean.setListaOfertasCandidatos(new ArrayList<>());
+		}
 	}
 	
 	private void guardarPreferencias(VistaPlazasOfertadas bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
@@ -304,12 +313,15 @@ public class ControladorPlazasOfertadas extends HttpServlet {
 		datos.setRespuestaEnviada(true);
 		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
+
 		ModeloConvocatoria modeloConvocatoria = ModeloConvocatoria.obtenerInstancia();
-		
+		ModeloOfertaCandidato modeloOferta = ModeloOfertaCandidato.obtenerInstancia();
+
 		try (PrintWriter writer = response.getWriter()) {
 			try {
-				BolsaEmpleoDataTable<OfertaCandidato> dataTable = ModeloOfertaCandidato.obtenerInstancia().listadoPlazasOfertadasCandidato(
-						request.getParameterMap(), bean.getUsuarioLogeado(), modeloConvocatoria.getUltimaConvocatoriaFinalizada());
+				Convocatoria c = modeloConvocatoria.getUltimaConvocatoriaFinalizada();
+				BolsaEmpleoDataTable<OfertaCandidato> dataTable = modeloOferta.
+						listadoPlazasOfertadasCandidato(request.getParameterMap(), bean.getUsuarioLogeado(), c);
 				bean.setDatatableOfertasCandidatos(dataTable);
 				writer.write(dataTable.toJson("dd/M/yyyy HH:mm:ss"));
 			} catch (UVException | SQLException e) {

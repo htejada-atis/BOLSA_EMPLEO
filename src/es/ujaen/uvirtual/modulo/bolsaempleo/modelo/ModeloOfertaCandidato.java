@@ -317,6 +317,11 @@ public class ModeloOfertaCandidato {
 		List<OfertaCandidato> rows = new ArrayList<>();
 		BolsaEmpleoDataTable<OfertaCandidato> dataTable = new BolsaEmpleoDataTable<>(params);
 		
+		if (convocatoria == null) {
+			dataTable.setData(rows);
+			return dataTable;
+		}
+		
 		String consulta = "SELECT bepplo.CODNUM AS BEPPLO_CODNUM, bepofc.CODNUM, bepofc.FLGRESULTADO, bepofc.FECHA_RESULTADO,"
 				+ "     bepofc.PREFERENCIA, bepsol.BEPUSU_CODNUM AS BEPUSU_CODNUM, bepcnt.CODNUM AS CONTRATACION"
 				+ " FROM TBEP_PLAZAS_OFERTADAS bepplo"
