@@ -16,6 +16,7 @@ import com.lowagie.text.Table;
 import com.lowagie.text.pdf.PdfWriter;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaResultado;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ItemBaremacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoPreferente;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoResultado;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
@@ -133,14 +134,16 @@ public class GenerarResultadosPDF extends BolsaEmpleoPDFGenerator {
 			generarTableHeader(table, headerColumns);
 			
 			for (MeritoResultado merito: bolsa.getListaMeritos()) {
-				String codigoItem = merito.getItemBaremacion().getBloqueBaremacion().getApartadoBaremacion().getCodigo() + "." 
-						+ merito.getItemBaremacion().getBloqueBaremacion().getCodigo() + "." 
-						+ merito.getItemBaremacion().getCodigo();
+				ItemBaremacion itemBaremacion = merito.getItemMeritoSolicitud();
+				
+				String codigoItem = itemBaremacion.getBloqueBaremacion().getApartadoBaremacion().getCodigo() + "." 
+						+ itemBaremacion.getBloqueBaremacion().getCodigo() + "." 
+						+ itemBaremacion.getCodigo();
 				
 				generarTableRow(table, new String[] {
 						merito.getCodNum().toString(),
 						codigoItem,
-						merito.getItemBaremacion().getNombre(),
+						itemBaremacion.getNombre(),
 						merito.getDesglose(),
 						merito.getResultado().toString(),
 						merito.getObservacionCandidato(),

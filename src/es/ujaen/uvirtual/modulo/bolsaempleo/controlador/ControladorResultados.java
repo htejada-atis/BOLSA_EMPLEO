@@ -229,7 +229,7 @@ public class ControladorResultados extends HttpServlet {
 		
 		bean.setMeritoPreferente(ModeloMeritosPreferentes.obtenerInstancia().getMeritoPreferenteTipoMerito());
 	}
-		
+	
 	private void listadoBolsas(VistaResultados bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException {
 		ModeloBolsa modelo = ModeloBolsa.obtenerInstancia();
 		

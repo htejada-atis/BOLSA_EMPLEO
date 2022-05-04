@@ -41,7 +41,6 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacionItems;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloConvocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMerito;
-import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMeritosPreferentes;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMeritosPreferentesCandidato;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloParametrosConfiguracion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloRol;
@@ -607,15 +606,15 @@ public class ControladorMisSolicitudes extends HttpServlet {
 				throw new UVException(MENSAJE_ERROR_NUMERO_MAXIMO_MERITOS_APARTADO);
 			}
 			
+			// comprobamos items excluyentes con el añadido
 			ModeloBaremacionItems modeloItems = ModeloBaremacionItems.obtenerInstancia();
-			
 			List<MeritoSolicitud> listaMeritos = modeloSolicitud.getMeritosSolicitudBolsa(solicitud, area);
 			for (MeritoSolicitud mer : listaMeritos) {
 				modeloItems.checkItemsExcluyentes(mer.getMerito().getItemBaremacion(), merito.getItemBaremacion());
 			}
 			
+			// leemos el merito de una solicitud anterior
 			MeritoSolicitud meritoSolicitudAnterior = modeloSolicitud.getMeritoSolicitudByConvocatoriaAnterior(solicitud.getConvocatoria(), area, merito);
-			
 			if (meritoSolicitudAnterior != null) {
 				if (meritoSolicitudAnterior.isExcluido()) {
 					throw new UVException(MENSAJE_ERROR_MERITO_EXCLUIDO);

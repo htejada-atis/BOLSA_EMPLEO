@@ -152,6 +152,38 @@ public final class UtilsTestBolsaEmpleo {
 			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/datos_desarrollo/datos_prueba_migraciones/08-im-solicitudbolsas.sql");
 			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/datos_desarrollo/datos_prueba_migraciones/09-im-solicitudbolsasmeritos.sql");
 			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/datos_desarrollo/datos_prueba_migraciones/10-im-solicitudbolsasmeritosvaloracion.sql");
+			
+			UtilsTestBolsaEmpleo.updateItemBaremacionEnSolicitudBolsaMeritos();
+		}
+	}
+	
+	/**
+	 * Actualiza los items de baremación en las solicitudes bolsa méritos.
+	 */
+	public static void updateItemBaremacionEnSolicitudBolsaMeritos() {
+		BbddRunner.conectarBd();
+		try (Connection con = BbddRunner.obtenerConexionUvirtual()) {
+			String consulta = ""
+				+ " SELECT bepsbm.CODNUM, bepmer.BEPITE_CODNUM "
+				+ " FROM TBEP_SOL_BOL_MERITOS bepsbm "
+				+ " INNER JOIN TBEP_MERITOS bepmer ON bepmer.CODNUM = bepsbm.BEPMER_CODNUM "
+				+ " WHERE bepsbm.BEPITE_CODNUM IS NULL ";
+			
+			String update = "UPDATE TBEP_SOL_BOL_MERITOS SET BEPITE_CODNUM = ? WHERE CODNUM = ?";
+
+			try (PreparedStatement stmt = con.prepareStatement(consulta)) {
+				try (ResultSet rs = stmt.executeQuery()) {
+					while (rs.next()) {
+						try (PreparedStatement stmtUpdate = con.prepareStatement(update)) {
+							stmtUpdate.setInt(1, rs.getInt("BEPITE_CODNUM"));
+							stmtUpdate.setInt(2, rs.getInt("CODNUM"));
+							stmtUpdate.executeUpdate();
+						}
+					}
+				}
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
 		}
 	}
 

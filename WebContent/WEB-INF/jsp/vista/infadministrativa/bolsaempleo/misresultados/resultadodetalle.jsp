@@ -1,3 +1,4 @@
+<%@page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.ItemBaremacion"%>
 <%@ page trimDirectiveWhitespaces="true"%>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorDescargaFicheros" %>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.candidato.ControladorMisResultados" %>
@@ -62,12 +63,14 @@ String titulaciones = BolsaEmpleoUtils.clobToString(bolsaResultado.getTitulacion
 				<th scope="col" style="width:40%">Observación</th>
 			</tr>
 			<tbody>
-			<%	for (MeritoResultado merito: bolsaResultado.getListaMeritos()) { %>
+			<%	for (MeritoResultado merito: bolsaResultado.getListaMeritos()) {
+				ItemBaremacion itemBaremacion = merito.getItemMeritoSolicitud();
+			%>
 					<tr>
 						<td><%= merito.getCodNum() %></td>
-						<td><%= EscapaHTML.escapa(merito.getItemBaremacion().getBloqueBaremacion().getApartadoBaremacion().getCodigo() + "." 
-						+ merito.getItemBaremacion().getBloqueBaremacion().getCodigo() + "." + merito.getItemBaremacion().getCodigo()) %></td>
-						<td><%= EscapaHTML.escapa(merito.getItemBaremacion().getNombre()) %></td>
+						<td><%= EscapaHTML.escapa(itemBaremacion.getBloqueBaremacion().getApartadoBaremacion().getCodigo() + "." 
+						+ itemBaremacion.getBloqueBaremacion().getCodigo() + "." + itemBaremacion.getCodigo()) %></td>
+						<td><%= EscapaHTML.escapa(itemBaremacion.getNombre()) %></td>
 						<td><%= EscapaHTML.escapa(merito.getDesglose()) %></td>
 						<td><%= merito.getResultado() %></td>
 						<td><%= EscapaHTML.escapa(merito.getObservacionCandidato()) %></td>

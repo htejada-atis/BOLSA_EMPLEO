@@ -1,3 +1,4 @@
+<%@page import="es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloConvocatoria"%>
 <%@ page trimDirectiveWhitespaces="true"%>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorValidarNoAfines"%>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorDescargaFicheros"%>
@@ -378,11 +379,17 @@ $(document).ready(function() {
 						return '<div title="' + row.convocatoria.codNum + ' - ' + row.convocatoria.descripcion + '">' + row.convocatoria.fechaCierre + '</div>';
 					}},
 					{'data': 'bolsa.codNum', 'render': function(row) {
-						var href = '<%= request.getRequestURL() + "?" + ControladorValidarNoAfines.PARAM_ACCION + "=" + ControladorValidarNoAfines.ACCION_MERITO_SELECCIONADO 
-							+ "&" + ControladorValidarNoAfines.PARAM_BOLSA + "=" %>' + row.bolsa.codNum + '<%=
-								  "&" + ControladorValidarNoAfines.PARAM_CANDIDATO + "=" + candidato.getCodNum()
-								+ "&" + ControladorValidarNoAfines.PARAM_MERITO + "=" + merito.getMerito().getCodNum()%>';
-						return "<a class='bolsaempleo-link' href='" + href + "'>" + row.bolsa.area.idAreaExterno + " : " + row.bolsa.area.descripcion + "</a>";
+						var name = row.bolsa.area.idAreaExterno + " : " + row.bolsa.area.descripcion;
+						
+						if (row.convocatoria.estado === '<%= ModeloConvocatoria.CONVOCATORIA_ESTADO_FINALIZADA %>') {
+							return name;
+						} else {
+							var href = '<%= request.getRequestURL() + "?" + ControladorValidarNoAfines.PARAM_ACCION + "=" + ControladorValidarNoAfines.ACCION_MERITO_SELECCIONADO 
+								+ "&" + ControladorValidarNoAfines.PARAM_BOLSA + "=" %>' + row.bolsa.codNum + '<%=
+									  "&" + ControladorValidarNoAfines.PARAM_CANDIDATO + "=" + candidato.getCodNum()
+									+ "&" + ControladorValidarNoAfines.PARAM_MERITO + "=" + merito.getMerito().getCodNum()%>';
+							return "<a class='bolsaempleo-link' href='" + href + "'>" + name + "</a>";
+						}
 					}},
 					{'data': 'item', 'render': function(row) {
 						return row.meritoSolicitud.item != null ? row.meritoSolicitud.item.bloque.apartado.codigo + "." + row.meritoSolicitud.item.bloque.codigo 

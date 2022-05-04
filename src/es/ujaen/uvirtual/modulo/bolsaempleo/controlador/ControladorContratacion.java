@@ -817,12 +817,10 @@ public class ControladorContratacion extends HttpServlet {
 		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
 
-		ModeloConvocatoria modeloConvocatoria = ModeloConvocatoria.obtenerInstancia();
-
 		try (PrintWriter writer = response.getWriter()) {
 			try {
 				BolsaEmpleoDataTable<CandidatoEstado> dataTable = ModeloEstadoCandidato.obtenerInstancia().listaEstadosCandidatoDisponiblesPlaza(
-						request.getParameterMap(), bean.getPlazaOfertada(), modeloConvocatoria.getUltimaConvocatoriaFinalizada());
+						request.getParameterMap(), bean.getPlazaOfertada());
 				bean.setDatatableCandidatosEstado(dataTable);
 				writer.write(dataTable.toJson("dd/M/yyyy HH:mm:ss"));
 			} catch (UVException | SQLException e) {

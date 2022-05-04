@@ -36,11 +36,12 @@ import es.ujaen.uvirtual.utilidades.UVException;
  * 
  * @author ATISoluciones 2021 
  */
-public class ModeloSolicitud {	
+public class ModeloSolicitud {		
+	public static final String N = "N";
 	public static final String SOLICITUD_ESTADO_ABIERTA = "ABIERTA";
 	public static final String SOLICITUD_ESTADO_CERRADA = "CERRADA";
 	public static final String SOLICITUD_EXCLUIDA = "S";
-	public static final String SOLICITUD_NO_EXCLUIDA = "N";
+	public static final String SOLICITUD_NO_EXCLUIDA = N;
 	
 	public static final String MENSAJE_ERROR_CONVOCATORIA_NO_ABIERTA = "La convocatoria no está abierta";
 	public static final String MENSAJE_ERROR_SOLICITUDES_ABIERTAS = "Ya existen solicitides abiertas";
@@ -72,6 +73,7 @@ public class ModeloSolicitud {
 	public static final String FLGEXCLUIDO = "FLGEXCLUIDO";
 	public static final String FLGVALIDADO = "FLGVALIDADO";
 	public static final String BEPITE_CODNUM = "BEPITE_CODNUM";
+	public static final String UID_USUARIO = "UID_USUARIO";
 	public static final String VALOR = "VALOR";
 	public static final String OBSERVACION_CANDIDATO = "OBSERVACION_CANDIDATO";
 	public static final String S = "S";
@@ -487,12 +489,12 @@ public class ModeloSolicitud {
 	 */
 	public MeritoSolicitud getMeritoSolicitud(Solicitud solicitud, Bolsa bolsa, Merito merito) throws SQLException, UVException {
 		String consulta = "SELECT bepsbm.* "
-				+ "FROM TBEP_SOL_BOL_MERITOS bepsbm "
-				+ "INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbo.CODNUM = bepsbm.BEPSBO_CODNUM "
-				+ "WHERE 1=1 "
-				+ "AND bepsbm.BEPMER_CODNUM = ? "
-				+ "AND bepsbo.BEPSOL_CODNUM = ? "
-				+ "AND bepsbo.BEPBOL_CODNUM = ? ";
+				+ " FROM TBEP_SOL_BOL_MERITOS bepsbm "
+				+ " INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbo.CODNUM = bepsbm.BEPSBO_CODNUM "
+				+ " WHERE 1=1 "
+				+ " AND bepsbm.BEPMER_CODNUM = ? "
+				+ " AND bepsbo.BEPSOL_CODNUM = ? "
+				+ " AND bepsbo.BEPBOL_CODNUM = ? ";
 			
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {			
 			int params = 1;
@@ -506,9 +508,18 @@ public class ModeloSolicitud {
 				}
 				
 				Merito meritoRead = ModeloMerito.obtenerInstancia().getMeritoById(rs.getInt(BEPMER_CODNUM), false, false);
-				MeritoSolicitud meritoSolicitud = new MeritoSolicitud(rs.getInt(CODNUM), meritoRead, rs.getString(FLGEXCLUIDO).equals(S));
-				meritoSolicitud.setItem(rs.getInt(BEPITE_CODNUM) != 0 
-						? ModeloBaremacionItems.obtenerInstancia().getItemBaremacionById(rs.getInt(BEPITE_CODNUM)) : null);
+				
+				ItemBaremacion itemBaremacion = rs.getInt(BEPITE_CODNUM) != 0 
+						? ModeloBaremacionItems.obtenerInstancia().getItemBaremacionById(rs.getInt(BEPITE_CODNUM)) : null;
+				
+				MeritoSolicitud meritoSolicitud = new MeritoSolicitud(
+						rs.getInt(CODNUM), 
+						meritoRead, 
+						rs.getString(FLGEXCLUIDO).equals(S)
+				);
+				meritoSolicitud.setItem(itemBaremacion);
+				meritoSolicitud.setValor(rs.getDouble(VALOR));
+				
 				return meritoSolicitud;
 			}
 		}
@@ -982,8 +993,10 @@ public class ModeloSolicitud {
 			
 			try {
 				// insertamos el mérito en la solicitud bolsa
-				String consulta = String.format("INSERT INTO TBEP_SOL_BOL_MERITOS (%s,%s,%s,%s,%s) VALUES (?,?,?,?,?)",
-						BEPSBO_CODNUM, BEPMER_CODNUM, VALOR, BEPITE_CODNUM, "UID_USUARIO");
+				String consulta = ""
+					+ "INSERT INTO TBEP_SOL_BOL_MERITOS ("
+						+ "BEPSBO_CODNUM, BEPMER_CODNUM, FLGEXCLUIDO, FLGVALIDADO, OBSERVACION_CANDIDATO, VALOR, BEPITE_CODNUM, UID_USUARIO"
+					+ ") VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 				
 				int codNumSBM;
 				
@@ -991,6 +1004,13 @@ public class ModeloSolicitud {
 					int indexParam = 1;
 					stmt.setInt(indexParam++, this.getIdSolicitudBolsa(solicitud, bolsa, conexion));
 					stmt.setInt(indexParam++, meritoSolicitud.getMerito().getCodNum());
+					stmt.setString(indexParam++, meritoSolicitud.isExcluido() ? S : N);
+					stmt.setString(indexParam++, meritoSolicitud.isValidado() ? S : N);
+					if (meritoSolicitud.getObservacionCandidato() != null) {
+						stmt.setString(indexParam++, meritoSolicitud.getObservacionCandidato());
+					} else {
+						stmt.setNull(indexParam++, Types.CHAR);
+					}
 					if (meritoSolicitud.getValor() != null && meritoSolicitud.getValor() != 0) {
 						stmt.setDouble(indexParam++, meritoSolicitud.getValor());
 					} else {
@@ -999,7 +1019,7 @@ public class ModeloSolicitud {
 					if (meritoSolicitud.getItem() != null) {
 						stmt.setInt(indexParam++, meritoSolicitud.getItem().getCodNum());
 					} else {
-						stmt.setNull(indexParam++, Types.NULL);
+						stmt.setInt(indexParam++, meritoSolicitud.getMerito().getItemBaremacion().getCodNum());
 					}
 					stmt.setString(indexParam++, usuarioUpdate.getCodCuenta());
 					stmt.executeUpdate();
@@ -1098,11 +1118,11 @@ public class ModeloSolicitud {
 		}
 		
 		// insertamos el mérito en la solicitud bolsa
-		String consulta = "INSERT INTO TBEP_SOL_BOL_MERITOS (BEPSBO_CODNUM, BEPMER_CODNUM, UID_USUARIO)"
-				+ " SELECT bepsbo.CODNUM AS BEPSBO_CODNUM, bepmer.CODNUM AS BEPMER_CODNUM, ? AS UID_USUARIO"
+		String consulta = "INSERT INTO TBEP_SOL_BOL_MERITOS (BEPSBO_CODNUM, BEPMER_CODNUM, BEPITE_CODNUM, UID_USUARIO)"
+				+ " SELECT bepsbo.CODNUM AS BEPSBO_CODNUM, bepmer.CODNUM AS BEPMER_CODNUM, bepmer.BEPITE_CODNUM AS BEPITE_CODNUM, ? AS UID_USUARIO"
 				+ " FROM TBEP_SOLICITUD_BOLSAS bepsbo, TBEP_MERITOS bepmer"
 				+ " WHERE bepsbo.BEPSOL_CODNUM = ? AND bepsbo.BEPBOL_CODNUM = ? AND bepmer.CODNUM = ? ";
-					
+
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int indexParam = 1;
 			stmt.setString(indexParam++, usuarioUpdate.getCodCuenta());
