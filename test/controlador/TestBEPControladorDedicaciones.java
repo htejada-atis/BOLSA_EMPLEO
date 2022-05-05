@@ -14,6 +14,7 @@ import bbdd.UtilsTestBolsaEmpleo;
 import controlador.implementacion.PeticionHttp;
 import controlador.implementacion.RespuestaHttp;
 import es.ujaen.uvirtual.modulo.bolsaempleo.controlador.configuracion.ControladorDedicaciones;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloDedicacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaDedicacion;
 
@@ -114,6 +115,7 @@ public class TestBEPControladorDedicaciones {
 		peticion.setParameter(ControladorDedicaciones.PARAM_TEXTO_DEDICACION, "Tiempo parcial (5 horas)");
 		peticion.setParameter(ControladorDedicaciones.PARAM_SUELDO, "5000");
 		peticion.setParameter(ControladorDedicaciones.PARAM_ENVIAR, "true");
+		peticion.setParameter(ControladorDedicaciones.PARAM_TIPO, ModeloDedicacion.TIPO_TIEMPO_PARCIAL);
 		
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorDedicaciones controlador = new ControladorDedicaciones();
@@ -140,6 +142,7 @@ public class TestBEPControladorDedicaciones {
 		peticion.setParameter(ControladorDedicaciones.PARAM_TEXTO_DEDICACION, "Tiempo parcial (4 horas)");
 		peticion.setParameter(ControladorDedicaciones.PARAM_SUELDO, "5000");
 		peticion.setParameter(ControladorDedicaciones.PARAM_ENVIAR, "true");
+		peticion.setParameter(ControladorDedicaciones.PARAM_TIPO, ModeloDedicacion.TIPO_TIEMPO_PARCIAL);
 		
 		RespuestaHttp respuesta = new RespuestaHttp();
 		ControladorDedicaciones controlador = new ControladorDedicaciones();

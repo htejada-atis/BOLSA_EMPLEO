@@ -163,7 +163,7 @@ public class ModeloEstadoCandidato {
 	 * @throws SQLException en caso de error de base de datos .
 	 * @throws UVException  error si no existe la area .
 	 */
-	public BolsaEmpleoDataTable<CandidatoEstado> listaEstadosCandidatoDisponiblesPlaza(Map<String, String[]> params, PlazaOfertada plaza, Convocatoria convocatoria)
+	public BolsaEmpleoDataTable<CandidatoEstado> listaEstadosCandidatoDisponiblesPlaza(Map<String, String[]> params, PlazaOfertada plaza)
 			throws SQLException, UVException {
 		List<CandidatoEstado> estados = new ArrayList<>();
 		BolsaEmpleoDataTable<CandidatoEstado> dataTable = new BolsaEmpleoDataTable<>(params);
@@ -182,7 +182,9 @@ public class ModeloEstadoCandidato {
 				+ "         ELSE 0"
 				+ "     END AS DISPONIBILIDAD"
 				+ " FROM TBEP_USUARIOS bepusu"
-				+ " INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.BEPUSU_CODNUM = bepusu.CODNUM AND bepsol.BEPCON_CODNUM = ?"
+				+ " INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.BEPUSU_CODNUM = bepusu.CODNUM"
+				+ " INNER JOIN TBEP_CONVOCATORIAS bepcon ON bepcon.CODNUM = bepsol.BEPCON_CODNUM AND bepcon.ESTADO = '" 
+						+ ModeloConvocatoria.CONVOCATORIA_ESTADO_FINALIZADA + "'"
 				+ " INNER JOIN TBEP_SOLICITUD_BOLSAS bepsob ON bepsob.BEPSOL_CODNUM = bepsol.CODNUM AND bepsob.FECHABAREMACION IS NOT NULL"
 				+ " INNER JOIN TBEP_BOLSAS bepbol ON bepbol.CODNUM = bepsob.BEPBOL_CODNUM"
 				+ " INNER JOIN TBEP_AREAS bepare ON bepare.CODNUM = bepbol.BEPARE_CODNUM"
@@ -192,7 +194,7 @@ public class ModeloEstadoCandidato {
 				+ " LEFT JOIN ("
 				+ "     SELECT"
 				+ "         bepesc.BEPUSU_CODNUM AS BEPUSU_CODNUM,"
-				+ "     COUNT(DISTINCT bepesc.BEPPLO_CODNUM) AS CONTRATOS"
+				+ "         COUNT(DISTINCT bepesc.BEPPLO_CODNUM) AS CONTRATOS"
 				+ "     FROM TBEP_ESTADO_CANDIDATOS bepesc"
 				+ "     WHERE bepesc.ESTADO NOT IN ('" + ModeloEstadoCandidato.ESTADO_DISPONIBLE + "', "
 				+ "         '" + ModeloEstadoCandidato.ESTADO_SUSPENSION_PROVISIONAL + "', '" + ModeloEstadoCandidato.ESTADO_NO_DISPONIBLE + "')"
@@ -208,8 +210,8 @@ public class ModeloEstadoCandidato {
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
 				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery())) {
 			int indexParam = 1;
-			stmt.setInt(indexParam, convocatoria.getCodNum());
-			stmtCount.setInt(indexParam++, convocatoria.getCodNum());
+//			stmt.setInt(indexParam, convocatoria.getCodNum());
+//			stmtCount.setInt(indexParam++, convocatoria.getCodNum());
 			stmt.setInt(indexParam, plaza.getCodNum());
 			stmtCount.setInt(indexParam++, plaza.getCodNum());
 			dataTable.setFiltersParams(stmt, stmtCount, indexParam);

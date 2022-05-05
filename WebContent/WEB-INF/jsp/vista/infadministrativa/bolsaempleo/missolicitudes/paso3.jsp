@@ -1,3 +1,4 @@
+<%@page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoPreferenteUsuario"%>
 <%@page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.TitulacionUsuario"%>
 <%@ page trimDirectiveWhitespaces="true" %>
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos" %>
@@ -142,12 +143,20 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 					var message = "";
 					
 					<% if (bean.getListaTitulaciones() != null && bean.getListaTitulaciones().size() > 0) { %>
-						message = "¿Desea confirmar la solicitud?<br/><br/>";
-						message += "Mis titulaciones: <br/>";
+						message = 
+							"¿Desea confirmar la solicitud?<br/><br/>" +
+							"Recuerde añadir ahora todas las titulaciones y acreditaciones, luego no podrá añadirlas.<br/><br/>";
 						
+						message += "Mis titulaciones: <br/>";						
 						<% for (TitulacionUsuario tu : bean.getListaTitulaciones()) { %>
 							message += "<%= tu.getTitulacion() != null ? tu.getTitulacion().getNombre() : tu.getOtraTitulacion() %><br/>";
 						<% } %>
+						
+						message += "<br/>Mis acreditaciones: <br/>";
+						<% for (MeritoPreferenteUsuario m : bean.getListaMeritosPreferentes()) { %>
+							message += "<%= m.getMeritoPreferente().getNombre() + " " + (m.getMeritoPreferenteOpcion() != null ? m.getMeritoPreferenteOpcion().getNombre() : "") %><br/>";
+						<% } %>
+						
 					<% } else { %>					
 						message = "No ha añadido ninguna titulación.<br/>Al menos debe incluir una titulación universitaria en el apartado 'Mis titulaciones'.<br/>Si no será excluido del proceseo de selección.<br/><br/>";
 						message += "¿Desea confirmar la solicitud?<br/><br/>";

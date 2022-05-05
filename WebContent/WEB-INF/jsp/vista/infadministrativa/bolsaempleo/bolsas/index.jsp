@@ -94,7 +94,7 @@ $(document).ready(function() {
 					return row.estado == '<%= ModeloBolsa.BOLSA_ESTADO_BAREMACION %>' ? 'VALIDACIÓN' : row.estado;
 				}, 
 				'filter': {'type': 'select', 'options': {
-					'<%= ModeloBolsa.BOLSA_ESTADO_BLOQUEADA %>': 'Bloqueada', 
+					'<%= ModeloBolsa.BOLSA_ESTADO_BLOQUEADA %>': 'Bloqueada',
 					'<%= ModeloBolsa.BOLSA_ESTADO_REVISION %>': 'Revisión',
 					'<%= ModeloBolsa.BOLSA_ESTADO_BAREMACION %>': 'Validación',
 					'<%= ModeloBolsa.BOLSA_ESTADO_ALEGACIONES %>':'Alegaciones',
@@ -108,9 +108,9 @@ $(document).ready(function() {
 			{'data': 'fechaBaremacion', 'filter': {'type': 'date'}},
 			{'data': 'baremable', 'filter': {'type': 'select', 'options': {'true': 'Baremable', 'false': 'No Baremable'} , 'optionDefault': 'true'}, 'render': function(row) {
 				if(row.baremable) {
-					return "<div title='Baremable' class='circle-true'></div>"; 
+					return "<div title='Baremable' class='circle-true'></div>";
 				} else {
-					return "<div title='No Baremable' class='circle-false'></div>"; 
+					return "<div title='No Baremable' class='circle-false'></div>";
 				}
 			}},
 		],
@@ -122,7 +122,7 @@ $(document).ready(function() {
 			{'label': 'Desbloquear', 'onClick': function(selected) { enviaAccion("<%=ControladorBolsas.ACCION_BOLSAS_DESBLOQUEAR%>", selected); } },
 			{'label': 'Baremar', 'onClick': function(selected) { enviaAccion("<%=ControladorBolsas.ACCION_BOLSAS_BAREMAR%>", selected); } },
 		]
-	});	
+	});
 	
 	function enviaAccion(accion, selected) {
 		if (selected.length == 0) {

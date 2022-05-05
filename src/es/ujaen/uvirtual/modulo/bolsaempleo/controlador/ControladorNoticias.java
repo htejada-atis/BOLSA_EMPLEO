@@ -109,7 +109,9 @@ public class ControladorNoticias extends HttpServlet {
 		LOGGER.log(Level.FINER, String.format("acción [%s]", nombreAccion));
 		
 		try {
-			init(bean, datos, request, response);
+			if (!init(bean, datos, request, response)) {
+				return;
+			}
 			switch (nombreAccion) {
 				case ACCION_INDEX:
 					bean.setVista(JSP_INDEX);
@@ -149,7 +151,7 @@ public class ControladorNoticias extends HttpServlet {
 		}
 	}
 	
-	private void init(VistaNoticias bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+	private boolean init(VistaNoticias bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		bean.setVista(JSP_INDEX);
 		LOGGER.log(Level.FINER, String.format("init jsp [%s]", JSP_INDEX));
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
@@ -167,7 +169,10 @@ public class ControladorNoticias extends HttpServlet {
 			LOGGER.log(Level.SEVERE, e.toString());
 			
 			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, e.getMessage());
+			return false;
 		}
+		
+		return true;
 	}
 	
 	private void errorFatal(VistaNoticias bean, String mensaje) {

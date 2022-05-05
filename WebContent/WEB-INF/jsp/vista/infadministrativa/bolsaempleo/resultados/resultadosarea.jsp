@@ -39,7 +39,7 @@ Bolsa bolsa = bean.getBolsa();
 	</table>
 	
 	<div class="row">
-		<button class="link-btn" id="resultados_volver" style="float:left; max-height: 25px">
+		<button class="link-btn" id="resultados_volver" style="float:left">
 			 Volver
 		</button>
 	</div>
@@ -56,7 +56,10 @@ $(document).ready(function() {
 		"defaultOrderBy": 2,
 		"defaultOrderDirection": 'desc',
 		"action": "<%= ControladorResultados.ACCION_DATATABLE_CANDIDATOS %>",
-		"params": {'<%=ControladorResultados.PARAM_BOLSA%>': '<%= bolsa.getCodNum() %>'},
+		"params": {
+			'<%=ControladorResultados.PARAM_BOLSA%>': '<%= bolsa.getCodNum() %>',
+			'<%=ControladorResultados.PARAM_CONVOCATORIA%>': '<%= bean.getConvocatoria().getCodNum() %>'
+		},
 		"columns": [
 			{'data': 'prsnif', 'filter': true},
 			{'data': 'apellido1', 'filter': true, 'overflow': 'auto', 'render': function(row) {
@@ -69,7 +72,8 @@ $(document).ready(function() {
 						var params = {
 							'<%= ControladorResultados.PARAM_ACCION %>': '<%= ControladorResultados.ACCION_SELECCIONAR_CANDIDATO %>',
 							'<%= ControladorResultados.PARAM_BOLSA %>': '<%= bolsa.getCodNum() %>',
-							'<%= ControladorResultados.PARAM_CANDIDATO %>': row.codNum
+							'<%= ControladorResultados.PARAM_CANDIDATO %>': row.codNum,
+							'<%= ControladorResultados.PARAM_CONVOCATORIA %>': '<%= bean.getConvocatoria().getCodNum() %>'
 						};
 						Atis.sendForm("<%= request.getRequestURI() %>", params);
 					}
@@ -79,12 +83,15 @@ $(document).ready(function() {
 	});
 	
 	document.getElementById("resultados_volver").addEventListener("click", function() {
-		Atis.sendForm("<%= request.getRequestURI() %>", {});
+		Atis.sendForm("<%= request.getRequestURI() %>", {'<%= ControladorResultados.PARAM_CONVOCATORIA %>': '<%= bean.getConvocatoria().getCodNum() %>'});
 	});
 	
 	$('#exportar').on('click', function() {
-		window.open("<%= request.getRequestURI() %>?<%= ControladorResultados.PARAM_ACCION %>=<%= ControladorResultados.ACCION_EXPORTAR_RESULTADOS %>&<%= ControladorResultados.PARAM_BOLSA %>=<%= bolsa.getCodNum() %>");
+		window.open("<%= request.getRequestURI() + "?" + ControladorResultados.PARAM_ACCION + "=" + ControladorResultados.ACCION_EXPORTAR_RESULTADOS %>"
+				+ "<%= "&" + ControladorResultados.PARAM_BOLSA + "=" + bolsa.getCodNum() %>"
+				+ "<%= "&" + ControladorResultados.PARAM_CONVOCATORIA +  "=" + bean.getConvocatoria().getCodNum() %>");
 	});
+	
 });
 
 </script>

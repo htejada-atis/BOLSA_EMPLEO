@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Merito;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
@@ -216,6 +217,42 @@ public class ModeloMerito {
 		}
 	}
 	
+	/**
+	 * Comprueba si se puede actualizar un mérito.
+	 * @param merito .
+	 * @return true o false si se puede modificar o no.
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	public boolean comprobarSiSePuedeActualizarMerito(Merito merito) throws SQLException, UVException {
+		ModeloConvocatoria modeloConvocatoria = ModeloConvocatoria.obtenerInstancia();
+		
+		// no se puede modificar un mérito asociado a una solicitud con convocatoria finalizada
+		String consultaConvocatoria = "SELECT bepcon.CODNUM "
+				+ " FROM TBEP_CONVOCATORIAS bepcon"
+				+ " INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.BEPCON_CODNUM = bepcon.CODNUM"
+				+ " INNER JOIN TBEP_USUARIOS bepusu ON bepusu.CODNUM = bepsol.BEPUSU_CODNUM"
+				+ " INNER JOIN TBEP_MERITOS bepmer ON bepmer.BEPUSU_CODNUM = bepusu.CODNUM"
+				+ " WHERE bepmer.CODNUM = ?";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consultaConvocatoria)) {
+			int parameterIndex = 1;
+			stmt.setInt(parameterIndex++, merito.getCodNum());
+			
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					int codNumConvocatoria = rs.getInt("CODNUM");
+					Convocatoria c = modeloConvocatoria.getConvocatoriaById(codNumConvocatoria);
+					if (c.getEstado().equals(ModeloConvocatoria.CONVOCATORIA_ESTADO_FINALIZADA)) {
+						return false;
+					}
+				}
+			}
+		}
+		
+		return true;
+	}
+	
 	/** Función que edita un mérito .
 	 * @param merito .
 	 * @param usuarioUpdate .
@@ -238,7 +275,11 @@ public class ModeloMerito {
 		if (usuarioUpdate == null) {
 			throw new UVException("No se puede modificar un mérito sin usuario");
 		}
+		if (!this.comprobarSiSePuedeActualizarMerito(merito)) {
+			throw new UVException("No se puede actualizar el mérito ya está asociado a una convocatoria finalizada");
+		}
 		
+		// actualizamos mérito
 		String consulta = "UPDATE TBEP_MERITOS bepmer" 
 				+ " SET BEPITE_CODNUM = ?, VALOR = ?, UID_USUARIO = ?"
 				+ " WHERE bepmer.CODNUM = ?";

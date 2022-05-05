@@ -68,7 +68,9 @@ public class ControladorMiembrosComision extends HttpServlet {
 		}
 		
 		try {
-			init(bean, datos, request, response);
+			if (!init(bean, datos, request, response)) {
+				return;
+			}
 			switch (nombreAccion) {
 				case ACCION_INDEX:
 					obtenerAreas(bean);
@@ -99,7 +101,7 @@ public class ControladorMiembrosComision extends HttpServlet {
 		}
 	}
 	
-	private void init(VistaMiembrosComision bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+	private boolean init(VistaMiembrosComision bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/miembroscomision/index.jsp");
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		
@@ -114,7 +116,10 @@ public class ControladorMiembrosComision extends HttpServlet {
 			LOGGER.log(Level.SEVERE, e.toString());
 			
 			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, e.getMessage());
+			return false;
 		}
+		
+		return true;
 	}
 	
 	private void errorFatal(VistaMiembrosComision bean, String mensaje) {

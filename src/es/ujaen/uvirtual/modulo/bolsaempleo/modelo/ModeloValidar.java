@@ -243,7 +243,7 @@ public class ModeloValidar {
 				+ "		INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbo.CODNUM = bepsbm.BEPSBO_CODNUM"
 				+ "		INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.CODNUM = bepsbo.BEPSOL_CODNUM"
 				+ "		INNER JOIN TBEP_MERITOS bepmer ON bepmer.CODNUM = bepsbm.BEPMER_CODNUM"
-				+ "		INNER JOIN TBEP_ITEMSBAREMACION bepite ON bepite.CODNUM = bepmer.BEPITE_CODNUM"
+				+ "		INNER JOIN TBEP_ITEMSBAREMACION bepite ON bepite.CODNUM = bepsbm.BEPITE_CODNUM"
 				+ "		INNER JOIN TBEP_USUARIOS bepusu ON bepusu.CODNUM = bepmer.BEPUSU_CODNUM"
 				+ "		WHERE 	bepsol.BEPCON_CODNUM = ?"
 				+ "			AND bepsol.FLGEXCLUIDO = 'N'"
@@ -333,7 +333,7 @@ public class ModeloValidar {
 				+ "		INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbo.CODNUM = bepsbm.BEPSBO_CODNUM"
 				+ "		INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.CODNUM = bepsbo.BEPSOL_CODNUM"
 				+ "		INNER JOIN TBEP_MERITOS bepmer ON bepmer.CODNUM = bepsbm.BEPMER_CODNUM"
-				+ "		INNER JOIN TBEP_ITEMSBAREMACION bepite ON bepite.CODNUM = bepmer.BEPITE_CODNUM"
+				+ "		INNER JOIN TBEP_ITEMSBAREMACION bepite ON bepite.CODNUM = bepsbm.BEPITE_CODNUM"
 				+ "		INNER JOIN TBEP_USUARIOS bepusu ON bepusu.CODNUM = bepmer.BEPUSU_CODNUM"
 				+ "		WHERE"
 				+ "				bepusu.ROL = " + ModeloRol.ID_ROL_CANDIDATO
@@ -476,27 +476,30 @@ public class ModeloValidar {
 			return dataTable;
 		}
 		
-		String consulta = "SELECT * FROM (SELECT bepusu.CODNUM, bepusu.CODCUENTA, bepusu.VUAJA_STRTIPODOCUMENTO, bepusu.VUAJA_IDNIF, bepusu.VUAJA_LETRANIF,"
-				+ "	bepusu.VUAJA_PRSNIF, bepusu.VUAJA_STRNOMBRE, bepusu.VUAJA_STRAPELLIDO1, bepusu.VUAJA_STRAPELLIDO2, bepusu.VUAJA_EMAIL_ALTA,"
-				+ "	SUM(CASE WHEN bepsbm.FLGVALIDADO = 'N' AND bepsbm.FLGEXCLUIDO = 'N' THEN 1 ELSE 0 END) AS COUNT_NO_VALIDADOS,"
-				+ "	SUM(CASE WHEN bepsbm.FLGVALIDADO = 'S' AND bepsbm.FLGEXCLUIDO = 'N' THEN 1 ELSE 0 END) AS COUNT_VALIDADOS,"
-				+ "	SUM(CASE WHEN bepsbm.FLGEXCLUIDO = 'S' THEN 1 ELSE 0 END) AS COUNT_EXCLUIDOS,"
-				+ "	COUNT(*) AS COUNT_TOTAL"
-				+ "	FROM TBEP_USUARIOS bepusu"
-				+ "	INNER JOIN TBEP_MERITOS bepmer ON bepusu.CODNUM = bepmer.BEPUSU_CODNUM"
-				+ "	INNER JOIN TBEP_ITEMSBAREMACION bepite ON bepite.CODNUM = bepmer.BEPITE_CODNUM"
-				+ "	INNER JOIN TBEP_SOL_BOL_MERITOS bepsbm ON bepmer.CODNUM = bepsbm.BEPMER_CODNUM"
-				+ "	INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbo.CODNUM = bepsbm.BEPSBO_CODNUM"
-				+ "	INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.CODNUM = bepsbo.BEPSOL_CODNUM"
-				+ "	WHERE	bepusu.ROL = " + ModeloRol.ID_ROL_CANDIDATO
-				+ "		AND bepsol.FLGEXCLUIDO = 'N'"
-				+ "		AND bepsbo.BEPBOL_CODNUM = ?"
-				+ "		AND bepsol.BEPCON_CODNUM = ?"
-				+ "		AND bepusu.FLGBORRADO = 'N'"
-				+ "		AND bepsol.ESTADO = '" + ModeloSolicitud.SOLICITUD_ESTADO_CERRADA + "'"
+		String consulta = "SELECT * "
+				+ " FROM ("
+				+ " 	SELECT "
+				+ "			bepusu.CODNUM, bepusu.CODCUENTA, bepusu.VUAJA_STRTIPODOCUMENTO, bepusu.VUAJA_IDNIF, bepusu.VUAJA_LETRANIF,"
+				+ "			bepusu.VUAJA_PRSNIF, bepusu.VUAJA_STRNOMBRE, bepusu.VUAJA_STRAPELLIDO1, bepusu.VUAJA_STRAPELLIDO2, bepusu.VUAJA_EMAIL_ALTA,"
+				+ "			SUM(CASE WHEN bepsbm.FLGVALIDADO = 'N' AND bepsbm.FLGEXCLUIDO = 'N' THEN 1 ELSE 0 END) AS COUNT_NO_VALIDADOS,"
+				+ "			SUM(CASE WHEN bepsbm.FLGVALIDADO = 'S' AND bepsbm.FLGEXCLUIDO = 'N' THEN 1 ELSE 0 END) AS COUNT_VALIDADOS,"
+				+ "			SUM(CASE WHEN bepsbm.FLGEXCLUIDO = 'S' THEN 1 ELSE 0 END) AS COUNT_EXCLUIDOS,"
+				+ "			COUNT(*) AS COUNT_TOTAL"
+				+ "		FROM TBEP_USUARIOS bepusu"
+				+ "		INNER JOIN TBEP_MERITOS bepmer ON bepusu.CODNUM = bepmer.BEPUSU_CODNUM"
+				+ "		INNER JOIN TBEP_SOL_BOL_MERITOS bepsbm ON bepsbm.BEPMER_CODNUM = bepmer.CODNUM"
+				+ "		INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbo.CODNUM = bepsbm.BEPSBO_CODNUM"
+				+ "		INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.CODNUM = bepsbo.BEPSOL_CODNUM"
+				+ "		INNER JOIN TBEP_ITEMSBAREMACION bepite ON bepite.CODNUM = bepsbm.BEPITE_CODNUM"
+				+ "		WHERE	bepusu.ROL = " + ModeloRol.ID_ROL_CANDIDATO
+				+ "			AND bepsol.FLGEXCLUIDO = 'N'"
+				+ "			AND bepsbo.BEPBOL_CODNUM = ?"
+				+ "			AND bepsol.BEPCON_CODNUM = ?"
+				+ "			AND bepusu.FLGBORRADO = 'N'"
+				+ "			AND bepsol.ESTADO = '" + ModeloSolicitud.SOLICITUD_ESTADO_CERRADA + "'"
 				+ (afinidad ? " AND bepite.AFINIDAD IS NOT NULL" : " AND bepite.AFINIDAD IS NULL")
-				+ "	GROUP BY bepusu.CODNUM, bepusu.CODCUENTA, bepusu.VUAJA_STRTIPODOCUMENTO, bepusu.VUAJA_IDNIF, bepusu.VUAJA_LETRANIF,"
-				+ "	bepusu.VUAJA_PRSNIF, bepusu.VUAJA_STRNOMBRE, bepusu.VUAJA_STRAPELLIDO1, bepusu.VUAJA_STRAPELLIDO2, bepusu.VUAJA_EMAIL_ALTA"
+				+ "		GROUP BY bepusu.CODNUM, bepusu.CODCUENTA, bepusu.VUAJA_STRTIPODOCUMENTO, bepusu.VUAJA_IDNIF, bepusu.VUAJA_LETRANIF,"
+				+ "		bepusu.VUAJA_PRSNIF, bepusu.VUAJA_STRNOMBRE, bepusu.VUAJA_STRAPELLIDO1, bepusu.VUAJA_STRAPELLIDO2, bepusu.VUAJA_EMAIL_ALTA"
 				+ " ) WHERE 1=1 ";
 		
 		String whereNombre = String.format("(%s || ' ' || %s || ' ' || %s)", "VUAJA_STRNOMBRE", "VUAJA_STRAPELLIDO1", "VUAJA_STRAPELLIDO2");
@@ -558,15 +561,18 @@ public class ModeloValidar {
 		}
 		
 		String consulta = "SELECT bepmer.CODNUM, bepmer.BEPITE_CODNUM, bepmer.VALOR, bepmer.DESCRIPCION,"
-				+ "		bepmer.OBSERVACION, bepsbm.FLGEXCLUIDO, bepsbm.FLGVALIDADO"
+				+ "		          bepmer.OBSERVACION, bepsbm.FLGEXCLUIDO, bepsbm.FLGVALIDADO"
 				+ " FROM TBEP_SOL_BOL_MERITOS bepsbm"
 				+ "	INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbo.CODNUM = bepsbm.BEPSBO_CODNUM"
 				+ "	INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.CODNUM = bepsbo.BEPSOL_CODNUM"
 				+ "	INNER JOIN TBEP_MERITOS bepmer ON bepmer.CODNUM = bepsbm.BEPMER_CODNUM"
-				+ "	INNER JOIN TBEP_ITEMSBAREMACION bepite ON bepite.CODNUM = bepmer.BEPITE_CODNUM"
+				+ "	INNER JOIN TBEP_ITEMSBAREMACION bepite ON bepite.CODNUM = bepsbm.BEPITE_CODNUM"
 				+ " INNER JOIN TBEP_BLOQUESBAREMACION bepblo ON bepblo.CODNUM = bepite.BEPBLO_CODNUM"
 				+ " INNER JOIN TBEP_APARTADOSBAREMACION bepapa ON bepapa.CODNUM  = bepblo.BEPAPA_CODNUM"
-				+ "	WHERE bepsol.ESTADO = 'CERRADA' AND bepsbo.BEPBOL_CODNUM = ? AND bepsol.BEPCON_CODNUM = ? AND bepmer.BEPUSU_CODNUM = ?";
+				+ "	WHERE bepsol.ESTADO = 'CERRADA' "
+				+ "       AND bepsbo.BEPBOL_CODNUM = ? "
+				+ "       AND bepsol.BEPCON_CODNUM = ? "
+				+ "       AND bepmer.BEPUSU_CODNUM = ?";
 		
 		// agrega el filtro de afinidad
 		consulta += afinidad ? " AND bepite.AFINIDAD IS NOT NULL" : " AND bepite.AFINIDAD IS NULL";
@@ -647,7 +653,8 @@ public class ModeloValidar {
 				+ "	LEFT JOIN TBEP_ITEMSBAREMACION bepite ON bepite.CODNUM = bepsbm.BEPITE_CODNUM"
 				+ "	LEFT JOIN TBEP_BLOQUESBAREMACION bepblo ON bepblo.CODNUM = bepite.BEPBLO_CODNUM"
 				+ "	LEFT JOIN TBEP_APARTADOSBAREMACION bepapa ON bepapa.CODNUM  = bepblo.BEPAPA_CODNUM"
-				+ "	WHERE bepbol.FLGBAREMABLE = 'S' AND bepsol.BEPUSU_CODNUM = ?";
+				+ "	WHERE bepbol.FLGBAREMABLE = 'S' "
+				+ " AND bepsol.BEPUSU_CODNUM = ?";
 		
 		String whereCodigo = String.format("(%s || '.' || %s || '.' || %s)", "bepapa.CODIGO", "bepblo.CODIGO", "bepite.CODIGO");
 		String orderCodigo = String.format("(%s || '.' || %s || '.' || %s) %%s", "LPAD(bepapa.CODIGO, 3)", "LPAD(bepblo.CODIGO, 3)", "LPAD(bepite.CODIGO, 3)");
@@ -665,9 +672,10 @@ public class ModeloValidar {
 			int paramIndex = 1;
 			stmt.setInt(paramIndex, merito.getCodNum());
 			stmtCount.setInt(paramIndex++, merito.getCodNum());
+			
 			stmt.setInt(paramIndex, candidato.getCodNum());
 			stmtCount.setInt(paramIndex++, candidato.getCodNum());
-
+			
 			dataTable.setFiltersParams(stmt, stmtCount, paramIndex);
 			
 			ModeloBolsa modeloBolsa = ModeloBolsa.obtenerInstancia();
@@ -676,10 +684,10 @@ public class ModeloValidar {
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
 					Bolsa bol = modeloBolsa.createFromResultSet(rs);
-					Convocatoria convocatoria = ModeloConvocatoria.obtenerInstancia().getConvocatoriaById(rs.getInt("BEPCON_CODNUM"));
+					Convocatoria convocatoriaValores = ModeloConvocatoria.obtenerInstancia().getConvocatoriaById(rs.getInt("BEPCON_CODNUM"));
 					int idMeritoSolicitud = rs.getInt("BEPSBM_CODNUM");
 					String uidUsuario = rs.getString("UID_EVALUADOR");
-					rows.add(new ValorMeritoBolsaTable(modeloSolicitud.getMeritoSolicitudById(idMeritoSolicitud), convocatoria, bol, uidUsuario));
+					rows.add(new ValorMeritoBolsaTable(modeloSolicitud.getMeritoSolicitudById(idMeritoSolicitud), convocatoriaValores, bol, uidUsuario));
 				}
 			}
 

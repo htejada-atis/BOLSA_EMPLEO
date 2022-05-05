@@ -20,6 +20,7 @@ import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaValidacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.CandidatoValidacion;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ItemBaremacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Merito;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitud;
@@ -128,7 +129,9 @@ public class ControladorValidarNoAfines extends HttpServlet {
 		}
 		
 		try {
-			init(bean, datos, request, response);
+			if (!init(bean, datos, request, response)) {
+				return;
+			}
 			switch (nombreAccion) {
 				case ACCION_INDEX:
 					break;
@@ -177,7 +180,7 @@ public class ControladorValidarNoAfines extends HttpServlet {
 		doGet(request, response);
 	}
 	
-	private void init(VistaValidarNoAfines bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+	private boolean init(VistaValidarNoAfines bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		bean.setVista(JSP_INDEX);
 		bean.setConvocatoria(ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoria());
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
@@ -193,7 +196,10 @@ public class ControladorValidarNoAfines extends HttpServlet {
 			LOGGER.log(Level.SEVERE, e.toString());
 			
 			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, e.getMessage());
+			return false;
 		}
+		
+		return true;
 	}
 	
 	private void accionNodefinida(VistaValidarNoAfines bean) {
@@ -288,8 +294,8 @@ public class ControladorValidarNoAfines extends HttpServlet {
 	private void validarMerito(VistaValidarNoAfines bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
 			throws UVException, IOException {
 		ModeloValidar modeloValidar = ModeloValidar.obtenerInstancia();
-		Gson gson = new GsonBuilder().create();
 		ModeloBolsa modeloBolsa = ModeloBolsa.obtenerInstancia();
+		Gson gson = new GsonBuilder().create();
 		
 		boolean afinidad = false;
 		
@@ -307,17 +313,18 @@ public class ControladorValidarNoAfines extends HttpServlet {
 				Integer idItem = Formateador.leeParametroInteger(request.getParameter(PARAM_ITEM));
 				ItemBaremacion item = ModeloBaremacionItems.obtenerInstancia().getItemBaremacionById(idItem);
 				merito.setItemBaremacion(item);
-				bean.getMerito().setItem(item);
+				// bean.getMerito().setItem(item);
 				
 				// valor
 				Double valor = ModeloMerito.validateValorDelMerito(request.getParameter(PARAM_VALOR), merito);
 				merito.setValor(valor);
 				bean.getMerito().setValor(valor);
 				
-				if (!item.equals(bean.getMerito().getMerito().getItemBaremacion())) {
+				if (!item.equals(bean.getMerito().getItem())) {
+					bean.getMerito().setItem(item);
+					
 					ModeloSolicitud modeloSolicitud = ModeloSolicitud.obtenerInstancia();
 					Solicitud solicitud = modeloSolicitud.getSolicitudCerradaByConvocatoriaUsuario(bean.getCandidato(), bean.getConvocatoria());
-					
 					Integer totalMeritos = modeloSolicitud.obtenerTotalMeritosPorBloqueSolicitud(solicitud, bean.getBolsa(), merito);
 					
 					if (totalMeritos >= bean.getConvocatoria().getNumMeritosPorBloque()
@@ -333,7 +340,7 @@ public class ControladorValidarNoAfines extends HttpServlet {
 						afinidad = true;
 					} else {
 						BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_MERITO_MODIFICAR_ITEM, bean, request);
-					}
+					}					
 				} else if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACEPTAR_MERITO)) != null) {
 					for (String idBolsa : bolsas) {
 						modeloValidar.evaluarMerito(idBolsa, bean.getMerito(),
@@ -350,9 +357,13 @@ public class ControladorValidarNoAfines extends HttpServlet {
 					}
 				}
 				
-				ModeloMerito.obtenerInstancia().actualizaMerito(merito, bean.getUsuarioLogeado());
+				if (ModeloMerito.obtenerInstancia().comprobarSiSePuedeActualizarMerito(merito)) {
+					ModeloMerito.obtenerInstancia().actualizaMerito(merito, bean.getUsuarioLogeado());
+				}
 			}
 			
+		} catch (UVException ex) {
+			BolsaEmpleoUtils.addMensajeDeError(ex.getMessage(), bean, request);
 		} catch (Exception ex) {
 			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(ex));
 			LOGGER.log(Level.SEVERE, ex.toString());
@@ -501,7 +512,7 @@ public class ControladorValidarNoAfines extends HttpServlet {
 	}
 	
 	private void listadoValoresMeritoBolsa(VistaValidarNoAfines bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
-			throws IOException {
+			throws IOException, SQLException {
 		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		datos.setRespuestaEnviada(true);
 		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);

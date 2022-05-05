@@ -127,7 +127,7 @@ public class ModeloCandidato {
 				+ "	WHERE bepmpu.BEPUSU_CODNUM = bepusu.CODNUM AND bepmpu.FLGBORRADO = 'N' AND bepmep.TIPO = ? ";
 		
 		String consulta = ""
-				+ " SELECT bepusu.*, "
+				+ " SELECT DISTINCT bepusu.*, "
 				+ "		(" + subquery + ") AS COUNT_ACREDITACIONES, "
 				+ "	    (SELECT COUNT(*) FROM TBEP_MER_PRE_USUARIO bepmpu "
 				+ "		 INNER JOIN TBEP_MERITOS_PREFERENTES bepmep ON bepmep.CODNUM = bepmpu.BEPMEP_CODNUM "
@@ -236,7 +236,7 @@ public class ModeloCandidato {
 				+ "	WHERE beptus.BEPTUS_USU_CODNUM = bepusu.CODNUM AND beptus.FLGBORRADO = 'N'";
 
 		String consulta = ""
-				+ " SELECT bepusu.CODNUM, "
+				+ " SELECT DISTINCT bepusu.CODNUM, "
 				+ "		(" + subquery + ") AS COUNT_TITULACIONES, "
 				+ "		(SELECT COUNT(*) FROM TBEP_TITULACIONES_USUARIO beptus "
 				+ "		 WHERE beptus.BEPTUS_USU_CODNUM = bepusu.CODNUM AND beptus.FLGBORRADO = 'N' AND beptus.FLGVALIDADA = 'S' "
@@ -245,7 +245,7 @@ public class ModeloCandidato {
 				+ " INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.BEPUSU_CODNUM = bepusu.CODNUM "
 				+ "	WHERE 1=1 "
 				+ "		AND bepusu.FLGBORRADO = 'N' "
-				+ "		AND bepusu.rol = " + ModeloRol.ID_ROL_CANDIDATO + " "
+				+ "		AND bepusu.ROL = " + ModeloRol.ID_ROL_CANDIDATO + " "
 				+ "		AND bepsol.ESTADO = '" + ModeloSolicitud.SOLICITUD_ESTADO_CERRADA + "'";
 						
 		if (conTitulaciones) {

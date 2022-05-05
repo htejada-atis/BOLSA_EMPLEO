@@ -28,6 +28,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaSolicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaSolicitudTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Merito;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoPreferenteUsuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitudTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Solicitud;
@@ -40,6 +41,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacionItems;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloConvocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMerito;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMeritosPreferentesCandidato;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloParametrosConfiguracion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloRol;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloSolicitud;
@@ -111,7 +113,9 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	public static final String MENSAJE_ERROR_BOLSAS_SELECCIONADAS_INCORRECTAS = "No hay bolsas seleccionadas válidas";
 	public static final String MENSAJE_ERROR_ITEM_EXCLUYENTE = "El item que ha seleccionado es excluyente con los items: ";
 	public static final String MENSAJE_ERROR_MERITOS_SIN_VALORACION = "No puede haber méritos con afinidad sin valoración";
+	public static final String MENSAJE_ERROR_MERITO_EXCLUIDO = "El mérito ya ha sido excluido para esta bolsa en una convocatoria anterior";
 	public static final String MENSAJE_ERROR_MERITO_NO_NULO = "Merito no puede ser nulo";
+	public static final String MENSAJE_ERROR_NUMERO_MAXIMO_MERITOS_APARTADO = "Se ha alcanzado el número máximo de méritos por apartado";
 	public static final String MENSAJE_ERROR_NUMERO_MAXIMO_MERITOS_BLOQUE = "Se ha alcanzado el número máximo de méritos por bloque";
 	public static final String MENSAJE_ERROR_SIN_MERITOS = "Dene incluir al menos un mérito en una bolsa para continuar";
 	public static final String MENSAJE_EXITO_SOLICITUD_CONFIRMADA = "La solicitud ha sido confirmada correctamente";
@@ -148,7 +152,9 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		}
 
 		try {
-			init(bean, datos, request, response);
+			if (!init(bean, datos, request, response)) {
+				return;
+			}
 			switch (nombreAccion) {
 				case ACCION_CONSULTAR_SOLICITUD:
 				case ACCION_CREAR_SOLICITUD:
@@ -200,7 +206,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		}
 	}
 	
-	private void init(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+	private boolean init(VistaSolicitudes bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		bean.setVista(JSP_INDEX);
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		
@@ -214,7 +220,10 @@ public class ControladorMisSolicitudes extends HttpServlet {
 			LOGGER.log(Level.WARNING, e.toString());
 			
 			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, e.getMessage());
-		}		
+			return false;
+		}
+		
+		return true;
 	}
 	
 	private void errorFatal(VistaSolicitudes bean, String mensaje) {
@@ -559,41 +568,62 @@ public class ControladorMisSolicitudes extends HttpServlet {
 	private void seleccionarMerito(VistaSolicitudes bean, HttpServletRequest request, Boolean seleccionado)
 			throws UVException, SQLException {
 		ModeloBolsa modeloBolsa = ModeloBolsa.obtenerInstancia();
-		ModeloMerito modeloMerito = ModeloMerito.obtenerInstancia();				
+		ModeloMerito modeloMerito = ModeloMerito.obtenerInstancia();
 		
 		Bolsa area = modeloBolsa.getBolsaById(Formateador.leeParametroInteger(request.getParameter(PARAM_BOLSA)));
 		bean.setArea(area);
-
+		
 		Merito merito = modeloMerito.listaMerito(Formateador.leeParametroInteger(request.getParameter(PARAM_MERITO_ID)));
 		bean.setMerito(merito);
-
+		
 		if (merito == null) {
 			throw new UVException(MENSAJE_ERROR_MERITO_NO_NULO);
 		}
 
 		Solicitud solicitud = this.listaBolsasSolicitud(bean, request);
 		this.seleccionarBolsa(bean, request);
-
+		
 		ModeloSolicitud modeloSolicitud = ModeloSolicitud.obtenerInstancia();
-				
+		
 		if (Boolean.TRUE.equals(seleccionado)) {
 			// comprobamos que el total de méritos por bloque de la solicitud sea menor que
 			// el permitido por la convocatoria
 			Integer totalMeritos = modeloSolicitud.obtenerTotalMeritosPorBloqueSolicitud(solicitud, area, merito);
-
+			
 			if (totalMeritos >= solicitud.getConvocatoria().getNumMeritosPorBloque()) {
 				this.seleccionarBolsa(bean, request);
 				throw new UVException(MENSAJE_ERROR_NUMERO_MAXIMO_MERITOS_BLOQUE);
 			}
 			
-			ModeloBaremacionItems modeloItems = ModeloBaremacionItems.obtenerInstancia();
+			// comprobamos que el total de méritos por apartado de la solicitud para esta bolsa
+			// sea menor que el permitido por el apartado
+			Integer totalMeritosApartado = modeloSolicitud.obtenerTotalMeritosPorApartadoSolicitud(solicitud, area, merito);
 			
+			if (merito.getItemBaremacion().getBloqueBaremacion().getNumeroMaximoMeritos() != null 
+					&& merito.getItemBaremacion().getBloqueBaremacion().getNumeroMaximoMeritos() != 0
+					&& totalMeritosApartado >= merito.getItemBaremacion().getBloqueBaremacion().getNumeroMaximoMeritos()) {
+				this.seleccionarBolsa(bean, request);
+				throw new UVException(MENSAJE_ERROR_NUMERO_MAXIMO_MERITOS_APARTADO);
+			}
+			
+			// comprobamos items excluyentes con el añadido
+			ModeloBaremacionItems modeloItems = ModeloBaremacionItems.obtenerInstancia();
 			List<MeritoSolicitud> listaMeritos = modeloSolicitud.getMeritosSolicitudBolsa(solicitud, area);
 			for (MeritoSolicitud mer : listaMeritos) {
 				modeloItems.checkItemsExcluyentes(mer.getMerito().getItemBaremacion(), merito.getItemBaremacion());
 			}
 			
-			modeloSolicitud.asignarMeritosASolicitudBolsa(solicitud, area, merito, bean.getUsuarioLogeado());			
+			// leemos el merito de una solicitud anterior
+			MeritoSolicitud meritoSolicitudAnterior = modeloSolicitud.getMeritoSolicitudByConvocatoriaAnterior(solicitud.getConvocatoria(), area, merito);
+			if (meritoSolicitudAnterior != null) {
+				if (meritoSolicitudAnterior.isExcluido()) {
+					throw new UVException(MENSAJE_ERROR_MERITO_EXCLUIDO);
+				}
+				
+				modeloSolicitud.asignarMeritoAnteriorASolicitudBolsa(solicitud, area, meritoSolicitudAnterior, bean.getUsuarioLogeado());
+			} else {
+				modeloSolicitud.asignarMeritosASolicitudBolsa(solicitud, area, merito, bean.getUsuarioLogeado());
+			}
 		} else {
 			modeloSolicitud.borrarMeritoDeSolicitudBolsa(solicitud, area, merito, bean.getUsuarioLogeado());
 		}
@@ -810,6 +840,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		
 		ModeloSolicitud modeloSolicitud = ModeloSolicitud.obtenerInstancia();
 		ModeloTitulacion modeloTitulacion = ModeloTitulacion.obtenerInstancia();
+		ModeloMeritosPreferentesCandidato modeloMeritoPreferentes = ModeloMeritosPreferentesCandidato.obtenerInstancia(); 
 		
 		Solicitud solicitud = this.getSolicitud(bean, request);
 		bean.setSolicitud(solicitud);
@@ -817,6 +848,9 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		List<TitulacionUsuario> titulaciones = modeloTitulacion.listaTitulacionesCandidato(bean.getUsuarioLogeado().getCodNum(), false);
 		bean.setListaTitulaciones(titulaciones);
 		
+		List<MeritoPreferenteUsuario> preferentes = modeloMeritoPreferentes.listaMeritosPreferentesCandidato(bean.getUsuarioLogeado());
+		bean.setListaMeritosPreferentes(preferentes);
+						
 		// comprobamos que el total de méritos sea mayor que 0
 		Integer totalMeritos = modeloSolicitud.obtenerTotalMeritosSolicitud(solicitud);
 		

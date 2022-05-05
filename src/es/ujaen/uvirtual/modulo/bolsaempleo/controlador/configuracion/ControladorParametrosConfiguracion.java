@@ -81,7 +81,9 @@ public class ControladorParametrosConfiguracion extends HttpServlet {
 		}
 		
 		try {
-			init(bean, datos, request, response);
+			if (!init(bean, datos, request, response)) {
+				return;
+			}
 			switch (nombreAccion) {
 				case ACCION_INDEX:
 					listaParametros(bean);
@@ -112,7 +114,7 @@ public class ControladorParametrosConfiguracion extends HttpServlet {
 		}
 	}
 	
-	private void init(VistaParametrosConfiguracion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) 
+	private boolean init(VistaParametrosConfiguracion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) 
 			throws SQLException, UVException, IOException {
 		bean.setVista(RUTA_BEP_CONF + "index.jsp");
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
@@ -128,7 +130,10 @@ public class ControladorParametrosConfiguracion extends HttpServlet {
 			LOGGER.log(Level.SEVERE, e.toString());
 			
 			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, e.getMessage());
-		}		
+			return false;
+		}
+		
+		return true;		
 	}
 	
 	private void errorFatal(VistaParametrosConfiguracion bean, String mensaje) {

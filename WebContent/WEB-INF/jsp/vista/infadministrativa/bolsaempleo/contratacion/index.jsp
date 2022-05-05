@@ -84,7 +84,7 @@ $(document).ready(function() {
 				return row.area.idAreaExterno + ' ' + row.area.descripcion;
 			}},
 			{'data': 'estado', 'filter': {'type': 'select', 'options': estadosPlaza}},
-			{'data': 'curso', 'filter': {'type': 'select', 'options': cursosPlaza, 'optionDefault': '<%= bean.getCursos().get(0) %>'}},
+			{'data': 'curso', 'filter': {'type': 'select', 'options': cursosPlaza, 'optionDefault': '<%= bean.getCursos().size() > 0 ? bean.getCursos().get(0) : "null" %>'}},
 			{'data': 'fechaCreacion', 'filter': {'type': 'date'}},
 			{'data': 'fechaAbierta', 'filter': {'type': 'date'}},
 			{'data': 'fechaFinOferta', 'filter': {'type': 'date'}},

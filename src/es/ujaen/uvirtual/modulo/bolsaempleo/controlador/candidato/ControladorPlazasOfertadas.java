@@ -3,6 +3,7 @@ package es.ujaen.uvirtual.modulo.bolsaempleo.controlador.candidato;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -17,6 +18,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.OfertaCandidato;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.PlazaOfertada;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloContratacion;
@@ -107,7 +109,9 @@ public class ControladorPlazasOfertadas extends HttpServlet {
 			nombreAccion = ACCION_INDEX;
 		}
 		try {
-			init(bean, datos, request, response);
+			if (!init(bean, datos, request, response)) {
+				return;
+			}
 			
 			switch (nombreAccion) {
 				case ACCION_DATATABLE_PLAZAS_OFERTADAS:
@@ -150,7 +154,7 @@ public class ControladorPlazasOfertadas extends HttpServlet {
 		}
 	}
 	
-	private void init(VistaPlazasOfertadas bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+	private boolean init(VistaPlazasOfertadas bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		bean.setVista(JSP_INDEX);
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		
@@ -168,7 +172,10 @@ public class ControladorPlazasOfertadas extends HttpServlet {
 		} catch (UVException e) {
 			LOGGER.log(Level.WARNING, e.toString());
 			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, e.getMessage());
+			return false;
 		}
+		
+		return true;
 	}
 	
 	private void errorFatal(VistaPlazasOfertadas bean, String mensaje) {
@@ -186,8 +193,15 @@ public class ControladorPlazasOfertadas extends HttpServlet {
 	
 	private void index(VistaPlazasOfertadas bean) throws SQLException, UVException {
 		ModeloConvocatoria modeloConvocatoria = ModeloConvocatoria.obtenerInstancia();
-		bean.setListaOfertasCandidatos(ModeloOfertaCandidato.obtenerInstancia().listaOfertasCandidatoPreferentes(bean.getUsuarioLogeado(),
-				modeloConvocatoria.getUltimaConvocatoria()));
+		ModeloOfertaCandidato modeloOferta = ModeloOfertaCandidato.obtenerInstancia();
+
+		Convocatoria c = modeloConvocatoria.getUltimaConvocatoriaFinalizada();
+
+		if (c != null) {
+			bean.setListaOfertasCandidatos(modeloOferta.listaOfertasCandidatoPreferentes(bean.getUsuarioLogeado(), c));
+		} else {
+			bean.setListaOfertasCandidatos(new ArrayList<>());
+		}
 	}
 	
 	private void guardarPreferencias(VistaPlazasOfertadas bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
@@ -299,12 +313,13 @@ public class ControladorPlazasOfertadas extends HttpServlet {
 		datos.setRespuestaEnviada(true);
 		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
+
 		ModeloConvocatoria modeloConvocatoria = ModeloConvocatoria.obtenerInstancia();
-		
+		ModeloOfertaCandidato modeloOferta = ModeloOfertaCandidato.obtenerInstancia();
+
 		try (PrintWriter writer = response.getWriter()) {
 			try {
-				BolsaEmpleoDataTable<OfertaCandidato> dataTable = ModeloOfertaCandidato.obtenerInstancia().listadoPlazasOfertadasCandidato(
-						request.getParameterMap(), bean.getUsuarioLogeado(), modeloConvocatoria.getUltimaConvocatoria());
+				BolsaEmpleoDataTable<OfertaCandidato> dataTable = modeloOferta.listadoPlazasOfertadasCandidato(request.getParameterMap(), bean.getUsuarioLogeado());
 				bean.setDatatableOfertasCandidatos(dataTable);
 				writer.write(dataTable.toJson("dd/M/yyyy HH:mm:ss"));
 			} catch (UVException | SQLException e) {

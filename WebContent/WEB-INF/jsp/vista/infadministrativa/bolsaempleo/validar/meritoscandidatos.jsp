@@ -264,8 +264,10 @@ Boolean onlyRead = bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRo
 							<%	if (individualizado) { %>
 									<select id="afinidad-individualizada" data-valoracion="<%= valoraciones ? meritoBolsa.getMeritoSolicitud().getValoraciones().get(0).getCodNum() : "0" %>"
 									<%= bolsaDisabled ? "disabled" : "" %>>
-									<% 	for (Afinidad afinidad : bean.getListaAfinidades()) { %>
-										<%	if (afinidad.getCodigo().equals(meritoBolsa.getMeritoSolicitud().getMerito().getItemBaremacion().getAfinidad())) { %>
+									<% 	for (Afinidad afinidad : bean.getListaAfinidades()) { 
+										ItemBaremacion itemMerito = meritoBolsa.getMeritoSolicitud().getItem() != null ? meritoBolsa.getMeritoSolicitud().getItem() : meritoBolsa.getMeritoSolicitud().getMerito().getItemBaremacion();
+									%>
+										<%	if (afinidad.getCodigo().equals(itemMerito.getAfinidad())) { %>
 											<% 	if (valoraciones && meritoBolsa.getMeritoSolicitud().getValoraciones().get(0).getAfinidad().getCodNum() == afinidad.getCodNum()) { %>
 												<option value="<%= afinidad.getCodNum() %>" selected><%= afinidad.getModulacion() * 100 + "%: " + afinidad.getDescripcion() %></option>
 											<%	} else { %>
@@ -293,11 +295,12 @@ Boolean onlyRead = bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRo
 													</td>
 												</tr>
 										<%	} %>
-												
 								<%	} else { %>
 									<% 	for (int i = 0; i < bean.getListaAfinidades().size(); i++) {
-											Afinidad afinidad = bean.getListaAfinidades().get(i); %>
-										<%	if (afinidad.getCodigo().equals(meritoBolsa.getMeritoSolicitud().getMerito().getItemBaremacion().getAfinidad())) { %>
+											Afinidad afinidad = bean.getListaAfinidades().get(i);
+											ItemBaremacion itemMerito = meritoBolsa.getMeritoSolicitud().getItem() != null ? meritoBolsa.getMeritoSolicitud().getItem() : meritoBolsa.getMeritoSolicitud().getMerito().getItemBaremacion();										
+										%>
+										<%	if (afinidad.getCodigo().equals(itemMerito.getAfinidad())) { %>
 												<tr>
 													<td style="width:70px">
 														<label for="merito_valoracion_<%= i %>">
@@ -315,7 +318,7 @@ Boolean onlyRead = bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRo
 										<tr>
 											<td style="width:70px">Total:</td>
 											<td>
-												<input class="validar-afinidad total-no-individualizado" data-total="<%= meritoBolsa.getMeritoSolicitud().getMerito().getValor() %>" type="number" min="0" name="total"
+												<input class="validar-afinidad total-no-individualizado" data-total="<%= meritoBolsa.getMeritoSolicitud().getValor() != 0 ? meritoBolsa.getMeritoSolicitud().getValor() : meritoBolsa.getMeritoSolicitud().getMerito().getValor() %>" type="number" min="0" name="total"
 												value="<%= total %>" disabled/>
 											</td>
 										</tr>

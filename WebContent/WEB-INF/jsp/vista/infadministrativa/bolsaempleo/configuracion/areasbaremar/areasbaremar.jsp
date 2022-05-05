@@ -23,7 +23,7 @@ VistaAreasBaremar bean = (VistaAreasBaremar) uvdatos.getVistas().get(VistaAreasB
 	
 	<table class="bluetable bolsaempleo" id="tableAreasABA">
 		<tr>
-			<th scope="col" style="width:5%"></th>
+			<th scope="col" style="width:18px"></th>
 			<th scope="col" style="width:5%" title="Id de la area">Id</th>
 			<th scope="col" style="width:25%" class="codigo" title="Código de area">Código</th>
 			<th scope="col" style="width:65%">Area</th>
@@ -45,8 +45,8 @@ $(document).ready(function() {
 	var table = new Atis.DataTable('#tableAreasABA', {
 		"ajax": { url: "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/areasbaremar" },
 		"selectable": true,
-		"pageSize": 200,
-		"pageSizeOptions": [10, 100, 200],
+		"pageSize": 20,
+		"pageSizeOptions": [10, 20, 100, 200],
 		"action": "<%= ControladorAreasABaremar.ACCION_DATATABLE %>",
 		"filterable": true,
 		"stateSave": true,

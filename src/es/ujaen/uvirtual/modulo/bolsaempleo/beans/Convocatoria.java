@@ -12,6 +12,7 @@ public class Convocatoria implements Serializable {
 	private Integer codNum;
 	private String descripcion;
 	private Date fechaCierre;
+	private Date fechaFinalizacion;
 	private String estado;
 	private Integer numBolsasMaximo;
 	private Integer numMeritosPorBloque;
@@ -110,27 +111,36 @@ public class Convocatoria implements Serializable {
 		this.numMeritosPorBloque = numMeritosPorBloque;
 	}
 	
+	public Date getFechaFinalizacion() {
+		return fechaFinalizacion;
+	}
+
+	public void setFechaFinalizacion(Date fechaFinalizacion) {
+		this.fechaFinalizacion = fechaFinalizacion;
+	}
+	
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}
 	
 	@Override
 	public String toString() {
-		return "Convocatoria [codNum=" + codNum + ", descripcion=" + descripcion 
-				+ ", fechaCierre=" + fechaCierre + ", estado=" + estado + ", numBolsasMaximo=" + numBolsasMaximo
-				+ ", numMeritosPorBloque=" + numMeritosPorBloque + "]";
+		return "Convocatoria [codNum=" + codNum + ", descripcion=" + descripcion + ", fechaCierre=" + fechaCierre 
+				+ ", estado=" + estado + ", numBolsasMaximo=" + numBolsasMaximo + ", numMeritosPorBloque=" + numMeritosPorBloque 
+				+ ", fechaFinalizacion=" + fechaFinalizacion + "]";
 	}
 	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
-		int result = 1;		
+		int result = 1;
 		result = prime * result + ((codNum == null) ? 0 : codNum.hashCode());
 		result = prime * result + ((descripcion == null) ? 0 : descripcion.hashCode());
 		result = prime * result + ((fechaCierre == null) ? 0 : fechaCierre.hashCode());
 		result = prime * result + ((estado == null) ? 0 : estado.hashCode());
 		result = prime * result + ((numBolsasMaximo == null) ? 0 : numBolsasMaximo.hashCode());
 		result = prime * result + ((numMeritosPorBloque == null) ? 0 : numMeritosPorBloque.hashCode());
+		result = prime * result + ((fechaFinalizacion == null) ? 0 : fechaFinalizacion.hashCode());
 		return result;
 	}
 	
@@ -189,7 +199,15 @@ public class Convocatoria implements Serializable {
 		} else if (!numMeritosPorBloque.equals(other.numMeritosPorBloque)) {
 			return false;
 		}
+		if (fechaFinalizacion == null) {
+			if (other.fechaFinalizacion != null) {
+				return false;
+			}
+		} else if (!fechaFinalizacion.equals(other.fechaFinalizacion)) {
+			return false;
+		}
 		
 		return true;
-	}	
+	}
+	
 }
