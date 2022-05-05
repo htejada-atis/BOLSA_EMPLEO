@@ -56,6 +56,9 @@ public class ModeloSolicitud {
 	public static final String MENSAJE_ERROR_SOLICITUD_CERRADA = "La solicitud está cerrada";
 	public static final String MENSAJE_ERROR_TIPO_AFINIDAD = "La afinidad no es del mismo tipo que la del item del mérito";
 	
+	public static final int ORDER_COLUMN_INDEX_CODIGO_AREA = 1;
+	public static final int ORDER_COLUMN_INDEX_DESCRIPCION_AREA = 2;
+	
 	public static final int ORDER_COLUMN_INDEX_MERITOS_ID_MERITO = 1;
 	public static final int ORDER_COLUMN_INDEX_MERITOS_ITEM_CODIGO = 2;
 	public static final int ORDER_COLUMN_INDEX_MERITOS_ITEM_NOMBRE = 3;
@@ -209,12 +212,15 @@ public class ModeloSolicitud {
 		List<Bolsa> bolsas = new ArrayList<>();
 		BolsaEmpleoDataTable<Bolsa> dataTable = new BolsaEmpleoDataTable<>(params);
 		
-		String consulta =
-			"  SELECT bepbol.* "
-			+ "FROM TBEP_SOLICITUD_BOLSAS bepsbo "
-			+ "INNER JOIN TBEP_BOLSAS bepbol ON bepbol.CODNUM = bepsbo.BEPBOL_CODNUM "
-			+ "WHERE bepsbo.BEPSOL_CODNUM = ? ";
-		
+		String consulta = ""
+			+ " SELECT bepbol.* "
+			+ " FROM TBEP_SOLICITUD_BOLSAS bepsbo "
+			+ " INNER JOIN TBEP_BOLSAS bepbol ON bepbol.CODNUM = bepsbo.BEPBOL_CODNUM "
+			+ " INNER JOIN TBEP_AREAS bepare ON bepare.CODNUM = bepbol.BEPARE_CODNUM "
+			+ " WHERE bepsbo.BEPSOL_CODNUM = ? ";
+			
+		dataTable.setColumn(ORDER_COLUMN_INDEX_CODIGO_AREA, "bepare.ID_AREA_CONOCIMIENTO");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_DESCRIPCION_AREA, "bepare.DES_AREA_CONOCIMIENTO");
 		dataTable.setQuery(consulta);
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
