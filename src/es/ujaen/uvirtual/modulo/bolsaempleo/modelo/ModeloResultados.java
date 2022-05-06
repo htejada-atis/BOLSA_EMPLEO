@@ -405,11 +405,12 @@ public class ModeloResultados {
 	 * Devuelve el listado de candidatos resultados para exportar en csv.
 	 * @param bolsa .
 	 * @param convocatoria .
+	 * @param separator .
 	 * @return .
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	public List<String[]> listadoResultadosCandidatosAreaCsv(Bolsa bolsa, Convocatoria convocatoria) throws SQLException, UVException {
+	public List<String[]> listadoResultadosCandidatosAreaCsv(Bolsa bolsa, Convocatoria convocatoria, String separator) throws SQLException, UVException {
 		String consulta = "SELECT bepusu.*, bepsob.TOTAL"
 				+ " FROM TBEP_SOLICITUD_BOLSAS bepsob"
 				+ " INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.CODNUM = bepsob.BEPSOL_CODNUM"
@@ -421,6 +422,8 @@ public class ModeloResultados {
 		
 		List<String[]> rows = new ArrayList<>();
 		
+		rows.add(new String[] {"NIF", "NOMBRE", "EMAIL", "TOTAL"});
+		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int paramIndex = 1;
 			stmt.setInt(paramIndex++, convocatoria.getCodNum());
@@ -429,16 +432,66 @@ public class ModeloResultados {
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
 					UsuarioBolsaEmpleo usuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioById(rs.getInt(CODNUM));
+
+					String nif = BolsaEmpleoUtils.string2csv(usuario.getPrsNif(), separator);
+					String nombre = BolsaEmpleoUtils.string2csv(
+							String.format("\"%s %s %s\"", usuario.getNombre() != null ? usuario.getNombre() : "",
+									usuario.getPrimerApellido() != null ? usuario.getPrimerApellido() : "",
+									usuario.getSegundoApellido() != null ? usuario.getSegundoApellido() : ""), separator);
+					String email = BolsaEmpleoUtils.string2csv(usuario.getEmail(), separator);
+					String total = BolsaEmpleoUtils.string2csv(String.valueOf(rs.getDouble(TOTAL)), separator);
+
+					rows.add(new String[] {nif, nombre, email, total});
+				}
+			}
+		}
+		
+		return rows;
+	}
+	
+	/**
+	 * Devuelve el listado de candidatos y areas y sus resultados resultados para exportar en csv.
+	 * @param convocatoria .
+	 * @param separator .
+	 * @return .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	public List<String[]> listadoResultadosCandidatosConvocatoriaCsv(Convocatoria convocatoria, String separator) throws SQLException, UVException {
+		String consulta = ""
+				+ " SELECT bepare.ID_AREA_CONOCIMIENTO, bepare.DES_AREA_CONOCIMIENTO, bepusu.*, bepsob.TOTAL"
+				+ " FROM TBEP_SOLICITUD_BOLSAS bepsob"
+				+ " INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.CODNUM = bepsob.BEPSOL_CODNUM"
+				+ " INNER JOIN TBEP_USUARIOS bepusu ON bepusu.CODNUM = bepsol.BEPUSU_CODNUM"
+				+ " INNER JOIN TBEP_BOLSAS bepbol ON bepbol.CODNUM = bepsob.BEPBOL_CODNUM"
+				+ " INNER JOIN TBEP_AREAS bepare ON bepare.CODNUM = bepbol.BEPARE_CODNUM"
+				+ " WHERE bepsol.BEPCON_CODNUM = ?"
+				+ "     AND bepsol.ESTADO = '" + ModeloSolicitud.SOLICITUD_ESTADO_CERRADA + "'"
+				+ "     AND bepusu.FLGBORRADO = 'N'";
+		
+		List<String[]> rows = new ArrayList<>();
+		
+		rows.add(new String[] {"COD. AREA", "AREA", "NIF", "NOMBRE", "EMAIL", "TOTAL"});
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			int paramIndex = 1;
+			stmt.setInt(paramIndex++, convocatoria.getCodNum());
+			
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					UsuarioBolsaEmpleo usuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioById(rs.getInt(CODNUM));
 					
-					rows.add(new String[] {
-						String.format("\"%s\"", usuario.getPrsNif() != null ? usuario.getPrsNif() : ""),
-						String.format("\"%s %s %s\"",
-								usuario.getNombre() != null ? usuario.getNombre() : "",
-								usuario.getPrimerApellido() != null ? usuario.getPrimerApellido() : "",
-								usuario.getSegundoApellido() != null ? usuario.getSegundoApellido() : ""),
-						String.format("\"%s\"", usuario.getEmail() != null ? usuario.getEmail() : ""),
-						String.valueOf(rs.getDouble(TOTAL)),
-					});
+					String idArea = BolsaEmpleoUtils.string2csv(rs.getString("ID_AREA_CONOCIMIENTO"), separator);
+					String area = BolsaEmpleoUtils.string2csv(rs.getString("DES_AREA_CONOCIMIENTO"), separator);
+					String nif = BolsaEmpleoUtils.string2csv(usuario.getPrsNif(), separator);
+					String nombre = BolsaEmpleoUtils.string2csv(
+							String.format("%s %s %s", usuario.getNombre() != null ? usuario.getNombre() : "",
+									usuario.getPrimerApellido() != null ? usuario.getPrimerApellido() : "",
+									usuario.getSegundoApellido() != null ? usuario.getSegundoApellido() : ""), separator);
+					String email = BolsaEmpleoUtils.string2csv(usuario.getEmail(), separator);
+					String total = BolsaEmpleoUtils.string2csv(String.valueOf(rs.getDouble(TOTAL)), separator);
+					
+					rows.add(new String[] {idArea, area, nif, nombre, email, total});
 				}
 			}
 		}

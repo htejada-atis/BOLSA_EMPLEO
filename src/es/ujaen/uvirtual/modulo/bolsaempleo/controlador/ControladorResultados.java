@@ -19,6 +19,7 @@ import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaResultado;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.CandidatoResultadoTable;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloConvocatoria;
@@ -65,6 +66,7 @@ public class ControladorResultados extends HttpServlet {
 	public static final String ACCION_SELECCIONAR_BOLSA = "seleccionarbolsa";
 	public static final String ACCION_SELECCIONAR_CANDIDATO = "seleccionarcandidato";
 	public static final String ACCION_EXPORTAR_RESULTADOS = "exportarresultados";
+	public static final String ACCION_EXPORTAR_TODOS_RESULTADOS = "exportartodosresultados";
 	
 	// mensajes
 	public static final String MENSAJE_ERROR_ACCION_NO_CONTEMPLADA = "Acción no contemplada";
@@ -124,6 +126,9 @@ public class ControladorResultados extends HttpServlet {
 					break;
 				case ACCION_EXPORTAR_RESULTADOS:
 					exportarResultados(bean, datos, request, response);
+					break;
+				case ACCION_EXPORTAR_TODOS_RESULTADOS:
+					exportarTodosResultados(bean, datos, request, response);
 					break;
 				default:
 					errorFatal(bean, MENSAJE_ERROR_ACCION_NO_CONTEMPLADA);
@@ -298,13 +303,14 @@ public class ControladorResultados extends HttpServlet {
 		response.setCharacterEncoding(RESPONSE_CSV_ENCODING);
 		response.setHeader("Content-Disposition", "attachment; filename=\"resultados-bolsa-" + idBolsa + ".csv\"");
 		
+		String separator = ";";
 		Bolsa bolsa = ModeloBolsa.obtenerInstancia().getBolsaById(idBolsa);
-		List<String[]> rows = ModeloResultados.obtenerInstancia().listadoResultadosCandidatosAreaCsv(bolsa, bean.getConvocatoria());
+		List<String[]> rows = ModeloResultados.obtenerInstancia().listadoResultadosCandidatosAreaCsv(bolsa, bean.getConvocatoria(), separator);
 		
 		try (ServletOutputStream stream = response.getOutputStream()) {
 			try (PrintWriter printer = new PrintWriter(stream)) {
 				for (String[] row : rows) {
-					printer.println(String.join(";", row));
+					printer.println(String.join(separator, row));
 				}
 			}
 			stream.flush();
@@ -312,6 +318,32 @@ public class ControladorResultados extends HttpServlet {
 			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(ex));
 			LOGGER.log(Level.SEVERE, ex.toString());
 			throw new UVException(ex.getMessage());
-        }
+		}
+	}
+	
+	private void exportarTodosResultados(VistaResultados bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException {
+		Convocatoria c = bean.getConvocatoria();
+		
+		datos.setRespuestaEnviada(true);
+		datos.setContentType(RESPONSE_CSV_CONTENTTYPE);
+		response.setContentType(RESPONSE_CSV_CONTENTTYPE);
+		response.setCharacterEncoding(RESPONSE_CSV_ENCODING);
+		response.setHeader("Content-Disposition", "attachment; filename=\"resultados-convocatoria-" + c.getCodNum().toString() + ".csv\"");
+		
+		String separator = ";";
+		List<String[]> rows = ModeloResultados.obtenerInstancia().listadoResultadosCandidatosConvocatoriaCsv(c, separator);
+		
+		try (ServletOutputStream stream = response.getOutputStream()) {
+			try (PrintWriter printer = new PrintWriter(stream)) {
+				for (String[] row : rows) {
+					printer.println(String.join(separator, row));
+				}
+			}
+			stream.flush();
+		} catch (Exception ex) {
+			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(ex));
+			LOGGER.log(Level.SEVERE, ex.toString());
+			throw new UVException(ex.getMessage());
+		}
 	}
 }
