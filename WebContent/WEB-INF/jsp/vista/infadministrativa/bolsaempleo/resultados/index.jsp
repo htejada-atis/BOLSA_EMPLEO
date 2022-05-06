@@ -17,7 +17,7 @@ VistaResultados bean = (VistaResultados)uvdatos.getVistas().get(VistaResultados.
 	
 	<h2>Resultados</h2>
 	
-	<div class="form-select form-group">
+	<div class="form-group">
 		<label>Convocatoria</label>
 		<select id="select_convocatoria">
 			<%	for (Convocatoria conv: bean.getListaConvocatorias()) { %>
@@ -26,6 +26,10 @@ VistaResultados bean = (VistaResultados)uvdatos.getVistas().get(VistaResultados.
 					</option>
 			<%	} %>
 		</select>
+		
+		<% if (bean.getUsuarioLogeado().isServicioPersonal()) { %>
+			<button class="link-btn" id="exportar" style="float: right;">Exportar a csv</button>
+		<% } %>
 	</div>
 	
 	<p>Resultados de la convocatoria seleccionada. Al pulsar sobre un area, listado de candidatos con su puntuanción y el detalle del cálculo.</p>
@@ -94,6 +98,11 @@ $(document).ready(function() {
 				}]
 			}
 		],
+	});
+	
+	$('#exportar').on('click', function() {
+		window.open("<%= request.getRequestURI() + "?" + ControladorResultados.PARAM_ACCION + "=" + ControladorResultados.ACCION_EXPORTAR_TODOS_RESULTADOS %>"
+				+ "<%= "&" + ControladorResultados.PARAM_CONVOCATORIA +  "=" + bean.getConvocatoria().getCodNum() %>");
 	});
 	
 });

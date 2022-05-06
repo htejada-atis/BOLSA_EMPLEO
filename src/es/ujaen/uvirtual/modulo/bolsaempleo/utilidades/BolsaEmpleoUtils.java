@@ -57,13 +57,13 @@ public final class BolsaEmpleoUtils {
 	private static final int NUMBER_1024 = 1024;
 	private static final int NUMBER_1000 = 1000;
 	private static final int NUMBER_999_950 = 999_950;
-	
+
 	private static final String NOMBREDEESTACLASE = BolsaEmpleoUtils.class.getName();
 	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
-	
+
 	private BolsaEmpleoUtils() {
 	}
-		
+
 	/**
 	 * Devuelve un string de un número '?' separadas por ',' para usarlo en
 	 * consultas de tipo where in. Por ejemplo si numParams, devuelve "?,?,?"
@@ -159,33 +159,35 @@ public final class BolsaEmpleoUtils {
 			return null;
 		}
 	}
-	
-	/** obtiene la fecha en formato yyyy-MM-dd hh:mm:ss.
-	 * @param valor cadena a analizar para obtener la fecha .
+
+	/**
+	 * obtiene la fecha en formato yyyy-MM-dd hh:mm:ss.
+	 * 
+	 * @param valor    cadena a analizar para obtener la fecha .
 	 * @param sepFecha separador de ano mes día .
-	 * @param sepHora separador de hora minutos segundos .
+	 * @param sepHora  separador de hora minutos segundos .
 	 * @return cadena en formato yyyyMMdd
 	 * @throws UVException .
 	 */
-	@SuppressWarnings({"checkstyle:magicnumber"})
+	@SuppressWarnings({ "checkstyle:magicnumber" })
 	public static Date leeParametroFechaHora(String valor, String sepFecha, String sepHora) throws UVException {
 		if (valor == null || valor.isBlank()) {
 			return null;
 		}
-		
+
 		Date dateFecha = null;
 		SimpleDateFormat formatoFecha = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		
+
 		String[] campos = valor.split(" ");
 		String[] camposFecha = campos[0].split(sepFecha);
-		
+
 		if (campos.length > 2) {
 			throw new UVException("Formato de fecha incorrecto");
 		}
-		
+
 		try {
 			String strFecha = camposFecha[2] + "-" + camposFecha[1] + "-" + camposFecha[0];
-			
+
 			if (campos.length == 2) {
 				String[] camposHora = campos[1].split(sepHora);
 				if (camposHora.length == 1) {
@@ -196,19 +198,21 @@ public final class BolsaEmpleoUtils {
 					strFecha += " " + campos[1];
 				}
 			}
-			
+
 			if (strFecha != null) {
 				dateFecha = formatoFecha.parse(strFecha);
 			}
 		} catch (Exception e) {
 			LOGGER.log(Level.WARNING, e.toString());
-			return null;
+			dateFecha = null;
 		}
-		
+
 		return dateFecha;
 	}
-	
-	/** Elimina decimales para el formato de puntuaciones en los resultados .
+
+	/**
+	 * Elimina decimales para el formato de puntuaciones en los resultados .
+	 * 
 	 * @param valor valor .
 	 * @return El valor formateado .
 	 */
@@ -256,28 +260,30 @@ public final class BolsaEmpleoUtils {
 			int bytesLeidos = 0;
 			byte[] bytes = new byte[NUMBER_1024];
 			long bytesTotal = 0;
-			
+
 			Integer maxSize = Formateador.leeParametroInteger(getParametroConfiguracion("bolsaempleo.maxEspacioArchivo"));
-			
+
 			while ((bytesLeidos = archivo.read(bytes)) != -1) {
 				salida.write(bytes, 0, bytesLeidos);
 				bytesTotal += bytesLeidos;
 				if (bytesTotal > maxSize) {
-					throw new UVException("No se puede insertar un archivo tan grande. Máximo: " + humanReadableByteCountSI(maxSize));
+					throw new UVException(
+							"No se puede insertar un archivo tan grande. Máximo: " + humanReadableByteCountSI(maxSize));
 				}
 			}
-			
+
 			if (bytesTotal == 0) {
 				throw new UVException("No se puede insertar sin archivo o archivo vacio");
 			}
-			
+
 			return new ByteArrayInputStream(salida.toByteArray());
 		}
 	}
-	
+
 	/**
 	 * Valor de bytes para pintarlo humanamente.
 	 * https://programming.guide/java/formatting-byte-size-to-human-readable-format.html
+	 * 
 	 * @param bytes .
 	 * @return .
 	 */
@@ -314,8 +320,8 @@ public final class BolsaEmpleoUtils {
 	}
 
 	/**
-	 * Devuelve la fecha actual del sistema. Con 00:00:00 
-	 * Según "java.time" classes should be used for dates and times (java:S2143)
+	 * Devuelve la fecha actual del sistema. Con 00:00:00 Según "java.time" classes
+	 * should be used for dates and times (java:S2143)
 	 * https://www.baeldung.com/java-date-to-localdate-and-localdatetime
 	 * 
 	 * @return .
@@ -324,7 +330,7 @@ public final class BolsaEmpleoUtils {
 		LocalDate ld = LocalDate.now();
 		return java.sql.Date.valueOf(ld);
 	}
-	
+
 	/**
 	 * Devuelve la fecha actual del sistema. Según "java.time" classes should be
 	 * used for dates and times (java:S2143)
@@ -336,10 +342,11 @@ public final class BolsaEmpleoUtils {
 		LocalDateTime ld = LocalDateTime.now();
 		return java.sql.Timestamp.valueOf(ld);
 	}
-	
+
 	/**
 	 * Establece la fecha y hora de la fecha a las 23:59:59.
 	 * https://www.baeldung.com/java-date-to-localdate-and-localdatetime
+	 * 
 	 * @param date .
 	 * @return .
 	 */
@@ -349,13 +356,14 @@ public final class BolsaEmpleoUtils {
 		LocalDateTime fromDateAndTime = LocalDateTime.of(currentDate, currentTime);
 		return java.sql.Timestamp.valueOf(fromDateAndTime);
 	}
-	
+
 	/**
 	 * Convierte un clob a string.
 	 * https://www.tutorialspoint.com/how-to-convert-a-clob-type-to-string-in-java
+	 * 
 	 * @param clob .
 	 * @return .
-	 * @throws IOException .
+	 * @throws IOException  .
 	 * @throws SQLException .
 	 */
 	public static String clobToString(Clob clob) throws IOException, SQLException {
@@ -364,25 +372,26 @@ public final class BolsaEmpleoUtils {
 			int ch;
 			while ((ch = r.read()) != -1) {
 				buffer.append("" + (char) ch);
-			}			
+			}
 			return buffer.toString();
 		}
 	}
-		
+
 	/**
 	 * Convierte string to clob.
 	 * https://stackoverflow.com/questions/4687696/string-to-clob-in-java
-	 * @param s .
+	 * 
+	 * @param s        .
 	 * @param conexion .
 	 * @return .
 	 * @throws SQLException .
 	 */
 	public static Clob stringToClob(String s, Connection conexion) throws SQLException {
 		Clob clob = conexion.createClob();
-		clob.setString(1, s);		
+		clob.setString(1, s);
 		return clob;
 	}
-	
+
 	/**
 	 * Añade un mensaje de exito al bean y en la sessión, para luego su lectura.
 	 * 
@@ -415,13 +424,13 @@ public final class BolsaEmpleoUtils {
 	 */
 	public static void readMensajeSession(Vista bean, HttpServletRequest request) {
 		LOGGER.log(Level.FINER, "Leyendo mensajes sessión");
-		
+
 		HttpSession session = request.getSession(false);
 
 		String mensajeExito = (String) session.getAttribute(MENSAJE_REDIRECT_SESSION_EXITO);
-		
+
 		LOGGER.log(Level.FINER, String.format("MensajeExito [%s]", mensajeExito));
-		
+
 		if (mensajeExito != null) {
 			String[] mensajeExitoSplit = mensajeExito.split(Pattern.quote("|"));
 			for (String m : mensajeExitoSplit) {
@@ -431,9 +440,9 @@ public final class BolsaEmpleoUtils {
 		}
 
 		String mensajeError = (String) session.getAttribute(MENSAJE_REDIRECT_SESSION_ERROR);
-		
+
 		LOGGER.log(Level.FINER, String.format("MensajeError [%s]", mensajeError));
-		
+
 		if (mensajeError != null) {
 			String[] mensajeErrorSplit = mensajeError.split(Pattern.quote("|"));
 			for (String m : mensajeErrorSplit) {
@@ -441,13 +450,14 @@ public final class BolsaEmpleoUtils {
 			}
 			session.removeAttribute(MENSAJE_REDIRECT_SESSION_ERROR);
 		}
-		
+
 		LOGGER.log(Level.FINER, "Fin leyendo mensajes sessión");
 	}
 
 	/**
 	 * Redirecciona a la url actual con parametros en la sessión.
-	 * @param datos .
+	 * 
+	 * @param datos    .
 	 * @param request  .
 	 * @param response .
 	 * @param params   .
@@ -460,39 +470,44 @@ public final class BolsaEmpleoUtils {
 		for (Map.Entry<String, String> entry : params.entrySet()) {
 			session.setAttribute(entry.getKey(), entry.getValue());
 		}
-		
+
 		datos.setRespuestaEnviada(true);
 		response.sendRedirect(request.getServletPath());
 	}
-	
+
 	/**
 	 * Redirecciona a la url de error.
-	 * @param bean .
-	 * @param datos .
+	 * 
+	 * @param bean     .
+	 * @param datos    .
 	 * @param request  .
 	 * @param response .
-	 * @param error .
+	 * @param error    .
 	 * @throws IOException .
 	 * @throws UVException .
 	 */
-	public static void redirectToError(Vista bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, String error)
-			throws IOException, UVException {
+	public static void redirectToError(Vista bean, UVDatos datos, HttpServletRequest request,
+			HttpServletResponse response, String error) throws IOException, UVException {
 		addMensajeDeError(error, bean, request);
 		datos.setRespuestaEnviada(true);
 		response.sendRedirect(ControladorErrorBolsaEmpleo.URL_ERROR);
 	}
-	
-	/** Devuelve un parámetro de multipart form, si no de la sesión y si no, leemos lo que viene del request.
-	 * @param request .
+
+	/**
+	 * Devuelve un parámetro de multipart form, si no de la sesión y si no, leemos
+	 * lo que viene del request.
+	 * 
+	 * @param request   .
 	 * @param multipart .
-	 * @param param .
+	 * @param param     .
 	 * @return .
 	 */
-	public static String getParamRequestOrMultipartOrSession(HttpServletRequest request, HashMap<String, Object> multipart, String param) {
+	public static String getParamRequestOrMultipartOrSession(HttpServletRequest request,
+			HashMap<String, Object> multipart, String param) {
 		if (multipart.keySet().size() > 0 && multipart.containsKey(param)) {
 			return (String) multipart.get(param);
 		}
-		
+
 		return getParamRequestOrSession(request, param);
 	}
 
@@ -516,65 +531,102 @@ public final class BolsaEmpleoUtils {
 		return valueSession;
 	}
 
-	private static void addMensajeSession(String mensaje, Vista bean, HttpServletRequest request, int tipo) throws UVException {
+	private static void addMensajeSession(String mensaje, Vista bean, HttpServletRequest request, int tipo)
+			throws UVException {
 		LOGGER.log(Level.FINER, String.format("Añadiendo mensajes de sessión [%d][%s]", tipo, mensaje));
-		
+
 		HttpSession session = request.getSession(false);
 
 		switch (tipo) {
-			case TIPO_MENSAJE_EXITO:
-				String mensajeExito = (String) session.getAttribute(MENSAJE_REDIRECT_SESSION_EXITO);
-				if (mensajeExito != null) {
-					mensajeExito += "|" + mensaje;
-				} else {
-					mensajeExito = mensaje;
-				}
-				LOGGER.log(Level.FINER, String.format("Session set atribute [%s]", mensajeExito));
-				session.setAttribute(MENSAJE_REDIRECT_SESSION_EXITO, mensajeExito);
-				bean.getMensajesDeExito().add(mensaje);
-				break;
-			case TIPO_MENSAJE_ERROR:
-				String mensajeError = (String) session.getAttribute(MENSAJE_REDIRECT_SESSION_ERROR);
-				if (mensajeError != null) {
-					mensajeError += "|" + mensaje;
-				} else {
-					mensajeError = mensaje;
-				}
-				LOGGER.log(Level.FINER, String.format("Session set atribute [%s]", mensajeError));
-				session.setAttribute(MENSAJE_REDIRECT_SESSION_ERROR, mensajeError);
-				bean.getMensajesDeError().add(mensaje);
-				break;
-			default:
-				throw new UVException("Tipo de mensaje no válido");
+		case TIPO_MENSAJE_EXITO:
+			String mensajeExito = (String) session.getAttribute(MENSAJE_REDIRECT_SESSION_EXITO);
+			if (mensajeExito != null) {
+				mensajeExito += "|" + mensaje;
+			} else {
+				mensajeExito = mensaje;
+			}
+			LOGGER.log(Level.FINER, String.format("Session set atribute [%s]", mensajeExito));
+			session.setAttribute(MENSAJE_REDIRECT_SESSION_EXITO, mensajeExito);
+			bean.getMensajesDeExito().add(mensaje);
+			break;
+		case TIPO_MENSAJE_ERROR:
+			String mensajeError = (String) session.getAttribute(MENSAJE_REDIRECT_SESSION_ERROR);
+			if (mensajeError != null) {
+				mensajeError += "|" + mensaje;
+			} else {
+				mensajeError = mensaje;
+			}
+			LOGGER.log(Level.FINER, String.format("Session set atribute [%s]", mensajeError));
+			session.setAttribute(MENSAJE_REDIRECT_SESSION_ERROR, mensajeError);
+			bean.getMensajesDeError().add(mensaje);
+			break;
+		default:
+			throw new UVException("Tipo de mensaje no válido");
 		}
 	}
-	
+
 	/**
-	 * Escapa una cadena de caracteres para ser mostrada en HTML y sustituir \n por <br/>.
+	 * Escapa una cadena de caracteres para ser mostrada en HTML y sustituir \n por
+	 * <br/>
+	 * .
+	 * 
 	 * @param origen cadena que queremos escapar
 	 * @return la cadena mostrable en formato xhtml.
 	 */
 	public static String escapaSaltosDeLinea(String origen) {
 		if (origen == null) {
-			return ""; 
+			return "";
 		}
 		origen = origen.replace("\n", "<br/>");
 		return origen;
 	}
-	
+
 	/**
 	 * Método que devuelve el curso actual por defecto para las plazas ofertadas .
+	 * 
 	 * @return el curso en formato YY/YY .
 	 */
 	public static String getCurrentCourse() {
 		SimpleDateFormat simpleFormat = new SimpleDateFormat("yy");
 		Calendar cal = Calendar.getInstance();
-		
+
 		Date today = cal.getTime();
 		cal.add(Calendar.YEAR, 1);
 		Date nextYear = cal.getTime();
-		
+
 		return simpleFormat.format(today) + "/" + simpleFormat.format(nextYear);
 	}
-	
+
+	/**
+	 * Prepara una cadena para pasarla a un csv.
+	 * 
+	 * @param value     .
+	 * @param separador .
+	 * @return .
+	 */
+	public static String string2csv(String value, String separador) {
+		if (value == null) {
+			return "";
+		}
+
+		if (value.contains("\"")) {
+			value = value.replace("\"", "\"\"");
+		}
+
+		if (value.contains(separador) || value.contains("\n") || value.contains("'") || value.contains("\\") || value.contains("\"")) {
+			value = "\"" + value + "\"";
+		}
+
+		return value;
+	}
+
+	/**
+	 * Prepara una cadena para un csv, sin indicar el separador de campos.
+	 * 
+	 * @param value .
+	 * @return .
+	 */
+	public static String string2csv(String value) {
+		return BolsaEmpleoUtils.string2csv(value, ",");
+	}
 }
