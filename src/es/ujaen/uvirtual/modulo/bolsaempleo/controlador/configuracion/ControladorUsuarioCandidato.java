@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.servlet.ServletOutputStream;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -23,6 +25,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Area;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaSolicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.CandidatoEstado;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Merito;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoPreferenteUsuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ParametrosConfiguracion;
@@ -33,6 +36,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.informes.GenerarSolicitudPDF;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloArea;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacionApartados;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBolsa;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloConvocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloEstadoCandidato;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMerito;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMeritosPreferentesCandidato;
@@ -64,7 +68,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static final String NOMBREDEESTACLASE = ControladorUsuarioBolsaEmpleo.class.getName();
 	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
-	
+
 	// parámetros
 	public static final String PARAM_ACCION = "a";
 	public static final String PARAM_ACCION_USUARIO = "aa";
@@ -84,7 +88,8 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 	public static final String PARAM_RAZON_EXCLUIDO = "razonexcluido";
 	public static final String PARAM_SOLICITUD = "solicitud";
 	public static final String PARAM_RAZON_EXCLUSION_SOLICITUD = "razonexclusionsolicitud";
-	
+	public static final String PARAM_CONVOCATORIA = "convocatoria";
+
 	// acciones
 	public static final String ACCION_ACREDITACIONES_CANDIDATO = "acreditacionescandidato";
 	public static final String ACCION_AREAS_EXCLUIDAS_CANDIDATO = "areasexcluidascandidato";
@@ -114,7 +119,8 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 	public static final String ACCION_VOLVER_CANDIDATO = "volvercandidato";
 	public static final String ACCION_EXCLUIR_SOLICITUD = "excluirsolicitudcandidato";	
 	public static final String ACCION_INCLUIR_SOLICITUD = "incluirsolicitudcandidato";
-	
+	public static final String ACCION_EXPORTAR = "exportarcandidatos";
+
 	// mensajes
 	public static final String MENSAJE_ERROR_ACCION_NO_CONTEMPLADA = "Acción no contemplada";
 	public static final String MENSAJE_ERROR_BOLSAS_SELECCIONADAS_INCORRECTAS = "No hay bolsas seleccionadas válidas";
@@ -129,7 +135,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 	public static final String MENSAJE_ERROR_RAZON_EXCLUSION_REQUERIDA = "La razón de exclusión es requerida";
 	public static final String MENSAJE_ERROR_RAZON_EXCLUSION_LARGA = "La razón de exclusión es demasiado larga. Máximo %d carácteres";
 	public static final String MENSAJE_ERROR_SIN_PERMISO_PERSONAL = "No tienes permiso de personal";
-	
+
 	public static final String MENSAJE_EXITO_AGREGAR = "Usuario creado correctamente";
 	public static final String MENSAJE_EXITO_AREAS_EXCLUIDAS = "Áreas excluidas correctamente para el candidato: %s";
 	public static final String MENSAJE_EXITO_AREA_EXCLUIDA = "Área excluida correctamente para el candidato: %s";
@@ -144,9 +150,9 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 	public static final String MENSAJE_EXITO_USUARIO_MODIFICADO_CORRECTAMENTE = "Usuario/s modificado/s correctamente";
 	public static final String MENSAJE_EXITO_EXCLUSION_SOLICITUD = "Solicitud excluida correctamente";
 	public static final String MENSAJE_EXITO_INCLUSION_SOLICITUD = "Solicitud incluida correctamente";
-	
+
 	public static final String URL_PATTERN = "/srv/es/informacionadministrativa/bolsaempleo/configuracion/candidatos";
-	
+
 	// ajax
 	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/candidatos";
 	public static final String RESPONSE_AJAX_CONTENTTYPE = "application/json";
@@ -154,12 +160,16 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 	public static final String RESPONSE_AJAX_ERROR = "error";
 	public static final int RESPONSE_AJAX_HTTP_CODE_ERROR = 400;
 	
+	// csv
+	public static final String RESPONSE_CSV_CONTENTTYPE = "text/csv";
+	public static final String RESPONSE_CSV_ENCODING = "UTF-8";
+
 	// ruta vistas
 	public static final String RUTA_BEP_CONF_CAND = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/configuracion/candidatos/";
-	public static final String JSP_INDEX = RUTA_BEP_CONF_CAND + "candidatos.jsp";	
+	public static final String JSP_INDEX = RUTA_BEP_CONF_CAND + "candidatos.jsp";
 	public static final String JSP_FORM_CANDIDATO = RUTA_BEP_CONF_CAND + "formCandidatos.jsp";
 	public static final String JSP_RESUMEN_SOLICITUD = RUTA_BEP_CONF_CAND + "resumenSolicitud.jsp";
-		
+
 	/** Peticion GET.
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
@@ -211,10 +221,13 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 					accionesCandidato(bean, datos, request, response, nombreAccion);
 					break;
 				case ACCION_INDEX:
-					bean.setVista(JSP_INDEX);
+					this.index(bean);
 					break;
 				case ACCION_DATATABLE_USUARIOS_CANDIDATOS:
 					listadoCandidatos(bean, datos, request, response);
+					break;
+				case ACCION_EXPORTAR:
+					exportarCandidatos(bean, datos, request, response);
 					break;
 				default:
 					errorFatal(bean, MENSAJE_ERROR_ACCION_NO_CONTEMPLADA);
@@ -250,7 +263,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 	private boolean init(VistaCandidatos bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		bean.setVista(JSP_INDEX);
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
-		
+
 		try {
 			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getAndRefreshUsuario(datos));
 
@@ -260,12 +273,18 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 		} catch (UVException e) {
 			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
 			LOGGER.log(Level.SEVERE, e.toString());
-			
+
 			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, e.getMessage());
 			return false;
 		}
-		
-		return true;		
+
+		return true;
+	}
+	
+	private void index(VistaCandidatos bean) throws SQLException {
+		ModeloConvocatoria modelo = ModeloConvocatoria.obtenerInstancia(); 
+		bean.setListaConvocatorias(modelo.listaConvocatorias());
+		bean.setVista(JSP_INDEX);
 	}
 	
 	private void errorFatal(VistaCandidatos bean, String mensaje) {
@@ -650,7 +669,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 	 * @throws SQLException .
 	 */
 	private void listadoCandidatos(VistaCandidatos bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException {
-		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();	
+		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		datos.setRespuestaEnviada(true);
 		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
@@ -933,6 +952,35 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 		u.setRol(ModeloRol.obtenerInstancia().getRoleById(ModeloRol.ID_ROL_CANDIDATO));
 		u.setListaDist("true".equals(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_LISTA))));
 		return u;
+	}
+	
+	private void exportarCandidatos(VistaCandidatos bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException {
+		Integer idConvocatoria = Formateador.leeParametroInteger(BolsaEmpleoUtils.getParamRequestOrSession(request, PARAM_CONVOCATORIA));
+		Convocatoria c = ModeloConvocatoria.obtenerInstancia().getConvocatoriaById(idConvocatoria);
+		
+		datos.setRespuestaEnviada(true);
+		datos.setContentType(RESPONSE_CSV_CONTENTTYPE);
+		response.setContentType(RESPONSE_CSV_CONTENTTYPE);
+		response.setCharacterEncoding(RESPONSE_CSV_ENCODING);		
+		response.setHeader("Content-Disposition", "attachment; filename=\"candidatos-convocatoria-" + c.getCodNum().toString() + ".csv\"");
+		
+		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
+		
+		String separator = ";";
+		List<String[]> rows = modelo.listadoCandidatosPorConvocatoriaCsv(c, separator); 
+				
+		try (ServletOutputStream stream = response.getOutputStream()) {
+			try (PrintWriter printer = new PrintWriter(stream)) {
+				for (String[] row : rows) {
+					printer.println(String.join(separator, row));
+				}
+			}
+			stream.flush();
+		} catch (Exception ex) {
+			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(ex));
+			LOGGER.log(Level.SEVERE, ex.toString());
+			throw new UVException(ex.getMessage());
+		}
 	}
 	
 	/**

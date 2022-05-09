@@ -17,6 +17,7 @@ import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Area;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable.DataTableColumn;
@@ -795,6 +796,7 @@ public class ModeloUsuarioBolsaEmpleo {
 	/**
 	 * Crear el usuario si es necesario como candidato y lo guarda en el memcaché.
 	 * @param usuArcos usuario vuja.
+	 * @param create .
 	 * @return .
 	 * @throws UVException .
 	 * @throws SQLException .
@@ -994,6 +996,57 @@ public class ModeloUsuarioBolsaEmpleo {
 		} catch (UVException ex) {
 			return null;
 		}
+	}
+
+	/**
+	 * Listado de candidatos con y sin solicitudes en una convocatorai. Para csv.
+	 * @param convocatoria .
+	 * @param separator .
+	 * @return .
+	 * @throws UVException .
+	 * @throws SQLException .
+	 */
+	public List<String[]> listadoCandidatosPorConvocatoriaCsv(Convocatoria convocatoria, String separator) throws SQLException, UVException {
+		String consulta = ""
+				+ " SELECT bepusu.CODNUM AS BEPUSU_CODNUM, bepcon.DESCRIPCION, bepsol.ESTADO, bepsol.FLGEXCLUIDO"
+				+ " FROM TBEP_USUARIOS bepusu"
+				+ " LEFT JOIN TBEP_SOLICITUDES bepsol ON ("
+				+ "			bepsol.BEPUSU_CODNUM = bepusu.CODNUM"
+				+ "		AND bepsol.BEPCON_CODNUM = ? )"
+				+ "	LEFT JOIN TBEP_CONVOCATORIAS bepcon ON bepcon.CODNUM = bepsol.BEPCON_CODNUM"
+				+ " WHERE"
+				+ "		bepusu.ROL = " + ModeloRol.ID_ROL_CANDIDATO
+				+ "	AND bepusu.FLGBORRADO = 'N'";
+		
+		List<String[]> rows = new ArrayList<>();
+		
+		rows.add(new String[] {"NIF", "USUARIO", "NOMBRE", "EMAIL", "CONVOCATORIA", "ESTADO SOLICITUD", "SOLICITUD EXCLUIDA"});
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			int paramIndex = 1;
+			stmt.setInt(paramIndex++, convocatoria.getCodNum());
+			
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					UsuarioBolsaEmpleo usuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioById(rs.getInt("BEPUSU_CODNUM"));
+					
+					String nif = BolsaEmpleoUtils.string2csv(usuario.getPrsNif(), separator);
+					String codcuenta = BolsaEmpleoUtils.string2csv(usuario.getCodCuenta());
+					String nombre = BolsaEmpleoUtils.string2csv(
+							String.format("%s %s %s", usuario.getNombre() != null ? usuario.getNombre() : "",
+									usuario.getPrimerApellido() != null ? usuario.getPrimerApellido() : "",
+									usuario.getSegundoApellido() != null ? usuario.getSegundoApellido() : ""), separator);
+					String email = BolsaEmpleoUtils.string2csv(usuario.getEmail(), separator);
+					String conName = BolsaEmpleoUtils.string2csv(rs.getString("DESCRIPCION"), separator);
+					String estado = BolsaEmpleoUtils.string2csv(rs.getString("ESTADO"), separator);
+					String solExcluida = BolsaEmpleoUtils.string2csv(rs.getString("FLGEXCLUIDO"), separator);
+					
+					rows.add(new String[] {nif, codcuenta, nombre, email, conName, estado, solExcluida});
+				}
+			}
+		}
+		
+		return rows;
 	}
 	
 	/**
