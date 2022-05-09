@@ -10,6 +10,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Area;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaSolicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.CandidatoEstado;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Merito;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoPreferenteUsuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Solicitud;
@@ -28,7 +29,8 @@ public class VistaCandidatos extends Vista implements Serializable {
 	private UsuarioBolsaEmpleo candidato;
 	private List<Area> listaAreas = new ArrayList<>();
 	private List<ApartadoBaremacion> apartados = new ArrayList<>();
-	private List<BolsaSolicitud> listaBolsasSolicitud;
+	private List<BolsaSolicitud> listaBolsasSolicitud;	
+	private List<Convocatoria> listaConvocatorias = new ArrayList<>();
 	private transient BolsaEmpleoDataTable<UsuarioBolsaEmpleo> dataTableCandidatos;
 	private transient BolsaEmpleoDataTable<Bolsa> dataTableAreas;
 	private transient BolsaEmpleoDataTable<MeritoPreferenteUsuario> dataTableAcreditaciones;
@@ -212,5 +214,13 @@ public class VistaCandidatos extends Vista implements Serializable {
 
 	public void setDataTableEstadosCandidato(BolsaEmpleoDataTable<CandidatoEstado> dataTableEstadosCandidato) {
 		this.dataTableEstadosCandidato = dataTableEstadosCandidato;
+	}
+	
+	public List<Convocatoria> getListaConvocatorias() {
+		return this.listaConvocatorias;
+	}
+	
+	public void setListaConvocatorias(List<Convocatoria> listaConvocatorias) {
+		this.listaConvocatorias = listaConvocatorias;
 	}
 }
