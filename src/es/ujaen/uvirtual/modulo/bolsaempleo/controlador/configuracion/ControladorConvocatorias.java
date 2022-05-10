@@ -41,7 +41,7 @@ import es.ujaen.uvirtual.utilidades.UVException;
 			"/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/convocatorias",
 			"/srv/en/ajax/informacionadministrativa/bolsaempleo/configuracion/convocatorias"
 })
-public class ControladorConvocatorias extends HttpServlet {
+public class ControladorConvocatorias extends HttpServlet {	
 	private static final long serialVersionUID = 1L;
 	private static final String NOMBREDEESTACLASE = ControladorConvocatorias.class.getName();
 	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
@@ -63,6 +63,7 @@ public class ControladorConvocatorias extends HttpServlet {
 	public static final String ACCION_INDEX = "listar";
 	public static final String ACCION_MODIFICAR_CONVOCATORIA = "editConvocatoria";
 	public static final String ACCION_SELECCIONAR_CONVOCATORIA = "seleccionarconvocatoria";
+	public static final String ACCION_REABRIR_FINALIZADA_CONVOCATORIA = "abrirConvocatoriaFinalizada";
 	
 	// mensajes
 	public static final String MENSAJE_ENVIADO = "mensaje";
@@ -89,6 +90,7 @@ public class ControladorConvocatorias extends HttpServlet {
 	public static final String MENSAJE_ERROR_NUMMERITOSBLOQUE_MINIMO = "El número de méritos por bloque debe ser al menos uno";
 	public static final String MENSAJE_ERROR_SIN_BOLSAS_BAREMABLES = "Antes de abrir una convocatoria debe de tener areas baremables";
 	public static final String MENSAJE_ERROR_SIN_PERMISO_PERSONAL = "No tienes permiso de personal";
+	public static final String MENSAJE_ERROR_CONVOCATORIA_DEBE_ESTAR_CERRADA = "La convocatoria debe estar finalizada";
 	public static final String MENSAJE_EXITO_ABRIR_CONVOCATORIA = "Convocatoria editada correctamente";
 	public static final String MENSAJE_EXITO_CERRAR_CONVOCATORIA = "Convocatoria cerrada correctamente";
 	public static final String MENSAJE_EXITO_EDITAR_CONVOCATORIA = "Convocatoria editada correctamente";
@@ -139,6 +141,7 @@ public class ControladorConvocatorias extends HttpServlet {
 				case ACCION_FINALIZAR_CONVOCATORIA:
 				case ACCION_MODIFICAR_CONVOCATORIA:
 				case ACCION_SELECCIONAR_CONVOCATORIA:
+				case ACCION_REABRIR_FINALIZADA_CONVOCATORIA:
 					seleccionarConvocatoria(bean, datos, request, response, nombreAccion);
 					break;
 				case ACCION_AGREGAR_CONVOCATORIA:
@@ -249,7 +252,16 @@ public class ControladorConvocatorias extends HttpServlet {
 		Convocatoria convocatoria = modelo.getConvocatoriaById(Formateador.leeParametroInteger(BolsaEmpleoUtils.getParamRequestOrSession(request, PARAM_CONVOCATORIA_ID)));
 		bean.setConvocatoria(convocatoria);
 		
-		if (!nombreAccion.equals(ACCION_SELECCIONAR_CONVOCATORIA) && convocatoria.getEstado().equals(ModeloConvocatoria.CONVOCATORIA_ESTADO_FINALIZADA)) {
+		// poner en cerrado la convocatoria finalizada
+		if (nombreAccion.equals(ACCION_REABRIR_FINALIZADA_CONVOCATORIA) 
+				&& convocatoria.getEstado().equals(ModeloConvocatoria.CONVOCATORIA_ESTADO_FINALIZADA)) {
+			reabrirConvocatoriaFinalizada(bean, datos, request, response);
+			return;
+		}
+		
+		// no permitir moficiar convocatorias finalizadas
+		if (!nombreAccion.equals(ACCION_SELECCIONAR_CONVOCATORIA) 
+				&& convocatoria.getEstado().equals(ModeloConvocatoria.CONVOCATORIA_ESTADO_FINALIZADA)) {
 			throw new UVException(MENSAJE_ERROR_MODIFICAR_CONVOCATORIA_FINALIZADA);
 		}
 		
@@ -378,10 +390,25 @@ public class ControladorConvocatorias extends HttpServlet {
 			BolsaEmpleoUtils.addMensajeDeError(MENSAJE_ERROR_MERITOS_SIN_VALIDAR, bean, request);
 		} else {
 			Convocatoria convocatoria = bean.getConvocatoria();
-			convocatoria.setEstado(ModeloConvocatoria.CONVOCATORIA_ESTADO_FINALIZADA);
-			modelo.cambiaEstadoConvocatoria(convocatoria, bean.getUsuarioLogeado());
+			modelo.finalizarConvocatoria(convocatoria, bean.getUsuarioLogeado());
 			
 			BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_CERRAR_CONVOCATORIA, bean, request);
+		}
+		
+		redireccionConConvocatoriaSeleccionada(bean, datos, request, response, ACCION_SELECCIONAR_CONVOCATORIA);
+	}
+	
+	private void reabrirConvocatoriaFinalizada(VistaConvocatorias bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
+			throws UVException, SQLException, IOException {
+		ModeloConvocatoria modelo = ModeloConvocatoria.obtenerInstancia();
+		
+		if (!bean.getConvocatoria().getEstado().contains(ModeloConvocatoria.CONVOCATORIA_ESTADO_FINALIZADA)) {
+			BolsaEmpleoUtils.addMensajeDeError(MENSAJE_ERROR_CONVOCATORIA_DEBE_ESTAR_CERRADA, bean, request);
+		} else {
+			Convocatoria convocatoria = bean.getConvocatoria();
+			modelo.ponerEnCerradaConvocatoriaFinalizada(convocatoria, bean.getUsuarioLogeado());
+			
+			BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_ABRIR_CONVOCATORIA, bean, request);
 		}
 		
 		redireccionConConvocatoriaSeleccionada(bean, datos, request, response, ACCION_SELECCIONAR_CONVOCATORIA);

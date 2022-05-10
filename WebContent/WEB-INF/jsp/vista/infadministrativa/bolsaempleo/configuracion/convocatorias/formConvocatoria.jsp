@@ -35,7 +35,7 @@ if (convocatoria != null) {
 		
 		<h4>Estado: <%= convocatoria.getEstado() %><br/>
 			<%= convocatoria.getFechaCierre() != null ? "Fecha cierre: " + Formateador.formatoFecha(convocatoria.getFechaCierre(), Formateador.FORMATO_FECHA_DDMMYYYY_HHMMSS) : "" %>
-			<%= convocatoria.getFechaFinalizacion() != null ? "Fecha finalización: " + Formateador.formatoFecha(convocatoria.getFechaFinalizacion(), Formateador.FORMATO_FECHA_DDMMYYYY_HHMMSS) : "" %></h4>
+			<%= convocatoria.getFechaFinalizacion() != null ? "<br/>Fecha finalización: " + Formateador.formatoFecha(convocatoria.getFechaFinalizacion(), Formateador.FORMATO_FECHA_DDMMYYYY_HHMMSS) : "" %></h4>
 			
 		<p>Las etiquetas en <strong>negrita</strong> corresponden a campos de relleno obligatorio</p>
 <%	} else { %>
@@ -114,10 +114,16 @@ if (convocatoria != null) {
 					<%	} else if (estadoCerrada) { %>
 							<button id="convocatoria_estado_finalizada" style="float:right; margin-right: 12px;">Finalizar</button>
 							<button id="convocatoria_estado_abierta" style="float:right; margin-right: 12px;">Abrir</button>
-					<%	} %>
+					<%	}  %>
 				</div>
 			</div>
-	<%	} %>
+	<%	} else { %>
+			<div class="form-group-container col1">
+				<div class="form-group">
+					<button id="convocatoria_estado_reabrir_finalizada" style="float:right; margin-right: 12px;">Poner en cerrada</button>
+				</div>
+			</div>
+	<%  } %>
 	</form>
 </div>
 
@@ -201,8 +207,23 @@ if (convocatoria != null) {
 					});
 				});
 		<%	} %>
+	<%	} else if (estadoFinalizada && bean.getConvocatoria() != null) { %>
+			document.getElementById("convocatoria_estado_reabrir_finalizada").addEventListener("click", function(e) {
+				e.preventDefault();
+				Atis.confirmDialog("Cambiar estado de la convocatoria", "La convocatoria pasará a estado cerrada.", {
+					'Si': function() {
+						var params = {
+								"<%= ControladorConvocatorias.PARAM_ACCION %>": "<%=ControladorConvocatorias.ACCION_REABRIR_FINALIZADA_CONVOCATORIA %>",
+								"<%= ControladorConvocatorias.PARAM_CONVOCATORIA_ID %>": <%= bean.getConvocatoria().getCodNum() %>
+						};
+						Atis.sendForm("<%= request.getRequestURI() %>", params);
+						$(this).dialog("close");
+					},
+					'No': function() {
+						$(this).dialog("close");
+					}
+				});
+			});
 	<%	} %>
-		
 	});
-	
 </script>
