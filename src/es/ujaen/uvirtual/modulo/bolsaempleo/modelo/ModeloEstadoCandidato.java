@@ -12,7 +12,6 @@ import java.util.Map;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.CandidatoEstado;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.PlazaOfertada;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
@@ -158,7 +157,6 @@ public class ModeloEstadoCandidato {
 	/** Listado de candidatos disponibles para una plaza .
 	 * @param params para leer los parametros de paginación, ordenacion, etc .
 	 * @param plaza .
-	 * @param convocatoria .
 	 * @return datatable .
 	 * @throws SQLException en caso de error de base de datos .
 	 * @throws UVException  error si no existe la area .
@@ -169,7 +167,7 @@ public class ModeloEstadoCandidato {
 		BolsaEmpleoDataTable<CandidatoEstado> dataTable = new BolsaEmpleoDataTable<>(params);
 		
 		String consulta = ""
-				+ " SELECT bepusu.CODNUM AS BEPUSU_CODNUM, bepesc.CODNUM,"
+				+ " SELECT DISTINCT bepusu.CODNUM AS BEPUSU_CODNUM, bepesc.CODNUM,"
 				+ "     bepesc.ESTADO, bepplo.CODNUM AS BEPPLO_CODNUM, bepbol.CODNUM AS BEPBOL_CODNUM, bepcts.CONTRATOS,"
 				+ "     CASE"
 				+ "         WHEN bepesc.ESTADO = '" + ModeloEstadoCandidato.ESTADO_CONTRATADO_PRIMER_CUATRIMESTRE + "'"
