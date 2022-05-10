@@ -52,7 +52,7 @@ public class ModeloUsuarioBolsaEmpleo {
 	public static final int ORDER_COLUMN_INDEX_CANDIDATO_LISTADISTRIBUCION = 3;
 	public static final int ORDER_COLUMN_INDEX_CANDIDATO_EXCLUIDO = 4;
 	public static final int ORDER_COLUMN_INDEX_CANDIDATO_BORRADO = 5;
-		
+	
 	public static final String USUARIO_BORRADO = "S";
 	public static final String USUARIO_NO_BORRADO = "N";
 	public static final String USUARIO_EXCLUIDO = "S";
@@ -184,6 +184,30 @@ public class ModeloUsuarioBolsaEmpleo {
 			}
 		}
 	}
+
+	/**
+	 * Devuelve el primer usuario por el nif o null si no existe.
+	 * @param nif .
+	 * @return .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	public UsuarioBolsaEmpleo getFirstUsuarioByPrsnif(String nif) throws SQLException, UVException {
+		String consulta = "SELECT * FROM TBEP_USUARIOS bepusu WHERE bepusu.VUAJA_PRSNIF = ? FETCH FIRST 1 ROW ONLY";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			stmt.setString(1, nif);
+
+			try (ResultSet rs = stmt.executeQuery()) {
+				if (!rs.next()) {
+					return null;
+				}
+				
+				return getUsuarioFromResultSet(rs);
+			}
+		}
+	}
+	
 	
 	/** Devuelve un usuario bep por su codigo de cuenta si existe, en caso contrario devuelve null.
 	 * @param codcuenta codigo de usuario .
@@ -191,7 +215,7 @@ public class ModeloUsuarioBolsaEmpleo {
 	 * @throws SQLException .
 	 * @throws UVException  .
 	 */
-	public UsuarioBolsaEmpleo compruebaUsuarioByCodCuenta(String codcuenta) throws SQLException, UVException {
+ 	public UsuarioBolsaEmpleo compruebaUsuarioByCodCuenta(String codcuenta) throws SQLException, UVException {
 		String consulta = "SELECT * FROM TBEP_USUARIOS bepusu WHERE bepusu.CODCUENTA = ?";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
@@ -809,6 +833,12 @@ public class ModeloUsuarioBolsaEmpleo {
 		LOGGER.log(Level.FINER, String.format("Chequeando si existe usuario en Bolsa Empleo [%s]", uid));
 		
 		if (!existeUsuarioBolsaEmpleoByUid(usuArcos.getUid())) {
+			// comprobamos que no existe otro candidato con el mismo dni
+			UsuarioBolsaEmpleo usuDni = this.getFirstUsuarioByPrsnif(usuArcos.getDocumentoNumero());
+			if (usuDni != null && create) {
+				throw new UVException("Ya existe un candidado con su mismo documento de identificación");
+			}
+			
 			if (create) {
 				// no existe el usuario en la bolsa de empleo lo creamos como candidato
 				LOGGER.log(Level.FINER, String.format("No existe usuario en Bolsa Empleo [%s]. Lo creamos como candidato.", uid));
