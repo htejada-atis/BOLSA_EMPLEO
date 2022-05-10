@@ -314,7 +314,6 @@ public class ControladorPlazasOfertadas extends HttpServlet {
 		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
 
-		ModeloConvocatoria modeloConvocatoria = ModeloConvocatoria.obtenerInstancia();
 		ModeloOfertaCandidato modeloOferta = ModeloOfertaCandidato.obtenerInstancia();
 
 		try (PrintWriter writer = response.getWriter()) {

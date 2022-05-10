@@ -35,7 +35,6 @@ public class TestBEPControladorConvocatorias {
 	
 	private static final String MENSAJE_CON_ERROR = "Debe devolver error";
 	private static final String MENSAJE_CON_ERROR_ESPERADO = "El mensaje de error debe coincidir";
-	private static final String MENSAJE_CON_EXITO_ESPERADO = "El mensaje de exito debe coincidir";
 	private static final String MENSAJE_CONVOCATORIAS_DEVUELTAS = "Debe devolver convocatorias";
 	private static final String MENSAJE_CONVOCATORIA_DEVUELTA = "Debe devolver convocatoria";
 	private static final String MENSAJE_SIN_ERROR = "No debe devolver error";

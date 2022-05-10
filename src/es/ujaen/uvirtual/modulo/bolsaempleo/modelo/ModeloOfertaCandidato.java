@@ -307,7 +307,6 @@ public class ModeloOfertaCandidato {
 	/** Lista de plazas ofertadas de un candidato .
 	 * @param params .
 	 * @param usuario .
-	 * @param convocatoria .
 	 * @return datatable de plazas ofertadas .
 	 * @throws SQLException .
 	 * @throws UVException .

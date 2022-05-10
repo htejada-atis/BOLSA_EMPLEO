@@ -429,6 +429,7 @@ public class ModeloPlazaOfertada {
 	/** inserta plaza ofertada .
 	 * @param plaza .
 	 * @param usuarioUpdate .
+	 * @param actualDate .
 	 * @return id plaza .
 	 * @throws SQLException .
 	 * @throws UVException .

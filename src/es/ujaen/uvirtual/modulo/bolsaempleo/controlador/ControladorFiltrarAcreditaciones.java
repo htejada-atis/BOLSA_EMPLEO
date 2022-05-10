@@ -131,7 +131,8 @@ public class ControladorFiltrarAcreditaciones extends HttpServlet {
 		}
 	}
 	
-	private boolean init(VistaFiltrarAcreditaciones bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+	private boolean init(VistaFiltrarAcreditaciones bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) 
+			throws SQLException, UVException, IOException {
 		bean.setVista(JSP_INDEX);
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		
