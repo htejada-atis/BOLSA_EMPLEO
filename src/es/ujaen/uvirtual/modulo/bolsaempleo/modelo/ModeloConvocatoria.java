@@ -496,6 +496,62 @@ public class ModeloConvocatoria {
 			}
 		}
 	}
+	
+	/**
+	 * Finaliza la convocatoria.
+	 * @param conv .
+	 * @param usuario .
+	 * @throws UVException .
+	 * @throws SQLException .
+	 */
+	public void finalizarConvocatoria(Convocatoria conv, UsuarioBolsaEmpleo usuario) throws UVException, SQLException {
+		validateConvocatoria(conv);
+		
+		if (!conv.getEstado().equals(CONVOCATORIA_ESTADO_CERRADA)) {
+			throw new UVException("La convocatoria no está cerrada");
+		}
+		
+		String usuarioUpdate = usuario != null ? usuario.getCodCuenta() : "TAREA_PROGRAMADA";
+		
+		String consulta = "UPDATE tbep_convocatorias SET ESTADO=?, UID_USUARIO=?, FECHA_FINALIZACION=? WHERE codnum=?";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			int parameterIndex = 1;
+			stmt.setString(parameterIndex++, CONVOCATORIA_ESTADO_FINALIZADA);
+			stmt.setString(parameterIndex++, usuarioUpdate);
+			stmt.setDate(parameterIndex++, new java.sql.Date(BolsaEmpleoUtils.getCurrentDateTime().getTime()));
+			stmt.setInt(parameterIndex++, conv.getCodNum());
+			stmt.executeUpdate();
+		}
+	}
+	
+	/**
+	 * Cambia el estado a cerrada una convocatoria finalizada.
+	 * 
+	 * @param conv .
+	 * @param usuario usuario que cierra la convocatoria, si es null, se cierra desde el cron.
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	public void ponerEnCerradaConvocatoriaFinalizada(Convocatoria conv, UsuarioBolsaEmpleo usuario) throws UVException, SQLException {
+		validateConvocatoria(conv);
+		
+		if (!conv.getEstado().equals(CONVOCATORIA_ESTADO_FINALIZADA)) {
+			throw new UVException("La convocatoria no está finalizada");
+		}
+		
+		String usuarioUpdate = usuario != null ? usuario.getCodCuenta() : "TAREA_PROGRAMADA";
+		
+		String consulta = "UPDATE tbep_convocatorias SET ESTADO=?, UID_USUARIO=? WHERE codnum=?";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			int parameterIndex = 1;
+			stmt.setString(parameterIndex++, CONVOCATORIA_ESTADO_CERRADA);
+			stmt.setString(parameterIndex++, usuarioUpdate);
+			stmt.setInt(parameterIndex++, conv.getCodNum());
+			stmt.executeUpdate();
+		}
+	}
 
 	/**
 	 * Devuelve si la convocatoria está cerrada o no.
