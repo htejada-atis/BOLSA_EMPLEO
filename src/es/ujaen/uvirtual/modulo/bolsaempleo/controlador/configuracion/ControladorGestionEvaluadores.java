@@ -9,6 +9,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.IntStream;
 import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -62,6 +63,7 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 	public static final String ACCION_DATATABLE_EVALUADORES = "datatableevaluadores";
 	public static final String ACCION_ELIMINAR_EVALUADOR = "eliminarevaluador";
 	public static final String ACCION_INDEX = "listar";
+	public static final String ACCION_EXPORTAR = "exportar";
 	
 	// Parámetros
 	public static final String PARAM_ACCION = "a";
@@ -101,6 +103,10 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 	public static final String RESPONSE_AJAX_ENCODING = "UTF-8";
 	public static final String RESPONSE_AJAX_ERROR = "error";
 	public static final int RESPONSE_AJAX_HTTP_CODE_ERROR = 400;
+	
+	// csv
+	public static final String RESPONSE_CSV_CONTENTTYPE = "text/csv";
+	public static final String RESPONSE_CSV_ENCODING = "UTF-8";
 
 	/** Peticion GET.
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
@@ -139,6 +145,9 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 					break;
 				case ACCION_DATATABLE_AREAS:
 					listadoAreas(bean, datos, request, response);
+					break;
+				case ACCION_EXPORTAR:
+					exportar(bean, datos, request, response);
 					break;
 				default:
 					errorFatal(bean, MENSAJE_ERROR_ACCION_NO_CONTEMPLADA);
@@ -374,6 +383,33 @@ public class ControladorGestionEvaluadores extends HttpServlet {
 				+ ControladorGestionEvaluadores.PARAM_DEPARTAMENTO + "=" + bean.getDepartamento().getCodNum() + "&" 
 				+ ControladorGestionEvaluadores.PARAM_AREA + "=" + bean.getArea().getCodNum();
 		response.sendRedirect(url);		
+	}
+	
+	private void exportar(VistaEvaluadores bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) 
+			throws SQLException, UVException, IOException {		
+		datos.setRespuestaEnviada(true);
+		datos.setContentType(RESPONSE_CSV_CONTENTTYPE);
+		response.setContentType(RESPONSE_CSV_CONTENTTYPE);
+		response.setCharacterEncoding(RESPONSE_CSV_ENCODING);		
+		response.setHeader("Content-Disposition", "attachment; filename=\"evaludoreas-activos.csv\"");
+		
+		ModeloEvaluador modelo = ModeloEvaluador.obtenerInstancia();
+		
+		String separator = ";";
+		List<String[]> rows = modelo.exportarEvaluadoresCsv(separator); 
+				
+		try (ServletOutputStream stream = response.getOutputStream()) {
+			try (PrintWriter printer = new PrintWriter(stream)) {
+				for (String[] row : rows) {
+					printer.println(String.join(separator, row));
+				}
+			}
+			stream.flush();
+		} catch (Exception ex) {
+			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(ex));
+			LOGGER.log(Level.SEVERE, ex.toString());
+			throw new UVException(ex.getMessage());
+		}
 	}
 	
 	private List<Departamento> getDepartamentosUsuario(VistaEvaluadores bean) throws SQLException {
