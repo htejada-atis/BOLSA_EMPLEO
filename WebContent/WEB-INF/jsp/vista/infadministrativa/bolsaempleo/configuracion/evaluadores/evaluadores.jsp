@@ -11,6 +11,9 @@ UVDatos uvdatos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
 VistaEvaluadores bean = (VistaEvaluadores) uvdatos.getVistas().get(VistaEvaluadores.class.getName());
 Departamento departamento = bean.getDepartamento();
 Area area = bean.getArea();
+
+boolean showUsuarios = departamento != null;
+boolean showExportar = departamento == null || departamento.getCodNum() == 0;
 %>
 
 <div class="bolsa-empleo evaluadores-listar">
@@ -32,17 +35,22 @@ Area area = bean.getArea();
 					</select>
 				</div>
 			</div>
-			<div class="form-group-container-offset col2 gap-5"  id="nuevo_evaluador_cont" style="<%= departamento == null ? "visibility: hidden" : "" %>">   
+			<div class="form-group-container-offset col2 gap-5"  id="nuevo_evaluador_cont" style="<%= !showUsuarios ? "display: none" : "" %>">
 				<div class="form-group" style="width:80%">
 					<label for="nombre_evaluador">Cuenta TIC evaluador <i class="tooltip">(?)<span>Introduzca la cuenta TIC sin @ujaen.es</span></i></label>
 					<input class="form-input-custom" type="text" name="<%= ControladorGestionEvaluadores.PARAM_NOMBRE_EVALUADOR %>" id="nombre_evaluador" value=""/>
 				</div>
 				<div class="form-group" style="width:20%;">
 					<label style="visibility: hidden">.</label>
-					<button class="link-btn" id="nuevo_evaluador" title="Añadir evaluador">
-						Buscar
-	   	 			</button>
-	   			</div>
+					<button class="link-btn" id="nuevo_evaluador" title="Añadir evaluador">Buscar</button>
+				</div>
+			</div>
+			
+			<div class="form-group-container-offset col2 gap-5" id="exportar_div" style="<%= !showExportar ? "display: none" : "" %>">
+				<div class="form-group">
+					<label style="visibility: hidden">.</label>
+					<button class="link-btn" id="exportar">Exportar evaluadores</button>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -92,10 +100,15 @@ Area area = bean.getArea();
 				};
 				Atis.sendForm("<%= request.getRequestURI() %>", params);
 			} else {
-				document.getElementById("nuevo_evaluador_cont").style.visibility = "hidden";
-				document.getElementById("tableAreasEVA").style.visibility = "hidden";
+				document.getElementById("nuevo_evaluador_cont").style.display = "none";
+				document.getElementById("tableAreasEVA").style.display = "none";
+				document.getElementById("exportar_div").style.display = "grid";
 			}
 		}
+		
+		$('#exportar').on('click', function() {
+			window.open("<%= request.getRequestURI() + "?" + ControladorGestionEvaluadores.PARAM_ACCION + "=" + ControladorGestionEvaluadores.ACCION_EXPORTAR %>");
+		});
 		
 		<% if (departamento != null) { %>
 			var tableAreas = new Atis.DataTable('#tableAreasEVA', {

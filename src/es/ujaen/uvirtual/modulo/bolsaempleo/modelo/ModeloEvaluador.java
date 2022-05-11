@@ -10,6 +10,7 @@ import java.util.Map;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Area;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.AreaEvaluadoresTable;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Departamento;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Evaluador;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
@@ -406,6 +407,48 @@ public class ModeloEvaluador {
 				conexion.setAutoCommit(true);
 			}
 		}
+	}
+	
+	/**
+	 * Listado de evaluadores para csv.
+	 * @param separator .
+	 * @return .
+	 * @throws UVException .
+	 * @throws SQLException .
+	 */
+	public List<String[]> exportarEvaluadoresCsv(String separator) throws SQLException, UVException {
+		String consulta = ""
+				+ " SELECT bepusu.CODNUM AS BEPUSU_CODNUM, bepare.ID_AREA_CONOCIMIENTO, bepare.DES_AREA_CONOCIMIENTO"
+				+ " FROM TBEP_EVALUADORES bepeva"
+				+ " LEFT JOIN TBEP_USUARIOS bepusu ON bepusu.CODNUM = bepeva.BEPUSU_CODNUM"
+				+ "	LEFT JOIN TBEP_AREAS bepare ON bepare.CODNUM = bepeva.BEPARE_CODNUM"
+				+ " WHERE bepeva.FLGACTIVO = 'S'";
+		
+		List<String[]> rows = new ArrayList<>();
+		
+		rows.add(new String[] {"NIF", "USUARIO", "NOMBRE", "EMAIL", "COD.AREA", "AREA"});
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {			
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					UsuarioBolsaEmpleo usuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioById(rs.getInt("BEPUSU_CODNUM"));
+					
+					String nif = BolsaEmpleoUtils.string2csv(usuario.getPrsNif(), separator);
+					String codcuenta = BolsaEmpleoUtils.string2csv(usuario.getCodCuenta());
+					String nombre = BolsaEmpleoUtils.string2csv(
+							String.format("%s %s %s", usuario.getNombre() != null ? usuario.getNombre() : "",
+									usuario.getPrimerApellido() != null ? usuario.getPrimerApellido() : "",
+									usuario.getSegundoApellido() != null ? usuario.getSegundoApellido() : ""), separator);
+					String email = BolsaEmpleoUtils.string2csv(usuario.getEmail(), separator);
+					String codigo = BolsaEmpleoUtils.string2csv(rs.getString("ID_AREA_CONOCIMIENTO"), separator);
+					String area = BolsaEmpleoUtils.string2csv(rs.getString("DES_AREA_CONOCIMIENTO"), separator);
+					
+					rows.add(new String[] {nif, codcuenta, nombre, email, codigo, area});
+				}
+			}
+		}
+		
+		return rows;
 	}
 	
 }
