@@ -16,10 +16,10 @@ VistaTitulaciones bean = (VistaTitulaciones) uvdatos.getVistas().get(VistaTitula
 	
 	<div class="titulo-bolsa-empleo">
 		<h2>Titulaciones</h2>
-    
-	    <button class="link-btn" id="nueva_titulacion">
-	    	 Nueva titulación
-	    </button>
+		<div>
+			<button class="link-btn" id="exportar">Exportar</button>
+			<button class="link-btn" id="nueva_titulacion">Nueva titulación</button>
+		</div>
 	</div>
 	
 	<table class="bluetable bolsaempleo" id="tableTitulacionesTIT">
@@ -74,6 +74,10 @@ VistaTitulaciones bean = (VistaTitulaciones) uvdatos.getVistas().get(VistaTitula
 		document.getElementById("nueva_titulacion").addEventListener("click", function(event) {
 			event.preventDefault();
 			Atis.sendForm("<%= request.getRequestURI() %>", {'a': '<%= ControladorGestionTitulaciones.ACCION_AGREGAR_TITULACION %>'});
+		});
+		
+		document.getElementById('exportar').addEventListener('click', function() {
+			window.open("<%= request.getRequestURI() + "?" + ControladorGestionTitulaciones.PARAM_ACCION + "=" + ControladorGestionTitulaciones.ACCION_EXPORTAR %>");
 		});
 		
 	});

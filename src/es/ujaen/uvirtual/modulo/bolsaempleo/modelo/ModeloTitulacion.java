@@ -584,6 +584,70 @@ public class ModeloTitulacion {
 			}
 		}
 	}
+	
+	/**
+	 * Listado de titulaciones preferentes por área para csv.
+	 * @param separator .
+	 * @return .
+	 * @throws UVException .
+	 * @throws SQLException .
+	 */
+	public List<String[]> exportarTitulacionesPreferentesCsv(String separator) throws SQLException, UVException {
+		String consulta = ""
+				+ " SELECT bepare.ID_AREA_CONOCIMIENTO, bepare.DES_AREA_CONOCIMIENTO, beptit.NOMBRE"
+				+ " FROM TBEP_TIT_PREFERENTES_AREA beptpa"
+				+ " LEFT JOIN TBEP_TITULACIONES beptit ON beptit.CODNUM = beptpa.BEPTIT_CODNUM"
+				+ "	LEFT JOIN TBEP_AREAS bepare ON bepare.CODNUM = beptpa.BEPARE_CODNUM"
+				+ " WHERE beptpa.FLGBORRADO = 'N' AND beptit.FLGBORRADO = 'N'";
+		
+		List<String[]> rows = new ArrayList<>();
+		
+		rows.add(new String[] {"COD.AREA", "AREA", "TITULACION PREFERENTE"});
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					String codigo = BolsaEmpleoUtils.string2csv(rs.getString("ID_AREA_CONOCIMIENTO"), separator);
+					String area = BolsaEmpleoUtils.string2csv(rs.getString("DES_AREA_CONOCIMIENTO"), separator);
+					String titulacion = BolsaEmpleoUtils.string2csv(rs.getString("NOMBRE"), separator);
+					
+					rows.add(new String[] {codigo, area, titulacion});
+				}
+			}
+		}
+		
+		return rows;
+	}
+	
+	/**
+	 * Listado de titulaciones para csv.
+	 * @param separator .
+	 * @return .
+	 * @throws UVException .
+	 * @throws SQLException .
+	 */
+	public List<String[]> exportarTitulacionesCsv(String separator) throws SQLException, UVException {
+		String consulta = ""
+				+ " SELECT beptit.NOMBRE"
+				+ " FROM TBEP_TITULACIONES beptit"
+				+ " WHERE beptit.FLGBORRADO = 'N'";
+		
+		List<String[]> rows = new ArrayList<>();
+		
+		rows.add(new String[] {"TITULACION"});
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					String titulacion = BolsaEmpleoUtils.string2csv(rs.getString("NOMBRE"), separator);
+					
+					rows.add(new String[] {titulacion});
+				}
+			}
+		}
+		
+		return rows;
+	}
 
 	private Titulacion createTitulacionFromResultSet(ResultSet rs) throws SQLException {
 		Titulacion t = new Titulacion();
