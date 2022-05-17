@@ -618,6 +618,36 @@ public class ModeloTitulacion {
 		
 		return rows;
 	}
+	
+	/**
+	 * Listado de titulaciones para csv.
+	 * @param separator .
+	 * @return .
+	 * @throws UVException .
+	 * @throws SQLException .
+	 */
+	public List<String[]> exportarTitulacionesCsv(String separator) throws SQLException, UVException {
+		String consulta = ""
+				+ " SELECT beptit.NOMBRE"
+				+ " FROM TBEP_TITULACIONES beptit"
+				+ " WHERE beptit.FLGBORRADO = 'N'";
+		
+		List<String[]> rows = new ArrayList<>();
+		
+		rows.add(new String[] {"TITULACION"});
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					String titulacion = BolsaEmpleoUtils.string2csv(rs.getString("NOMBRE"), separator);
+					
+					rows.add(new String[] {titulacion});
+				}
+			}
+		}
+		
+		return rows;
+	}
 
 	private Titulacion createTitulacionFromResultSet(ResultSet rs) throws SQLException {
 		Titulacion t = new Titulacion();
