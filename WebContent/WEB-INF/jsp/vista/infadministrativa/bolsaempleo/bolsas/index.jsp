@@ -27,7 +27,10 @@ VistaEstadoBolsas bean = (VistaEstadoBolsas) uvdatos.getVistas().get(VistaEstado
 
 	<jsp:include page="/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/mensajes.jsp" />
 	
-	<h2>Estado de las bolsas</h2>
+	<div class="titulo-bolsa-empleo">
+		<h2>Estado de las bolsas</h2>
+		<button class="link-btn" id="exportar">Exportar</button>
+	</div>	
 	
 	<div class="titulo-bolsa-empleo">
 		<div class="form-group-container col3">
@@ -142,6 +145,10 @@ $(document).ready(function() {
 		};
 		Atis.sendForm("<%= request.getRequestURI() %>", params);
 	}
+	
+	document.getElementById('exportar').addEventListener('click', function() {
+		window.open("<%= request.getRequestURI() + "?" + ControladorBolsas.PARAM_ACCION + "=" + ControladorBolsas.ACCION_EXPORTAR %>");
+	});
 	
 }); 
 </script>

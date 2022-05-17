@@ -619,6 +619,23 @@ public final class BolsaEmpleoUtils {
 
 		return value;
 	}
+	
+	/**
+	 * Prepara una fecha para pasarla a un csv.
+	 * 
+	 * @param value     .
+	 * @param separador .
+	 * @return .
+	 */
+	public static String date2csv(Date value, String separador) {
+		if (value == null) {
+			return "";
+		}
+		
+		String parsea = Formateador.formatoFecha(value, Formateador.FORMATO_FECHA_DDMMYYYY);
+		
+		return BolsaEmpleoUtils.string2csv(parsea);
+	}
 
 	/**
 	 * Prepara una cadena para un csv, sin indicar el separador de campos.

@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
@@ -638,5 +639,42 @@ public class ModeloBolsa {
 		bolsa.setFechaBaremacion(rs.getDate("FECHABAREMACION"));
 
 		return bolsa;
+	}
+	
+	/**
+	 * Listado de bolsas para csv.
+	 * @param separator .
+	 * @return .
+	 * @throws UVException .
+	 * @throws SQLException .
+	 */
+	public List<String[]> exportarBolsasCsv(String separator) throws SQLException, UVException {
+		String consulta = ""
+				+ " SELECT bepare.ID_AREA_CONOCIMIENTO, bepare.DES_AREA_CONOCIMIENTO, bepbol.ESTADO, bepbol.FLGBAREMABLE, "
+				+ "		bepbol.FECHABLOQUEO, bepbol.FECHADEBLOQUEO, bepbol.FECHABAREMACION"
+				+ " FROM TBEP_BOLSAS bepbol"
+				+ "	LEFT JOIN TBEP_AREAS bepare ON bepare.CODNUM = bepbol.BEPARE_CODNUM";
+		
+		List<String[]> rows = new ArrayList<>();
+		
+		rows.add(new String[] {"COD.AREA", "AREA", "ESTADO", "BAREMABLE", "FECHA BLOQUEO", "FECHA DESBLOQUEO", "FECHA BAREMACION"});
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					String codigo = BolsaEmpleoUtils.string2csv(rs.getString("ID_AREA_CONOCIMIENTO"), separator);
+					String area = BolsaEmpleoUtils.string2csv(rs.getString("DES_AREA_CONOCIMIENTO"), separator);
+					String estado = BolsaEmpleoUtils.string2csv(rs.getString("ESTADO"), separator);
+					String baremable = BolsaEmpleoUtils.string2csv(rs.getString("FLGBAREMABLE"), separator);
+					String fechaBloqueo = BolsaEmpleoUtils.date2csv((Date) rs.getTimestamp("FECHABLOQUEO"), separator);
+					String fechaDesBloqueo = BolsaEmpleoUtils.date2csv((Date) rs.getTimestamp("FECHADEBLOQUEO"), separator);
+					String fechaBaremacion = BolsaEmpleoUtils.date2csv((Date) rs.getTimestamp("FECHABAREMACION"), separator);
+																	
+					rows.add(new String[] {codigo, area, estado, baremable, fechaBloqueo, fechaDesBloqueo, fechaBaremacion});
+				}
+			}
+		}
+		
+		return rows;
 	}
 }
