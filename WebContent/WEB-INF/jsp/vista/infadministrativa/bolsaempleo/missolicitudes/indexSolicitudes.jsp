@@ -89,6 +89,16 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 			}
 		};
 		
+		var renderEstado = function(row) {
+			var convocatoriaCerrada = row.convocatoria.estado == '<%= ModeloConvocatoria.CONVOCATORIA_ESTADO_CERRADA %>';
+			
+			if (convocatoriaCerrada) {
+				return 'PENDIENTE DE APERTURA';
+			} else {
+				return row.convocatoria.estado;
+			}
+		};
+		
 		var createSolicitud = function() {
 			var id = $(this).data('rowid')
 			var params = {
@@ -135,7 +145,7 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 		    "columns": [
 		    	{'data': 'convocatoria.descripcion', order: {'active': false}},
 		        {'data': 'convocatoria.fechaCierre', order: {'active': false}, render: renderFechaCierre},
-		        {'data': 'convocatoria.estado', order: {'active': false}},
+		        {'data': 'convocatoria.estado', order: {'active': false}, render: renderEstado},
 		        {'data': 'codNum', order: {'active': false}, render: renderSolicitud},		        
 		    ],
 		});		
