@@ -17,7 +17,10 @@ VistaCandidatos bean = (VistaCandidatos) uvdatos.getVistas().get(VistaCandidatos
 	
 	<div class="titulo-bolsa-empleo">
 		<h2>Usuarios Candidatos</h2>
-		<button class="link-btn" id="exportar">Exportar candidatos</button>
+		<div>
+			<button class="link-btn" id="darBaja">Dar de baja</button>
+			<button class="link-btn" id="exportar">Exportar</button>
+		</div>
 	</div>
 	
 	<table class="bluetable bolsaempleo" id="tableUsuariosCAN">
@@ -88,29 +91,44 @@ $(document).ready(function() {
 			mensaje += "         <label class='bold-label' for='select_convocatorias'>Convocatoria: </label>";
 			mensaje += "         <select id='select_convocatorias' required>";
 			
-			<% for (Convocatoria c : bean.getListaConvocatorias()) { %>
-				mensaje += "<option value='<%= c.getCodNum() %>'><%= c.getDescripcion() %></option>";
-			<%	} %>
-			
-			mensaje += "         </select>";
-			mensaje += "     </div>";
-			mensaje += " </div>";
-			
-			Atis.confirmDialog("Exportar candidatos", mensaje, {
-				'Si': function() {
-					var selectConvocatoria = this.querySelector('#select_convocatorias');
-					
-					window.open("<%= request.getRequestURI() + "?" 
-						+ ControladorUsuarioCandidato.PARAM_ACCION + "=" + ControladorUsuarioCandidato.ACCION_EXPORTAR %>"
-						+ "<%= "&" + ControladorUsuarioCandidato.PARAM_CONVOCATORIA + "=" %>" + selectConvocatoria.value);
-					
-					$(this).dialog("close");
-				},
-				'No': function() {
-					$(this).dialog("close");
-				}
-			});
+		<% for (Convocatoria c : bean.getListaConvocatorias()) { %>
+			mensaje += "<option value='<%= c.getCodNum() %>'><%= c.getDescripcion() %></option>";
+		<%	} %>
 		
+		mensaje += "         </select>";
+		mensaje += "     </div>";
+		mensaje += " </div>";
+		
+		Atis.confirmDialog("Exportar candidatos", mensaje, {
+			'Si': function() {
+				var selectConvocatoria = this.querySelector('#select_convocatorias');
+				
+				window.open("<%= request.getRequestURI() + "?" 
+					+ ControladorUsuarioCandidato.PARAM_ACCION + "=" + ControladorUsuarioCandidato.ACCION_EXPORTAR %>"
+					+ "<%= "&" + ControladorUsuarioCandidato.PARAM_CONVOCATORIA + "=" %>" + selectConvocatoria.value);
+				
+				$(this).dialog("close");
+			},
+			'No': function() {
+				$(this).dialog("close");
+			}
+		});
 	});
+	
+	$('#darBaja').on('click', function() {
+		var mensaje = "<p>Se darán de baja todos los candidatos que no tienen ninguna solicitud (ni abierta ni cerrada) en cualquier convocatoria.</p>";
+			
+		Atis.confirmDialog("Dar de baja candidatos", mensaje, {
+			'Si': function() {
+				var params = {'<%= ControladorUsuarioCandidato.PARAM_ACCION %>': '<%= ControladorUsuarioCandidato.ACCION_DAR_BAJA_CANDIDATOS %>'};
+				Atis.sendForm("<%= request.getRequestURI() %>", params);
+				$(this).dialog("close");
+			},
+			'No': function() {
+				$(this).dialog("close");
+			}
+		});
+	});
+	
 }); 
 </script>

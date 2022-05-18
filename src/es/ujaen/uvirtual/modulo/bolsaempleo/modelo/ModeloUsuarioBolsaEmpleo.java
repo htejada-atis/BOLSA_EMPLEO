@@ -969,6 +969,35 @@ public class ModeloUsuarioBolsaEmpleo {
 		
 		refrescarUsuarioBEP(usuario);
 	}
+		
+	/**
+	 * Dar de baja a todos los usuarios que no tengan solicitudes.
+	 * @param usuarioQueBorra .
+	 * @throws UVException .
+	 * @throws SQLException .
+	 */
+	public void darBajaCandidatosSinSolicitudes(UsuarioBolsaEmpleo usuarioQueBorra) throws SQLException, UVException {
+		ModeloConvocatoria modelo = ModeloConvocatoria.obtenerInstancia();
+		
+		String consulta = ""
+				+ " SELECT bepusu.CODNUM"
+				+ " FROM TBEP_USUARIOS bepusu"
+				+ " LEFT JOIN TBEP_SOLICITUDES bepsol ON bepsol.BEPUSU_CODNUM = bepusu.CODNUM"
+				+ " WHERE"
+				+ "		bepusu.ROL = " + ModeloRol.ID_ROL_CANDIDATO
+				+ "	AND bepusu.FLGBORRADO = 'N'"
+				+ " AND bepsol.ESTADO IS NULL";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					UsuarioBolsaEmpleo usu = this.getUsuarioById(rs.getInt("CODNUM"));
+					usu.setRazonBorrado("Sin solicitudes en convocatorias");
+					this.cambiarFlagBorradoUsuarioRazon(usu, usuarioQueBorra);
+				}
+			}
+		}
+	}
 
 	/**
 	 * método que crea un usuario en bolsa empleo y lo devuelve.
