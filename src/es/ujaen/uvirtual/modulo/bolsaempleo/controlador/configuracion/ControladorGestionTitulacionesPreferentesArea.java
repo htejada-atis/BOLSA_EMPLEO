@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -59,6 +60,7 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 	public static final String ACCION_INCLUIR_TITULACION_AREA = "incluirtitulacionarea";
 	public static final String ACCION_INDEX = "listarareas";
 	public static final String ACCION_SELECCIONAR_AREA = "seleccionarArea";
+	public static final String ACCION_EXPORTAR = "exportarTitulaciones";
 	
 	// Parámetros
 	public static final String PARAM_ACCION = "a";
@@ -83,6 +85,10 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 	public static final String RESPONSE_AJAX_ENCODING = "UTF-8";
 	public static final String RESPONSE_AJAX_ERROR = "error";
 	public static final int RESPONSE_AJAX_HTTP_CODE_ERROR = 400;
+	
+	// csv
+	public static final String RESPONSE_CSV_CONTENTTYPE = "text/csv";
+	public static final String RESPONSE_CSV_ENCODING = "UTF-8";
 
 	/** Peticion GET.
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
@@ -122,6 +128,9 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 					break;
 				case ACCION_DATATABLE_TITULACIONES_PREFERENTES_AREA:
 					listadoTitulacionesPreferentesArea(bean, datos, request, response);
+					break;
+				case ACCION_EXPORTAR:
+					exportar(bean, datos, request, response);
 					break;
 				default:
 					errorFatal(bean, "Acción no contemplada");
@@ -291,6 +300,33 @@ public class ControladorGestionTitulacionesPreferentesArea extends HttpServlet {
 		}
 		
 		datos.setRespuestaEnviada(true);
+	}
+	
+	private void exportar(VistaTitulacionesArea bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) 
+			throws SQLException, UVException, IOException {
+		datos.setRespuestaEnviada(true);
+		datos.setContentType(RESPONSE_CSV_CONTENTTYPE);
+		response.setContentType(RESPONSE_CSV_CONTENTTYPE);
+		response.setCharacterEncoding(RESPONSE_CSV_ENCODING);
+		response.setHeader("Content-Disposition", "attachment; filename=\"titulaciones-preferentes.csv\"");
+		
+		ModeloTitulacion modelo = ModeloTitulacion.obtenerInstancia();
+		
+		String separator = ";";
+		List<String[]> rows = modelo.exportarTitulacionesPreferentesCsv(separator); 
+		
+		try (ServletOutputStream stream = response.getOutputStream()) {
+			try (PrintWriter printer = new PrintWriter(stream)) {
+				for (String[] row : rows) {
+					printer.println(String.join(separator, row));
+				}
+			}
+			stream.flush();
+		} catch (Exception ex) {
+			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(ex));
+			LOGGER.log(Level.SEVERE, ex.toString());
+			throw new UVException(ex.getMessage());
+		}
 	}
 
 	private void redireccionConAreaSeleccionada(UVDatos datos, HttpServletRequest request, HttpServletResponse response, Area area) throws IOException {

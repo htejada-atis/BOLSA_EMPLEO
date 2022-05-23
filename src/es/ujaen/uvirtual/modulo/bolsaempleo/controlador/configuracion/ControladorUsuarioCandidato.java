@@ -89,7 +89,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 	public static final String PARAM_SOLICITUD = "solicitud";
 	public static final String PARAM_RAZON_EXCLUSION_SOLICITUD = "razonexclusionsolicitud";
 	public static final String PARAM_CONVOCATORIA = "convocatoria";
-
+	
 	// acciones
 	public static final String ACCION_ACREDITACIONES_CANDIDATO = "acreditacionescandidato";
 	public static final String ACCION_AREAS_EXCLUIDAS_CANDIDATO = "areasexcluidascandidato";
@@ -120,6 +120,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 	public static final String ACCION_EXCLUIR_SOLICITUD = "excluirsolicitudcandidato";	
 	public static final String ACCION_INCLUIR_SOLICITUD = "incluirsolicitudcandidato";
 	public static final String ACCION_EXPORTAR = "exportarcandidatos";
+	public static final String ACCION_DAR_BAJA_CANDIDATOS = "darbajacandidatos";
 
 	// mensajes
 	public static final String MENSAJE_ERROR_ACCION_NO_CONTEMPLADA = "Acción no contemplada";
@@ -150,7 +151,8 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 	public static final String MENSAJE_EXITO_USUARIO_MODIFICADO_CORRECTAMENTE = "Usuario/s modificado/s correctamente";
 	public static final String MENSAJE_EXITO_EXCLUSION_SOLICITUD = "Solicitud excluida correctamente";
 	public static final String MENSAJE_EXITO_INCLUSION_SOLICITUD = "Solicitud incluida correctamente";
-
+	public static final String MENSAJE_EXITO_CANDIDATOS_SIN_SOLICITUDES_DADOS_DE_BAJA = "Candidatos sin solicitudes dados de baja";
+	
 	public static final String URL_PATTERN = "/srv/es/informacionadministrativa/bolsaempleo/configuracion/candidatos";
 
 	// ajax
@@ -228,6 +230,9 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 					break;
 				case ACCION_EXPORTAR:
 					exportarCandidatos(bean, datos, request, response);
+					break;
+				case ACCION_DAR_BAJA_CANDIDATOS:
+					darBajaCandidatosSinSolicitudes(bean, datos, request, response);
 					break;
 				default:
 					errorFatal(bean, MENSAJE_ERROR_ACCION_NO_CONTEMPLADA);
@@ -981,6 +986,18 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 			LOGGER.log(Level.SEVERE, ex.toString());
 			throw new UVException(ex.getMessage());
 		}
+	}
+	
+	private void darBajaCandidatosSinSolicitudes(VistaCandidatos bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) 
+			throws SQLException, UVException, IOException {
+		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
+		
+		modelo.darBajaCandidatosSinSolicitudes(bean.getUsuarioLogeado());
+		
+		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_CANDIDATOS_SIN_SOLICITUDES_DADOS_DE_BAJA, bean, request);
+		Map<String, String> params = new HashMap<>();
+		params.put(PARAM_ACCION, ACCION_INDEX);
+		BolsaEmpleoUtils.redirectWithParams(datos, request, response, params);
 	}
 	
 	/**

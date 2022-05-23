@@ -63,7 +63,7 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 				html = 'Tiene un solicitud abierta. No olvide CERRAR antes de la fecha de cierre de la convocatoria. ' + btnConsultar;
 			} else if (convocatoriaCerrada && solicitudNoCreada) {
 				// convocatoria cerrada, solicitud no creada
-				html = 'No tiene ninguna solicitud en esta convocatoria.';
+				html = 'La convocatoria aún no está abierta. Espere su apertura.';
 			} else if (convocatoriaCerrada && solicitudAbierta) {
 				// convocatoria cerrada, solicitud abierta
 				html = 'No ha validado la solicitud antes de la fecha de cierre de la convocatoria.';
@@ -77,6 +77,26 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 			}
 			
 			return html
+		};
+		
+		var renderFechaCierre = function(row) {
+			var convocatoriaCerrada = row.convocatoria.estado == '<%= ModeloConvocatoria.CONVOCATORIA_ESTADO_CERRADA %>';
+			
+			if (convocatoriaCerrada) {
+				return '';
+			} else {
+				return row.convocatoria.fechaCierre;
+			}
+		};
+		
+		var renderEstado = function(row) {
+			var convocatoriaCerrada = row.convocatoria.estado == '<%= ModeloConvocatoria.CONVOCATORIA_ESTADO_CERRADA %>';
+			
+			if (convocatoriaCerrada) {
+				return 'PENDIENTE DE APERTURA';
+			} else {
+				return row.convocatoria.estado;
+			}
 		};
 		
 		var createSolicitud = function() {
@@ -124,8 +144,8 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 		    "afterRender": afterRender,
 		    "columns": [
 		    	{'data': 'convocatoria.descripcion', order: {'active': false}},
-		        {'data': 'convocatoria.fechaCierre', order: {'active': false}},
-		        {'data': 'convocatoria.estado', order: {'active': false}},
+		        {'data': 'convocatoria.fechaCierre', order: {'active': false}, render: renderFechaCierre},
+		        {'data': 'convocatoria.estado', order: {'active': false}, render: renderEstado},
 		        {'data': 'codNum', order: {'active': false}, render: renderSolicitud},		        
 		    ],
 		});		

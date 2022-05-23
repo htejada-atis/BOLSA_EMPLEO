@@ -4,9 +4,11 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -49,6 +51,7 @@ public class ControladorGestionTitulaciones extends HttpServlet {
 	public static final String ACCION_BORRAR_TITULACION = "borrartitulacion";
 	public static final String ACCION_DATATABLE_TITULACIONES = "datatabletitulaciones";
 	public static final String ACCION_INDEX = "listartitulaciones";
+	public static final String ACCION_EXPORTAR = "exportar";
 	
 	// Parámetros
 	public static final String PARAM_ACCION = "a";
@@ -77,6 +80,10 @@ public class ControladorGestionTitulaciones extends HttpServlet {
 	
 	// urls
 	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/titulaciones";
+	
+	// csv
+	public static final String RESPONSE_CSV_CONTENTTYPE = "text/csv";
+	public static final String RESPONSE_CSV_ENCODING = "UTF-8";
 
 	/** Peticion GET.
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
@@ -110,7 +117,10 @@ public class ControladorGestionTitulaciones extends HttpServlet {
 					break;
 				case ACCION_DATATABLE_TITULACIONES:
 					listadoTitulaciones(bean, datos, request, response);
-					break;				
+					break;
+				case ACCION_EXPORTAR:
+					exportar(bean, datos, request, response);
+					break;
 				default:
 					errorFatal(bean, "Acción no contemplada");
 			}
@@ -260,5 +270,32 @@ public class ControladorGestionTitulaciones extends HttpServlet {
 		}
 		
 		return t;
+	}
+	
+	private void exportar(VistaTitulaciones bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) 
+			throws SQLException, UVException, IOException {
+		datos.setRespuestaEnviada(true);
+		datos.setContentType(RESPONSE_CSV_CONTENTTYPE);
+		response.setContentType(RESPONSE_CSV_CONTENTTYPE);
+		response.setCharacterEncoding(RESPONSE_CSV_ENCODING);
+		response.setHeader("Content-Disposition", "attachment; filename=\"titulaciones.csv\"");
+		
+		ModeloTitulacion modelo = ModeloTitulacion.obtenerInstancia();
+		
+		String separator = ";";
+		List<String[]> rows = modelo.exportarTitulacionesCsv(separator); 
+		
+		try (ServletOutputStream stream = response.getOutputStream()) {
+			try (PrintWriter printer = new PrintWriter(stream)) {
+				for (String[] row : rows) {
+					printer.println(String.join(separator, row));
+				}
+			}
+			stream.flush();
+		} catch (Exception ex) {
+			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(ex));
+			LOGGER.log(Level.SEVERE, ex.toString());
+			throw new UVException(ex.getMessage());
+		}
 	}
 }

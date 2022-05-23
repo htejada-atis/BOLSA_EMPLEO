@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.logging.Level;
 
 import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -64,7 +65,8 @@ public class ControladorBolsas extends HttpServlet {
 	public static final String ACCION_BOLSAS_BAREMACION = "baremacion";
 	public static final String ACCION_BOLSAS_ALEGACION = "alegacion";
 	public static final String ACCION_BOLSAS_DESBLOQUEAR = "desbloquear";
-	public static final String ACCION_BOLSAS_BAREMAR = "baremar";	
+	public static final String ACCION_BOLSAS_BAREMAR = "baremar";
+	public static final String ACCION_EXPORTAR = "exportar";
 	
 	// mensajes
 	public static final String MENSAJE_ERROR_ACCION_BOLSA_NO_VALIDA = "Acción no válida";
@@ -76,6 +78,10 @@ public class ControladorBolsas extends HttpServlet {
 	public static final String RESPONSE_AJAX_ENCODING = "UTF-8";
 	public static final String RESPONSE_AJAX_ERROR = "error";
 	public static final int RESPONSE_AJAX_HTTP_CODE_ERROR = 400;
+	
+	// csv
+	public static final String RESPONSE_CSV_CONTENTTYPE = "text/csv";
+	public static final String RESPONSE_CSV_ENCODING = "UTF-8";
 
 	/** Peticion GET.
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
@@ -108,6 +114,9 @@ public class ControladorBolsas extends HttpServlet {
 					break;
 				case ACCION_BOLSA:
 					accionSobreBolsas(bean, datos, request, response);
+					break;
+				case ACCION_EXPORTAR:
+					exportar(bean, datos, request, response);
 					break;
 				default:
 					errorFatal(bean, "Acción no contemplada");
@@ -265,6 +274,33 @@ public class ControladorBolsas extends HttpServlet {
 			}
 			
 			modeloBolsa.baremarBolsa(bolsa, null);
+		}
+	}
+	
+	private void exportar(VistaEstadoBolsas bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) 
+			throws SQLException, UVException, IOException {
+		datos.setRespuestaEnviada(true);
+		datos.setContentType(RESPONSE_CSV_CONTENTTYPE);
+		response.setContentType(RESPONSE_CSV_CONTENTTYPE);
+		response.setCharacterEncoding(RESPONSE_CSV_ENCODING);
+		response.setHeader("Content-Disposition", "attachment; filename=\"bolsas.csv\"");
+		
+		ModeloBolsa modelo = ModeloBolsa.obtenerInstancia();
+		
+		String separator = ";";
+		List<String[]> rows = modelo.exportarBolsasCsv(separator); 
+		
+		try (ServletOutputStream stream = response.getOutputStream()) {
+			try (PrintWriter printer = new PrintWriter(stream)) {
+				for (String[] row : rows) {
+					printer.println(String.join(separator, row));
+				}
+			}
+			stream.flush();
+		} catch (Exception ex) {
+			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(ex));
+			LOGGER.log(Level.SEVERE, ex.toString());
+			throw new UVException(ex.getMessage());
 		}
 	}
 }

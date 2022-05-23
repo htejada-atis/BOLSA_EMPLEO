@@ -17,14 +17,22 @@ Area area = bean.getArea();
 	
 	<h2>Titulaciones preferentes por área</h2>
 	
-	<div class="form-select form-group">
-		<label>Área</label>
-		<select id="select_area">
-			<option value="0">Elija el área</option>
-			<% for(Area a: bean.getAreas()) { %>
-				<option value="<%=a.getCodNum()%>" <%= area != null && area.getCodNum().equals(a.getCodNum()) ? "selected=\"selected\"" : "" %>><%=a.getDescripcion()%></option>
-			<% } %>
-		</select>
+	<div class="form-group-container col2">
+		<div class="form-select form-group">
+			<label>Área</label>
+			<select id="select_area">
+				<option value="0">Elija el área</option>
+				<% for(Area a: bean.getAreas()) { %>
+					<option value="<%=a.getCodNum()%>" <%= area != null && area.getCodNum().equals(a.getCodNum()) ? "selected=\"selected\"" : "" %>><%=a.getDescripcion()%></option>
+				<% } %>
+			</select>
+		</div>
+		<div class="form-group-container-offset col2">
+			<div class="form-group">
+				<label style="visibility: hidden">.</label>
+				<button class="link-btn" id="exportar">Exportar titulaciones</button>
+			</div>
+		</div>
 	</div>
 	
 	<div id="tablas_titulaciones" style="<%= area == null ? "visibility: hidden" : "" %>">
@@ -73,6 +81,10 @@ Area area = bean.getArea();
 				document.getElementById("tablas_titulaciones").style.visibility = "hidden";
 			}
 		}
+		
+		$('#exportar').on('click', function() {
+			window.open("<%= request.getRequestURI() + "?" + ControladorGestionTitulacionesPreferentesArea.PARAM_ACCION + "=" + ControladorGestionTitulacionesPreferentesArea.ACCION_EXPORTAR %>");
+		});
 		
 		<% if (area != null) { %>
 			table_titulaciones_area = new Atis.DataTable('#tableTitulacionesPreferentesAreaTPA', {
