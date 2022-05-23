@@ -1,14 +1,8 @@
 package es.ujaen.uvirtual.modulo.bolsaempleo.tareas;
 
 import java.sql.SQLException;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
-import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Solicitud;
-import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBolsa;
-import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloConvocatoria;
-import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloResultados;
 import es.ujaen.uvirtual.utilidades.Formateador;
 import es.ujaen.uvirtual.utilidades.UVException;
 
@@ -46,19 +40,19 @@ public final class BaremarBolsa {
 	}
 	
 	private static void baremarBolsas() throws SQLException, UVException {
-		ModeloBolsa modeloBolsa = ModeloBolsa.obtenerInstancia();
-		ModeloResultados modeloResultados = ModeloResultados.obtenerInstancia();
-		
-		List<Bolsa> bolsas = modeloBolsa.getBolsasPendientesBaremacion();
-		
-		for (Bolsa bolsa: bolsas) {
-			List<Solicitud> solicitudes = modeloResultados.listaSolicitudesBolsa(bolsa, ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoria());
-			
-			for (Solicitud solicitud: solicitudes) {
-				modeloResultados.calcularSolicitud(solicitud, bolsa);
-			}
-			
-			modeloBolsa.baremarBolsa(bolsa, null);
-		}
+//		ModeloBolsa modeloBolsa = ModeloBolsa.obtenerInstancia();
+//		ModeloResultados modeloResultados = ModeloResultados.obtenerInstancia();
+//		
+//		List<Bolsa> bolsas = modeloBolsa.getBolsasPendientesBaremacion();
+//		
+//		for (Bolsa bolsa: bolsas) {
+//			List<Solicitud> solicitudes = modeloResultados.listaSolicitudesBolsa(bolsa, ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoria());
+//			
+//			for (Solicitud solicitud: solicitudes) {
+//				modeloResultados.calcularSolicitud(solicitud, bolsa);
+//			}
+//			
+//			modeloBolsa.baremarBolsa(bolsa, null);
+//		}
 	}
 }

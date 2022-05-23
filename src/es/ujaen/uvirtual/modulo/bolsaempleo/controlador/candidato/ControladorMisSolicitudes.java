@@ -781,7 +781,7 @@ public class ControladorMisSolicitudes extends HttpServlet {
 			throws IOException {
 		
 		datos.setRespuestaEnviada(true);
-		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);		
+		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
 		

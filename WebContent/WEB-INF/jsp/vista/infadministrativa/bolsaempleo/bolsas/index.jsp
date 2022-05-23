@@ -23,28 +23,33 @@ VistaEstadoBolsas bean = (VistaEstadoBolsas) uvdatos.getVistas().get(VistaEstado
 		revisadas = bean.getTotalBolsasRevisadas();
 		baremables = bean.getTotalBolsasBaremables();
 		totales = bean.getTotalBolsas();
+		
+		String descripcion = "";
+		if(bean.getConvocatoria() != null) {
+			descripcion = bean.getConvocatoria().getDescripcion();
+		} else {
+			descripcion = "No existen convocatorias en este momento";
+		}
 	%>
 
 	<jsp:include page="/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/mensajes.jsp" />
 	
-	<div class="titulo-bolsa-empleo">
-		<h2>Estado de las bolsas</h2>
-		<button class="link-btn" id="exportar">Exportar</button>
-	</div>	
-	
+	<h2>Estado de las bolsas</h2>
+	<h3><%= descripcion %><button class="link-btn" id="exportar" style="float: right;">Exportar</button></h3>
+		
 	<div class="titulo-bolsa-empleo">
 		<div class="form-group-container col3">
-			<div class="form-group">
+			<div class="form-group" style="margin-bottom: 0">
 					<p>Total de bolsas bloqueadas:
 						<%= bloqueadas %> / <%= totales %>
 					</p>
 			</div>
-			<div class="form-group">
+			<div class="form-group" style="margin-bottom: 0">
 					<p>Total de bolsas revisadas:
 						<%= revisadas %> / <%= totales %>
 					</p>
 			</div>
-			<div class="form-group">
+			<div class="form-group" style="margin-bottom: 0">
 					<p>Total de bolsas baremables:
 						<%= baremables %> / <%= totales %>
 					</p>
@@ -54,16 +59,16 @@ VistaEstadoBolsas bean = (VistaEstadoBolsas) uvdatos.getVistas().get(VistaEstado
 	</div>
 	
 	
-	<table class="bluetable bolsaempleo" id="tableBolsasBOL">
+	<table class="bluetable bolsaempleo tablebolsas" id="tableBolsasBOL">
 		<tr>
 			<th scope="col" style="width:15px"></th>
 			<th scope="col" style="width:30px" title="Id de la convocatoria">Id</th>
 			<th scope="col" style="width:100%" class="area">Area</th>
-			<th scope="col" style="width:90px">Estado</th>
-			<th scope="col" style="width:68px">Actualizada</th>
+			<th scope="col" style="width:80px">Estado</th>
 			<th scope="col" style="width:68px">Bloqueo</th>
 			<th scope="col" style="width:68px">Desbloqueo</th>
-			<th scope="col" style="width:68px">Baremación</th>
+			<th scope="col" style="width:70px">Baremación</th>
+			<th scope="col" style="width:70px">Contratación</th>
 			<th scope="col" class="center" style="width:48px">Baremable</th>
 		</tr>
 		<tbody>
@@ -74,9 +79,8 @@ VistaEstadoBolsas bean = (VistaEstadoBolsas) uvdatos.getVistas().get(VistaEstado
 			</tr>
 		</tfoot>
 	</table>
-	
 </div>
-	
+
 <script>
 $(document).ready(function() {
 	var table = new Atis.DataTable('#tableBolsasBOL', {
@@ -94,7 +98,14 @@ $(document).ready(function() {
 			{'data': 'codNum', 'filter': {'type': 'number'}},
 			{'data': 'area.descripcion', 'filter': true},
 			{'data': 'estado', 'render': function(row) {
-					return row.estado == '<%= ModeloBolsa.BOLSA_ESTADO_BAREMACION %>' ? 'VALIDACIÓN' : row.estado;
+					switch(row.estado) {
+					case '<%= ModeloBolsa.BOLSA_ESTADO_BAREMACION %>':
+						return 'VALIDACION';
+					case '<%= ModeloBolsa.BOLSA_ESTADO_DESBLOQUEADA %>':
+						return 'DESBLOQUE.';
+					default:
+						return row.estado;
+					}
 				}, 
 				'filter': {'type': 'select', 'options': {
 					'<%= ModeloBolsa.BOLSA_ESTADO_BLOQUEADA %>': 'Bloqueada',
@@ -105,10 +116,14 @@ $(document).ready(function() {
 					}
 				}
 			},
-			{'data': 'fechaActualizacion', 'filter': {'type': 'date'}},
 			{'data': 'fechaBloqueo', 'filter': {'type': 'date'}},
 			{'data': 'fechaDesBloqueo', 'filter': {'type': 'date'}},
-			{'data': 'fechaBaremacion', 'filter': {'type': 'date'}},
+			{'data': 'fechaBaremacion', 'class': 'ta-right', 'filter': {'type': 'date'}, 'render': function(row) {
+				var fb = row.fechaBaremacion ? 'P: ' + row.fechaBaremacion : '';
+				fb += row.fechaBaremacionDefinitiva ? '<br/>D: ' + row.fechaBaremacionDefinitiva : '';
+				return fb;
+			}},
+			{'data': 'fechaHabilitarContratos', 'filter': {'type': 'date'}},
 			{'data': 'baremable', 'filter': {'type': 'select', 'options': {'true': 'Baremable', 'false': 'No Baremable'} , 'optionDefault': 'true'}, 'render': function(row) {
 				if(row.baremable) {
 					return "<div title='Baremable' class='circle-true'></div>";
@@ -124,22 +139,64 @@ $(document).ready(function() {
 			{'label': 'Alegación', 'onClick': function(selected) { enviaAccion("<%=ControladorBolsas.ACCION_BOLSAS_ALEGACION%>", selected); } },
 			{'label': 'Desbloquear', 'onClick': function(selected) { enviaAccion("<%=ControladorBolsas.ACCION_BOLSAS_DESBLOQUEAR%>", selected); } },
 			{'label': 'Baremar', 'onClick': function(selected) { enviaAccion("<%=ControladorBolsas.ACCION_BOLSAS_BAREMAR%>", selected); } },
+			{'label': 'Contratación', 'onClick': function(selected) { enviaAccion("<%=ControladorBolsas.ACCION_BOLSAS_CONTRATACION%>", selected); } },
 		]
 	});
 	
+	function bloquearAcciones() {
+		$('#tableBolsasBOL').find('.actions').find('.btn').prop('disabled', true);
+		return true;
+	}
+	
+	function desbloquearAcciones() {
+		$('#tableBolsasBOL').find('.actions').find('.btn').prop('disabled', false);
+		return true;
+	}
+	
 	function enviaAccion(accion, selected) {
+		bloquearAcciones();
+		
 		if (selected.length == 0) {
-			Atis.alertDialog('Estado de las bolsas', 'Seleccione al menos una bolsa para cambiar su estado.');
+			Atis.alertDialog('Estado de las bolsas', 'Seleccione al menos una bolsa para cambiar su estado.', desbloquearAcciones, desbloquearAcciones);
 			return;
 		}
 		
-		if (accion == 'baremar' && selected.length > 5) {
-			Atis.alertDialog('Baremar bolsa', 'Sólo puede baremar 5 bolsas al mismo tiempo como máximo.');
+		if (accion == 'baremar') {
+			if (selected.length > 1) {
+				Atis.alertDialog('Baremar bolsa', 'Sólo puede baremar 1 bolsas al mismo tiempo como máximo.', desbloquearAcciones, desbloquearAcciones);
+				return;
+			}
+			
+			var paramsBaremar = {
+				'<%= ControladorBolsas.PARAM_ACCION %>': '<%= ControladorBolsas.ACCION_BOLSA%>', 
+				'<%= ControladorBolsas.PARAM_ACCION_BOLSA %>': '<%= ControladorBolsas.ACCION_BOLSAS_BAREMAR %>',
+				'<%= ControladorBolsas.PARAM_BOLSAS_SELECCIONADAS %>': Atis.object2Json(selected)
+			}
+			
+			Atis.confirmDialog("Baremar bolsa", "Seleccione baremación provisional o baremación definitiva.<br/><br/>Si se barema de forma provisional, la fecha de baremación definitiva se pondrá en blanco.", {
+				Provisional: function(row) {
+					paramsBaremar['<%= ControladorBolsas.PARAM_ACCION_TIPO_BAREMACION %>'] = '<%= ControladorBolsas.ACCION_BOLSAS_BAREMAR_PROVISIONAL %>';
+					Atis.sendForm("<%= request.getRequestURI() %>", paramsBaremar);
+					desbloquearAcciones();
+					$(this).dialog("close");
+				},
+				Definitiva: function() {
+					paramsBaremar['<%= ControladorBolsas.PARAM_ACCION_TIPO_BAREMACION %>'] = '<%= ControladorBolsas.ACCION_BOLSAS_BAREMAR_DEFINITIVA %>';
+					Atis.sendForm("<%= request.getRequestURI() %>", paramsBaremar);
+					desbloquearAcciones();
+					$(this).dialog("close");
+				},
+				CANCELAR: function() {
+					desbloquearAcciones();
+					$(this).dialog("close");
+				}
+			}, desbloquearAcciones);
+			
 			return;
 		}
 		
 		var params = {
-			'a': '<%=ControladorBolsas.ACCION_BOLSA%>', 
+			'<%= ControladorBolsas.PARAM_ACCION %>': '<%=ControladorBolsas.ACCION_BOLSA%>', 
 			'<%=ControladorBolsas.PARAM_ACCION_BOLSA%>': accion, 
 			'<%=ControladorBolsas.PARAM_BOLSAS_SELECCIONADAS%>': Atis.object2Json(selected)
 		};

@@ -253,6 +253,11 @@ table.bluetable.bolsaempleo .page-size select {
 	padding: 0px;
 }
 
+table.bluetable.bolsaempleo.tablebolsas span.actions {
+	float:left;
+	margin-top: 10px;
+} 
+
 /* overflow */
 
 .overflow-ellipsis {

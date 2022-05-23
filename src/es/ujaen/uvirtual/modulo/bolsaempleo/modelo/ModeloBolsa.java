@@ -96,7 +96,11 @@ public class ModeloBolsa {
 		List<Bolsa> bolsas = new ArrayList<>();
 		BolsaEmpleoDataTable<Bolsa> dataTable = new BolsaEmpleoDataTable<>(params);
 
-		String consulta = "SELECT bepbol.* FROM TBEP_BOLSAS bepbol INNER JOIN TBEP_AREAS bepare ON bepare.CODNUM = bepbol.BEPARE_CODNUM WHERE 1=1 ";
+		String consulta = ""
+			+ " SELECT bepbol.* "
+			+ " FROM TBEP_BOLSAS bepbol "
+			+ " INNER JOIN TBEP_AREAS bepare ON bepare.CODNUM = bepbol.BEPARE_CODNUM "
+			+ " WHERE 1=1 ";
 
 		dataTable.setColumn(ORDER_COLUMN_INDEX_ID, "bepbol.CODNUM", DataTableColumn.COLUMN_TYPE_NUMBER);
 		dataTable.setColumn(ORDER_COLUMN_INDEX_AREA, "bepare.DES_AREA_CONOCIMIENTO");
@@ -143,7 +147,8 @@ public class ModeloBolsa {
 		boolean evaluador = usuario.getRol().getValor().equals(ModeloRol.ROL_MIEMBRO_COMISION) 
 				|| usuario.getRol().getValor().equals(ModeloRol.ROL_DIRECTOR_DEPARTAMENTO);
 		
-		String consulta = "SELECT bepbol.*,"
+		String consulta = ""
+				+ " SELECT bepbol.*,"
 				+ "		("
 				+ "		SELECT"
 				+ "			CASE"
@@ -241,7 +246,8 @@ public class ModeloBolsa {
 	public List<Bolsa> getBolsasByAreaDepartamentoEnSolicitud(Area area, Solicitud solicitud) throws SQLException, UVException {
 		ArrayList<Bolsa> bolsas = new ArrayList<>();
 		String consulta = ""
-				+ " SELECT DISTINCT bepbol.* FROM TBEP_AREAS bepare"
+				+ " SELECT DISTINCT bepbol.* "
+				+ " FROM TBEP_AREAS bepare "
 				+ " INNER JOIN TBEP_BOLSAS bepbol ON bepbol.BEPARE_CODNUM = bepare.CODNUM"
 				+ " INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbo.BEPBOL_CODNUM = bepbol.CODNUM AND bepsbo.BEPSOL_CODNUM = ?"
 				+ " INNER JOIN TBEP_AREAS_DEPARTAMENTOS bepade ON bepade.BEPARE_CODNUM = bepare.CODNUM"
@@ -460,7 +466,8 @@ public class ModeloBolsa {
 		 */
 		this.cambiarEstadoBolsas(bolsas, BOLSA_ESTADO_DESBLOQUEADA, usuario);
 	}
-
+	
+	
 	/** Establece las bolsas como pendientes de baremación .
 	 * @param bolsas .
 	 * @param usuarioUpdate .
@@ -502,28 +509,78 @@ public class ModeloBolsa {
 	/** Baremar bolsa .
 	 * @param bolsa .
 	 * @param usuarioUpdate .
+	 * @param definitiva .
 	 * @throws UVException .
 	 * @throws SQLException .
 	 */
-	public void baremarBolsa(Bolsa bolsa, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
+	public void baremarBolsa(Bolsa bolsa, boolean definitiva, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
 		if (bolsa == null) {
 			throw new UVException(MENSAJE_ERROR_BOLSA_NULL);
 		}
 		
+		if (!bolsa.getEstado().equals(BOLSA_ESTADO_BLOQUEADA)) {
+			throw new UVException(MENSAJE_ERROR_BAREMAR_BOLSA_NO_BLOQUEADA);
+		}
+		
+		if (!bolsa.getBaremable()) {
+			throw new UVException(MENSAJE_ERROR_BAREMAR_BOLSA_NO_BAREMABLE);
+		}
+		
 		String usuarioUp = usuarioUpdate != null ? usuarioUpdate.getCodCuenta() : "TAREA_PROGRAMADA";
+		String query = " UPDATE TBEP_BOLSAS SET FLGPENBAREMACION = 'N', UID_USUARIO = ?, ";
 		
-		String query = "UPDATE TBEP_BOLSAS SET FECHABAREMACION = ?, FLGPENBAREMACION = 'N', UID_USUARIO = ? WHERE CODNUM = ?";
+		if (definitiva) {
+			query += " FECHABAREMACIONFIN = ? ";
+		} else {
+			query += " FECHABAREMACION = ?, FECHABAREMACIONFIN = NULL ";
+		}
 		
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-				PreparedStatement stmt = conexion.prepareStatement(query)) {
+		query += " WHERE CODNUM = ? ";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(query)) {
 			int indexParam = 1;
-			stmt.setDate(indexParam++, new java.sql.Date(BolsaEmpleoUtils.getCurrentDateTime().getTime()));
 			stmt.setString(indexParam++, usuarioUp);
+			stmt.setDate(indexParam++, new java.sql.Date(BolsaEmpleoUtils.getCurrentDateTime().getTime()));
 			stmt.setInt(indexParam++, bolsa.getCodNum());
 			stmt.executeUpdate();
 		}
 	}
 
+	/**
+	 * Indica si la bolsa está marcada para contratación.
+	 * @param bolsa .
+	 * @param usuario . 
+	 * @throws UVException .
+	 * @throws SQLException .
+	 */
+	public void habilitarBolsaParaContratacion(Bolsa bolsa, UsuarioBolsaEmpleo usuario) throws SQLException, UVException {
+		if (bolsa == null) {
+			throw new UVException(MENSAJE_ERROR_BOLSA_NULL);
+		}
+		
+		if (!bolsa.getEstado().equals(BOLSA_ESTADO_BLOQUEADA)) {
+			throw new UVException(MENSAJE_ERROR_BAREMAR_BOLSA_NO_BLOQUEADA);
+		}
+		
+		if (!bolsa.getBaremable()) {
+			throw new UVException(MENSAJE_ERROR_BAREMAR_BOLSA_NO_BAREMABLE);
+		}
+		
+		if (bolsa.getFechaBaremacionDefinitiva() == null) {
+			throw new UVException("La bolsa no tiene fecha de baremación definitiva");
+		}
+		
+		String query = "UPDATE TBEP_BOLSAS SET FECHAHABCONTRATOS = ?, UID_USUARIO = ? WHERE CODNUM = ?";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(query)) {
+			int indexParam = 1;
+			stmt.setDate(indexParam++, new java.sql.Date(BolsaEmpleoUtils.getCurrentDateTime().getTime()));
+			stmt.setString(indexParam++, usuario.getCodCuenta());
+			stmt.setInt(indexParam++, bolsa.getCodNum());
+			stmt.executeUpdate();
+		}
+	}
+	
 	/**
 	 * Establece la area asociada a la bolsa como baremable.
 	 * 
@@ -637,6 +694,8 @@ public class ModeloBolsa {
 		bolsa.setFechaBloqueo(rs.getTimestamp("FECHABLOQUEO"));
 		bolsa.setFechaDesBloqueo(rs.getTimestamp("FECHADEBLOQUEO"));
 		bolsa.setFechaBaremacion(rs.getDate("FECHABAREMACION"));
+		bolsa.setFechaBaremacionDefinitiva(rs.getDate("FECHABAREMACIONFIN"));
+		bolsa.setFechaHabilitarContratos(rs.getDate("FECHAHABCONTRATOS"));
 
 		return bolsa;
 	}
@@ -651,13 +710,14 @@ public class ModeloBolsa {
 	public List<String[]> exportarBolsasCsv(String separator) throws SQLException, UVException {
 		String consulta = ""
 				+ " SELECT bepare.ID_AREA_CONOCIMIENTO, bepare.DES_AREA_CONOCIMIENTO, bepbol.ESTADO, bepbol.FLGBAREMABLE, "
-				+ "		bepbol.FECHABLOQUEO, bepbol.FECHADEBLOQUEO, bepbol.FECHABAREMACION"
+				+ "		bepbol.FECHABLOQUEO, bepbol.FECHADEBLOQUEO, bepbol.FECHABAREMACION, bepbol.FECHABAREMACIONFIN, bepbol.FECHAHABCONTRATOS "
 				+ " FROM TBEP_BOLSAS bepbol"
 				+ "	LEFT JOIN TBEP_AREAS bepare ON bepare.CODNUM = bepbol.BEPARE_CODNUM";
 		
 		List<String[]> rows = new ArrayList<>();
 		
-		rows.add(new String[] {"COD.AREA", "AREA", "ESTADO", "BAREMABLE", "FECHA BLOQUEO", "FECHA DESBLOQUEO", "FECHA BAREMACION"});
+		rows.add(new String[] {"COD.AREA", "AREA", "ESTADO", "BAREMABLE", "FECHA BLOQUEO", "FECHA DESBLOQUEO", "FECHA BAREMACION PROVISIONAL", 
+				"FECHA BAREMACION DEFINITIVA", "FECHA HABILITAR CONTRATACION"});
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			try (ResultSet rs = stmt.executeQuery()) {
@@ -669,8 +729,11 @@ public class ModeloBolsa {
 					String fechaBloqueo = BolsaEmpleoUtils.date2csv((Date) rs.getTimestamp("FECHABLOQUEO"), separator);
 					String fechaDesBloqueo = BolsaEmpleoUtils.date2csv((Date) rs.getTimestamp("FECHADEBLOQUEO"), separator);
 					String fechaBaremacion = BolsaEmpleoUtils.date2csv((Date) rs.getTimestamp("FECHABAREMACION"), separator);
-																	
-					rows.add(new String[] {codigo, area, estado, baremable, fechaBloqueo, fechaDesBloqueo, fechaBaremacion});
+					String fechaBaremacionDefinitiva = BolsaEmpleoUtils.date2csv((Date) rs.getTimestamp("FECHABAREMACIONFIN"), separator);
+					String fechaContratacion = BolsaEmpleoUtils.date2csv((Date) rs.getTimestamp("FECHAHABCONTRATOS"), separator);
+
+					rows.add(new String[] {codigo, area, estado, baremable, fechaBloqueo, fechaDesBloqueo, fechaBaremacion, fechaBaremacionDefinitiva, 
+							fechaContratacion});
 				}
 			}
 		}

@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 import es.ujaen.uvirtual.beans.vistas.Vista;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 
@@ -21,6 +22,7 @@ public class VistaEstadoBolsas extends Vista implements Serializable {
 	private Integer totalBolsasBaremables;
 	private String vista;
 	private UsuarioBolsaEmpleo usuarioLogeado;
+	private Convocatoria conv;
 
 	public Integer getTotalBolsas() {
 		return totalBolsas;
@@ -60,6 +62,14 @@ public class VistaEstadoBolsas extends Vista implements Serializable {
 
 	public void setDatatableBolsas(BolsaEmpleoDataTable<Bolsa> dt) {
 		this.dataTable = dt;
+	}
+	
+	public Convocatoria getConvocatoria() {
+		return conv;
+	}
+	
+	public void setConvocatoria(Convocatoria pconv) {
+		this.conv = pconv;
 	}
 	
 	public String getVista() {

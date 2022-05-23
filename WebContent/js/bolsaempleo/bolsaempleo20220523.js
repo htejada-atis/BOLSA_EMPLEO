@@ -5,7 +5,7 @@
  * @copyright ATISoluciones 2021
  */
 
- function alertDialog(title, message, onOk) {
+ function alertDialog(title, message, onOk, onClose) {
 	$('<div class="atisDialog"></div>')
 		.appendTo('body')
 		.html(message)
@@ -28,26 +28,32 @@
 				}
 			},
 			close: function(event, ui) {
+				if (onClose) {
+					onClose(this);
+				}
 				$(this).remove();
 			}
 	});
 }
 
-function confirmDialog(title, message, buttons) {
+function confirmDialog(title, message, buttons, onClose) {
 	$('<div></div>').appendTo('body')
-			.html(message)
-			.dialog({
-				modal: true,
-				title: title,
-				zIndex: 10000,
-				autoOpen: true,
-				width: 'auto',
-				resizable: false,
-				buttons: buttons,
-				close: function(event, ui) {
+		.html(message)
+		.dialog({
+			modal: true,
+			title: title,
+			zIndex: 10000,
+			autoOpen: true,
+			width: 'auto',
+			resizable: false,
+			buttons: buttons,
+			close: function(event, ui) {
+				if (onClose) {
+					onClose(this);
+				}
 				$(this).remove();
 			}
-		});
+	});
 }
 
 function escapeHtml(str) {

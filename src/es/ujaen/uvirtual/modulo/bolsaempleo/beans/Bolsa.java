@@ -17,7 +17,8 @@ public class Bolsa implements Serializable {
 	private Date fechaBloqueo;
 	private Date fechaDesBloqueo;
 	private Date fechaBaremacion;
-	
+	private Date fechaBaremacionDefinitiva;
+	private Date fechaHabilitarContratos;
 
 	/** Constructor por defecto.
 	 */
@@ -66,6 +67,8 @@ public class Bolsa implements Serializable {
 		this.fechaBloqueo = copia.fechaBloqueo;
 		this.fechaDesBloqueo = copia.fechaDesBloqueo;
 		this.fechaBaremacion = copia.fechaBaremacion;
+		this.fechaBaremacionDefinitiva = copia.fechaBaremacionDefinitiva;
+		this.fechaHabilitarContratos = copia.fechaHabilitarContratos;
 	}
 	
 	public Integer getCodNum() {
@@ -132,11 +135,28 @@ public class Bolsa implements Serializable {
 		this.fechaBaremacion = fechaBaremacion;
 	}
 	
+	public Date getFechaBaremacionDefinitiva() {
+		return fechaBaremacionDefinitiva;
+	}
+
+	public void setFechaBaremacionDefinitiva(Date fechaBaremacionDefinitiva) {
+		this.fechaBaremacionDefinitiva = fechaBaremacionDefinitiva;
+	}
+	
+	public Date getFechaHabilitarContratos() {
+		return fechaHabilitarContratos;
+	}
+
+	public void setFechaHabilitarContratos(Date fechaHabilitarContratos) {
+		this.fechaHabilitarContratos = fechaHabilitarContratos;
+	}
+	
 	@Override
 	public String toString() {
 		return "BolsaEmpleo [idBolsaEmpleo=" + codNum + ", area=" + area.getDescripcion()
 				+ ", estado=" + estado + ", baremable=" + baremable + ", fechaActualizacion=" + fechaActualizacion
-				+ ", fechaBloqueo=" + fechaBloqueo + ", fechaDesBloqueo=" + fechaDesBloqueo + ", fechaBaremacion=" + fechaBaremacion + "]";
+				+ ", fechaBloqueo=" + fechaBloqueo + ", fechaDesBloqueo=" + fechaDesBloqueo + ", fechaBaremacion=" + fechaBaremacion 
+				+ ", fechaBaremacionDefinitiva=" + fechaBaremacionDefinitiva + ", fechaHabilitarContratos=" + fechaHabilitarContratos + "]";
 	}
 	
 	@Override
@@ -151,6 +171,8 @@ public class Bolsa implements Serializable {
 		result = prime * result + ((fechaBloqueo == null) ? 0 : fechaBloqueo.hashCode());
 		result = prime * result + ((fechaDesBloqueo == null) ? 0 : fechaDesBloqueo.hashCode());
 		result = prime * result + ((fechaBaremacion == null) ? 0 : fechaBaremacion.hashCode());
+		result = prime * result + ((fechaBaremacionDefinitiva == null) ? 0 : fechaBaremacionDefinitiva.hashCode());
+		result = prime * result + ((fechaHabilitarContratos == null) ? 0 : fechaHabilitarContratos.hashCode());
 		return result;
 	}
 
@@ -222,6 +244,20 @@ public class Bolsa implements Serializable {
 				return false;
 			}
 		} else if (!fechaBaremacion.equals(other.fechaBaremacion)) {
+			return false;
+		}
+		if (fechaBaremacionDefinitiva == null) {
+			if (other.fechaBaremacionDefinitiva != null) {
+				return false;
+			}
+		} else if (!fechaBaremacionDefinitiva.equals(other.fechaBaremacionDefinitiva)) {
+			return false;
+		}
+		if (fechaHabilitarContratos == null) {
+			if (other.fechaHabilitarContratos != null) {
+				return false;
+			}
+		} else if (!fechaHabilitarContratos.equals(other.fechaHabilitarContratos)) {
 			return false;
 		}
 		
