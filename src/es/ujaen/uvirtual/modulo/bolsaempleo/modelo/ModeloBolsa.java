@@ -280,7 +280,6 @@ public class ModeloBolsa {
 	 * @throws UVException  si bolsa no es existe
 	 */
 	public Bolsa getBolsaById(int codNum) throws SQLException, UVException {
-
 		String consulta = "SELECT bepbol.* FROM TBEP_BOLSAS bepbol WHERE bepbol.CODNUM = ?";
 
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
@@ -314,7 +313,27 @@ public class ModeloBolsa {
 
 		return bolsas;
 	}
-
+	
+	/**
+	 * Devuleve la bolsa asociada a la bolsa.
+	 * @param area .
+	 * @return .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	public Bolsa getBolsaByArea(Area area) throws SQLException, UVException {
+		String consulta = "SELECT bepbol.* FROM TBEP_BOLSAS bepbol WHERE bepbol.BEPARE_CODNUM = ?";
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			stmt.setInt(1, area.getCodNum());
+			try (ResultSet rs = stmt.executeQuery()) {
+				if (!rs.next()) {
+					throw new UVException("No existe la bolsa con id " + area.getCodNum());
+				}
+				return this.createFromResultSet(rs);
+			}
+		}
+	}
+	
 	/**
 	 * Devuelve el total de bolsas .
 	 * 

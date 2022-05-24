@@ -24,6 +24,7 @@ public class VistaContratacion extends Vista implements Serializable {
 	private List<Dedicacion> listaDedicaciones = new ArrayList<>();
 	private List<OfertaCandidato> listaOfertas = new ArrayList<>();
 	private List<String> cursos = new ArrayList<>();
+	private List<CandidatoEstado> candidatosEstado = new ArrayList<>(); 
 	private transient BolsaEmpleoDataTable<PlazaOfertada> datatablePlazasOfertadas;
 	private transient BolsaEmpleoDataTable<OfertaCandidato> datatableCandidatos;
 	private transient BolsaEmpleoDataTable<CandidatoEstado> datatableCandidatosEstado;
@@ -103,6 +104,14 @@ public class VistaContratacion extends Vista implements Serializable {
 		this.listaOfertas = listaOfertas;
 	}
 
+	public List<CandidatoEstado> getCandidatosEstado() {
+		return candidatosEstado;
+	}
+	
+	public void setCandidatosEstado(List<CandidatoEstado> candidatosEstado) {
+		this.candidatosEstado = candidatosEstado;
+	}
+	
 	public BolsaEmpleoDataTable<CandidatoEstado> getDatatableCandidatosEstado() {
 		return datatableCandidatosEstado;
 	}

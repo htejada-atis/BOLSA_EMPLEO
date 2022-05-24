@@ -315,12 +315,7 @@ public class ModeloOfertaCandidato {
 			throws SQLException, UVException {
 		List<OfertaCandidato> rows = new ArrayList<>();
 		BolsaEmpleoDataTable<OfertaCandidato> dataTable = new BolsaEmpleoDataTable<>(params);
-		
-//		if (convocatoria == null) {
-//			dataTable.setData(rows);
-//			return dataTable;
-//		}
-		
+				
 		String consulta = ""
 				+ " SELECT DISTINCT bepplo.CODNUM AS BEPPLO_CODNUM, bepofc.CODNUM, bepofc.FLGRESULTADO, bepofc.FECHA_RESULTADO,"
 				+ "        bepofc.PREFERENCIA, bepsol.BEPUSU_CODNUM AS BEPUSU_CODNUM, bepcnt.CODNUM AS CONTRATACION"
@@ -330,8 +325,7 @@ public class ModeloOfertaCandidato {
 				+ " INNER JOIN TBEP_BOLSAS bepbol ON bepbol.BEPARE_CODNUM = bepare.CODNUM"
 				+ " INNER JOIN TBEP_SOLICITUD_BOLSAS bepsob ON bepsob.BEPBOL_CODNUM = bepbol.CODNUM AND bepsob.FECHABAREMACION IS NOT NULL"
 				+ " INNER JOIN TBEP_SOLICITUDES bepsol ON bepsob.BEPSOL_CODNUM = bepsol.CODNUM"
-				+ " INNER JOIN TBEP_CONVOCATORIAS bepcon ON bepcon.CODNUM = bepsol.BEPCON_CODNUM AND bepcon.ESTADO = '" 
-						+ ModeloConvocatoria.CONVOCATORIA_ESTADO_FINALIZADA + "'"
+				+ " INNER JOIN TBEP_CONVOCATORIAS bepcon ON bepcon.CODNUM = bepsol.BEPCON_CODNUM"
 				+ " LEFT JOIN TBEP_OFERTAS_CANDIDATOS bepofc ON bepofc.BEPPLO_CODNUM = bepplo.CODNUM AND bepofc.BEPUSU_CODNUM = bepsol.BEPUSU_CODNUM"
 				+ " LEFT JOIN TBEP_CONTRATACIONES bepcnt ON bepcnt.BEPUSU_CODNUM = bepsol.BEPUSU_CODNUM AND bepcnt.BEPPLO_CODNUM = bepplo.CODNUM"
 				+ " LEFT JOIN TBEP_ESTADO_CANDIDATOS bepesc ON bepesc.BEPUSU_CODNUM = bepsol.BEPUSU_CODNUM AND bepesc.BEPBOL_CODNUM = bepbol.CODNUM"
