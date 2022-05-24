@@ -55,6 +55,7 @@ public class ControladorBolsas extends HttpServlet {
 	public static final String PARAM_ACCION = "a";
 	public static final String PARAM_ACCION_BOLSA = "ab";
 	public static final String PARAM_BOLSAS_SELECCIONADAS = "bolsasselected";
+	public static final String PARAM_ACCION_TIPO_BAREMACION = "tipobaremacion";
 	
 	// acciones
 	public static final String ACCION_INDEX = "listar";
@@ -66,6 +67,9 @@ public class ControladorBolsas extends HttpServlet {
 	public static final String ACCION_BOLSAS_ALEGACION = "alegacion";
 	public static final String ACCION_BOLSAS_DESBLOQUEAR = "desbloquear";
 	public static final String ACCION_BOLSAS_BAREMAR = "baremar";
+	public static final String ACCION_BOLSAS_CONTRATACION = "contratacion";
+	public static final String ACCION_BOLSAS_BAREMAR_PROVISIONAL = "baremarprovisional";
+	public static final String ACCION_BOLSAS_BAREMAR_DEFINITIVA = "baremardefinitiva";
 	public static final String ACCION_EXPORTAR = "exportar";
 	
 	// mensajes
@@ -149,6 +153,7 @@ public class ControladorBolsas extends HttpServlet {
 		bean.setTotalBolsasRevisadas(modeloBolsa.getBolsasRevisadas());
 		bean.setTotalBolsasBaremables(modeloBolsa.getBolsasBaremables());
 		bean.setTotalBolsas(modeloBolsa.getTotalBolsas());
+		bean.setConvocatoria(ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoria());
 		
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		
@@ -192,7 +197,7 @@ public class ControladorBolsas extends HttpServlet {
 		
 		try (PrintWriter writer = response.getWriter()) {
 			try {
-				BolsaEmpleoDataTable<Bolsa> dataTable = modelo.listaBolsaEmpleoDatatable(request.getParameterMap());				
+				BolsaEmpleoDataTable<Bolsa> dataTable = modelo.listaBolsaEmpleoDatatable(request.getParameterMap());
 				bean.setDatatableBolsas(dataTable);
 				writer.write(dataTable.toJson());
 			} catch (UVException | SQLException e) {
@@ -241,9 +246,20 @@ public class ControladorBolsas extends HttpServlet {
 			case ACCION_BOLSAS_DESBLOQUEAR:
 				modelo.desbloquearBolsas(bolsas, bean.getUsuarioLogeado());
 				break;
+			case ACCION_BOLSAS_CONTRATACION:
+				this.habilitarContratacion(bean, bolsas);
+				break;
 			case ACCION_BOLSAS_BAREMAR:
-				modelo.ponerBolsasComoPendientesBaremacion(bolsas, bean.getUsuarioLogeado());
-				this.baremarBolsas(bolsas);
+				if (bolsas.size() > 1) {
+					throw new UVException("Solo se puede baremar una bolsa a la vez");
+				}
+				
+				String paramTipoBaremacion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION_TIPO_BAREMACION));
+				if (paramTipoBaremacion.equals(ACCION_BOLSAS_BAREMAR_PROVISIONAL) || paramTipoBaremacion.equals(ACCION_BOLSAS_BAREMAR_DEFINITIVA)) {
+					this.baremarBolsas(bean, bolsas, paramTipoBaremacion);
+				} else {
+					throw new UVException("Tipo de baremación incorrecta");
+				}
 				break;
 			default:
 				BolsaEmpleoUtils.addMensajeDeError(MENSAJE_ERROR_ACCION_BOLSA_NO_VALIDA, bean, request);
@@ -257,15 +273,15 @@ public class ControladorBolsas extends HttpServlet {
 		response.sendRedirect(request.getServletPath());
 	}
 	
-	private void baremarBolsas(List<Bolsa> bolsas) throws SQLException, UVException {
-		ModeloBolsa modeloBolsa = ModeloBolsa.obtenerInstancia();
-		ModeloResultados modeloResultados = ModeloResultados.obtenerInstancia();
+	private void baremarBolsas(VistaEstadoBolsas bean, List<Bolsa> bolsas, String tipoBaremacion) throws SQLException, UVException {
 		Convocatoria convocatoria = ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoria();
 		
 		if (!convocatoria.getEstado().equals(ModeloConvocatoria.CONVOCATORIA_ESTADO_CERRADA)) {
-			throw new UVException("La convocatoria no está cerrada");
+			throw new UVException("La convocatoria [" + convocatoria.getDescripcion() + "] no está cerrada");
 		}
 		
+		ModeloBolsa modeloBolsa = ModeloBolsa.obtenerInstancia();
+		ModeloResultados modeloResultados = ModeloResultados.obtenerInstancia();
 		for (Bolsa bolsa: bolsas) {
 			List<Solicitud> solicitudes = modeloResultados.listaSolicitudesBolsa(bolsa, convocatoria);
 			
@@ -273,7 +289,21 @@ public class ControladorBolsas extends HttpServlet {
 				modeloResultados.calcularSolicitud(solicitud, bolsa);
 			}
 			
-			modeloBolsa.baremarBolsa(bolsa, null);
+			boolean definitiva = tipoBaremacion.equals(ACCION_BOLSAS_BAREMAR_DEFINITIVA);
+			modeloBolsa.baremarBolsa(bolsa, definitiva, bean.getUsuarioLogeado());
+		}
+	}
+	
+	private void habilitarContratacion(VistaEstadoBolsas bean, List<Bolsa> bolsas) throws SQLException, UVException {
+		Convocatoria convocatoria = ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoria();
+		
+		if (!convocatoria.getEstado().equals(ModeloConvocatoria.CONVOCATORIA_ESTADO_CERRADA)) {
+			throw new UVException("La convocatoria [" + convocatoria.getDescripcion() + "] no está cerrada");
+		}
+		
+		ModeloBolsa modeloBolsa = ModeloBolsa.obtenerInstancia();
+		for (Bolsa bolsa: bolsas) {
+			modeloBolsa.habilitarBolsaParaContratacion(bolsa, bean.getUsuarioLogeado());
 		}
 	}
 	

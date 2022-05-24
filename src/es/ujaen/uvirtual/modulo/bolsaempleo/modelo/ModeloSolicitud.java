@@ -232,7 +232,7 @@ public class ModeloSolicitud {
 			
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
-					bolsas.add(ModeloBolsa.obtenerInstancia().createFromResultSet(rs));					
+					bolsas.add(ModeloBolsa.obtenerInstancia().createFromResultSet(rs));
 				}
 			}
 			

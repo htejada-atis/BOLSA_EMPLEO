@@ -142,6 +142,7 @@ public final class UtilsTestBolsaEmpleo {
 			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/migraciones/29-parametrosplantillaemailcreacionplaza.sql");
 			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/migraciones/30-convocatoriafinalizada.sql");
 			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/migraciones/31-menusalegaciones.sql");
+			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/migraciones/32-fechasbolsas.sql");
 			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/datos_desarrollo/datos_prueba_migraciones/01-im-solicitudbolsasmeritos.sql");
 			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/datos_desarrollo/datos_prueba_migraciones/02-im-prefijomeritospreferentes.sql");
 			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/datos_desarrollo/datos_prueba_migraciones/03-im-dedicaciones.sql");
@@ -154,6 +155,7 @@ public final class UtilsTestBolsaEmpleo {
 			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/datos_desarrollo/datos_prueba_migraciones/10-im-solicitudbolsasmeritosvaloracion.sql");
 			
 			UtilsTestBolsaEmpleo.updateItemBaremacionEnSolicitudBolsaMeritos();
+			UtilsTestBolsaEmpleo.updateFechasBolsas();
 		}
 	}
 	
@@ -177,6 +179,39 @@ public final class UtilsTestBolsaEmpleo {
 						try (PreparedStatement stmtUpdate = con.prepareStatement(update)) {
 							stmtUpdate.setInt(1, rs.getInt("BEPITE_CODNUM"));
 							stmtUpdate.setInt(2, rs.getInt("CODNUM"));
+							stmtUpdate.executeUpdate();
+						}
+					}
+				}
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * Actualiza las fechas de las bolsas, para añadir la fecha de baremación definitiva y la fecha
+	 * de habilitación de contratos.
+	 */
+	public static void updateFechasBolsas() {
+		BbddRunner.conectarBd();
+		try (Connection con = BbddRunner.obtenerConexionUvirtual()) {
+			
+			String consulta = ""
+				+ " SELECT bepbol.CODNUM, bepbol.FECHABAREMACION "
+				+ " FROM TBEP_BOLSAS bepbol "
+				+ " WHERE bepbol.FECHABAREMACION IS NOT NULL ";
+			
+			String update = "UPDATE TBEP_BOLSAS SET FECHABAREMACIONFIN = ?, FECHAHABCONTRATOS = ? WHERE CODNUM = ?";
+
+			try (PreparedStatement stmt = con.prepareStatement(consulta)) {
+				try (ResultSet rs = stmt.executeQuery()) {
+					while (rs.next()) {
+						try (PreparedStatement stmtUpdate = con.prepareStatement(update)) {
+							int indexParam = 1;
+							stmtUpdate.setDate(indexParam++, rs.getDate("FECHABAREMACION"));
+							stmtUpdate.setDate(indexParam++, rs.getDate("FECHABAREMACION"));
+							stmtUpdate.setInt(indexParam++, rs.getInt("CODNUM"));
 							stmtUpdate.executeUpdate();
 						}
 					}

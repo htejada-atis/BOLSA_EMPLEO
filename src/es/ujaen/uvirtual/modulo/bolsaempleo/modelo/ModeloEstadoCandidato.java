@@ -12,6 +12,7 @@ import java.util.Map;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.CandidatoEstado;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.PlazaOfertada;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
@@ -165,53 +166,31 @@ public class ModeloEstadoCandidato {
 			throws SQLException, UVException {
 		List<CandidatoEstado> estados = new ArrayList<>();
 		BolsaEmpleoDataTable<CandidatoEstado> dataTable = new BolsaEmpleoDataTable<>(params);
-		
-		String consulta = ""
-				+ " SELECT DISTINCT bepusu.CODNUM AS BEPUSU_CODNUM, bepesc.CODNUM,"
-				+ "     bepesc.ESTADO, bepplo.CODNUM AS BEPPLO_CODNUM, bepbol.CODNUM AS BEPBOL_CODNUM, bepcts.CONTRATOS,"
-				+ "     CASE"
-				+ "         WHEN bepesc.ESTADO = '" + ModeloEstadoCandidato.ESTADO_CONTRATADO_PRIMER_CUATRIMESTRE + "'"
-				+ "             AND bepplo.CUATRIMESTRE = '" + ModeloPlazaOfertada.CUATRIMESTRE_SEGUNDO + "' THEN 1"
-				+ "         WHEN bepesc.ESTADO = '" + ModeloEstadoCandidato.ESTADO_CONTRATADO_PARCIAL + "'"
-				+ "             AND bepded.TIPO = '" + ModeloDedicacion.TIPO_TIEMPO_PARCIAL + "' THEN 1"
-				+ "         WHEN bepcts.CONTRATOS > 0 THEN 0"
-				+ "         WHEN bepesc.CODNUM IS NULL THEN 1"
-				+ "         WHEN bepesc.ESTADO = '" + ModeloEstadoCandidato.ESTADO_DISPONIBLE + "' THEN 1"
-				+ "         ELSE 0"
-				+ "     END AS DISPONIBILIDAD"
-				+ " FROM TBEP_USUARIOS bepusu"
-				+ " INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.BEPUSU_CODNUM = bepusu.CODNUM"
-				+ " INNER JOIN TBEP_CONVOCATORIAS bepcon ON bepcon.CODNUM = bepsol.BEPCON_CODNUM AND bepcon.ESTADO = '" 
-						+ ModeloConvocatoria.CONVOCATORIA_ESTADO_FINALIZADA + "'"
-				+ " INNER JOIN TBEP_SOLICITUD_BOLSAS bepsob ON bepsob.BEPSOL_CODNUM = bepsol.CODNUM AND bepsob.FECHABAREMACION IS NOT NULL"
-				+ " INNER JOIN TBEP_BOLSAS bepbol ON bepbol.CODNUM = bepsob.BEPBOL_CODNUM"
-				+ " INNER JOIN TBEP_AREAS bepare ON bepare.CODNUM = bepbol.BEPARE_CODNUM"
-				+ " INNER JOIN TBEP_PLAZAS_OFERTADAS bepplo ON bepplo.BEPARE_CODNUM = bepare.CODNUM"
-				+ " INNER JOIN TBEP_DEDICACIONES bepded ON bepded.CODNUM = bepplo.BEPDED_CODNUM"
-				+ " LEFT JOIN TBEP_ESTADO_CANDIDATOS bepesc ON bepesc.BEPUSU_CODNUM = bepusu.CODNUM AND bepesc.BEPBOL_CODNUM = bepbol.CODNUM"
-				+ " LEFT JOIN ("
-				+ "     SELECT"
-				+ "         bepesc.BEPUSU_CODNUM AS BEPUSU_CODNUM,"
-				+ "         COUNT(DISTINCT bepesc.BEPPLO_CODNUM) AS CONTRATOS"
-				+ "     FROM TBEP_ESTADO_CANDIDATOS bepesc"
-				+ "     WHERE bepesc.ESTADO NOT IN ('" + ModeloEstadoCandidato.ESTADO_DISPONIBLE + "', "
-				+ "         '" + ModeloEstadoCandidato.ESTADO_SUSPENSION_PROVISIONAL + "', '" + ModeloEstadoCandidato.ESTADO_NO_DISPONIBLE + "')"
-				+ "     GROUP BY bepesc.BEPUSU_CODNUM"
-				+ " ) bepcts ON bepcts.BEPUSU_CODNUM = bepusu.CODNUM"
-				+ " WHERE bepplo.CODNUM = ?"
-				+ "     AND bepusu.ROL = " + ModeloRol.ID_ROL_CANDIDATO
-				+ "     AND bepusu.FLGBORRADO = 'N'";
+					
+		String consulta = this.getQueryCandidatosEstadoPlaza();
 		
 		dataTable.setQuery(consulta);
+		
+		Bolsa bolsa = ModeloPlazaOfertada.obtenerInstancia().getBolsaConContracionHabilitadaPlaza(plaza);
+		Convocatoria convocatoria = ModeloPlazaOfertada.obtenerInstancia().getConvocatoriaConSolicitudesParaPlaza(plaza);
+		if (bolsa == null || convocatoria == null) {
+			dataTable.setData(estados);
+			return dataTable;
+		}
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
 				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery())) {
 			int indexParam = 1;
-//			stmt.setInt(indexParam, convocatoria.getCodNum());
-//			stmtCount.setInt(indexParam++, convocatoria.getCodNum());
+			stmt.setInt(indexParam, convocatoria.getCodNum());
+			stmtCount.setInt(indexParam++, convocatoria.getCodNum());
+			
+			stmt.setInt(indexParam, bolsa.getCodNum());
+			stmtCount.setInt(indexParam++, bolsa.getCodNum());
+			
 			stmt.setInt(indexParam, plaza.getCodNum());
 			stmtCount.setInt(indexParam++, plaza.getCodNum());
+			
 			dataTable.setFiltersParams(stmt, stmtCount, indexParam);
 			
 			try (ResultSet rs = stmt.executeQuery()) {
@@ -225,6 +204,43 @@ public class ModeloEstadoCandidato {
 		}
 		
 		return dataTable;
+	}
+	
+	/**
+	 * Listado de candidatos disponibles para la plaza.
+	 * @param plaza .
+	 * @return .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	public List<CandidatoEstado> listaEstadosCandidatoPlazaDisponibles(PlazaOfertada plaza) throws SQLException, UVException {
+		List<CandidatoEstado> estados = new ArrayList<>();
+		
+		Bolsa bolsa = ModeloPlazaOfertada.obtenerInstancia().getBolsaConContracionHabilitadaPlaza(plaza);
+		Convocatoria convocatoria = ModeloPlazaOfertada.obtenerInstancia().getConvocatoriaConSolicitudesParaPlaza(plaza);
+		if (bolsa == null || convocatoria == null) {
+			return estados;
+		}
+		
+		String consulta = this.getQueryCandidatosEstadoPlaza();
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			int indexParam = 1;
+			stmt.setInt(indexParam++, convocatoria.getCodNum());
+			stmt.setInt(indexParam++, bolsa.getCodNum());
+			stmt.setInt(indexParam++, plaza.getCodNum());
+			
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					CandidatoEstado c = this.createCandidatoEstadoFromResultSet(rs, null, true);
+					if (c.isDisponibilidad()) {
+						estados.add(c);
+					}
+				}
+			}
+		}
+		
+		return estados;
 	}
 	
 	/** Cambiar estados del candidato para distintas bolsas .
@@ -402,4 +418,46 @@ public class ModeloEstadoCandidato {
 		return candidato;
 	}
 	
+	/**
+	 * Devuelve la query de estados de candidatos para una plaza.
+	 * @return .
+	 */
+	public String getQueryCandidatosEstadoPlaza() {
+		String estadosCandidato = "'" + ModeloEstadoCandidato.ESTADO_DISPONIBLE + "','" 
+				+ ModeloEstadoCandidato.ESTADO_SUSPENSION_PROVISIONAL + "','" 
+				+ ModeloEstadoCandidato.ESTADO_NO_DISPONIBLE + "'";
+				
+		return ""
+			+ " SELECT DISTINCT bepusu.CODNUM AS BEPUSU_CODNUM, bepesc.CODNUM, bepesc.ESTADO, bepplo.CODNUM AS BEPPLO_CODNUM, "
+			+ "		bepbol.CODNUM AS BEPBOL_CODNUM, bepcts.CONTRATOS, bepofc.CODNUM AS BEPOFC_CODNUM, bepsob.TOTAL AS PUNTUACION, "
+			+ "     CASE"
+			+ "         WHEN bepesc.ESTADO = '" + ModeloEstadoCandidato.ESTADO_CONTRATADO_PRIMER_CUATRIMESTRE + "'"
+			+ "             AND bepplo.CUATRIMESTRE = '" + ModeloPlazaOfertada.CUATRIMESTRE_SEGUNDO + "' THEN 1"
+			+ "         WHEN bepesc.ESTADO = '" + ModeloEstadoCandidato.ESTADO_CONTRATADO_PARCIAL + "'"
+			+ "             AND bepded.TIPO = '" + ModeloDedicacion.TIPO_TIEMPO_PARCIAL + "' THEN 1"
+			+ "         WHEN bepcts.CONTRATOS > 0 THEN 0"
+			+ "         WHEN bepesc.CODNUM IS NULL THEN 1"
+			+ "         WHEN bepesc.ESTADO = '" + ModeloEstadoCandidato.ESTADO_DISPONIBLE + "' THEN 1"
+			+ "         ELSE 0"
+			+ "     END AS DISPONIBILIDAD"
+			+ " FROM TBEP_USUARIOS bepusu"
+			+ " INNER JOIN TBEP_SOLICITUDES bepsol ON (bepsol.BEPUSU_CODNUM = bepusu.CODNUM AND bepsol.BEPCON_CODNUM = ? "
+			+ "		AND bepsol.ESTADO = '" + ModeloSolicitud.SOLICITUD_ESTADO_CERRADA + "')"
+			+ " INNER JOIN TBEP_SOLICITUD_BOLSAS bepsob ON (bepsob.BEPSOL_CODNUM = bepsol.CODNUM AND bepsob.FECHABAREMACION IS NOT NULL)"
+			+ " INNER JOIN TBEP_BOLSAS bepbol ON (bepbol.CODNUM = bepsob.BEPBOL_CODNUM AND bepbol.CODNUM = ?)"
+			+ " INNER JOIN TBEP_AREAS bepare ON bepare.CODNUM = bepbol.BEPARE_CODNUM"
+			+ " INNER JOIN TBEP_PLAZAS_OFERTADAS bepplo ON bepplo.BEPARE_CODNUM = bepare.CODNUM"
+			+ " INNER JOIN TBEP_DEDICACIONES bepded ON bepded.CODNUM = bepplo.BEPDED_CODNUM"
+			+ " LEFT JOIN TBEP_ESTADO_CANDIDATOS bepesc ON (bepesc.BEPUSU_CODNUM = bepusu.CODNUM AND bepesc.BEPBOL_CODNUM = bepbol.CODNUM) "
+			+ " LEFT JOIN TBEP_OFERTAS_CANDIDATOS bepofc ON (bepofc.BEPUSU_CODNUM = bepusu.CODNUM AND bepofc.BEPPLO_CODNUM = bepplo.CODNUM) "
+			+ " LEFT JOIN ("
+			+ "     SELECT bepesc.BEPUSU_CODNUM AS BEPUSU_CODNUM, COUNT(DISTINCT bepesc.BEPPLO_CODNUM) AS CONTRATOS"
+			+ "     FROM TBEP_ESTADO_CANDIDATOS bepesc"
+			+ "     WHERE bepesc.ESTADO NOT IN (" + estadosCandidato + ")"
+			+ "     GROUP BY bepesc.BEPUSU_CODNUM"
+			+ " ) bepcts ON bepcts.BEPUSU_CODNUM = bepusu.CODNUM"
+			+ " WHERE bepplo.CODNUM = ?"
+			+ "     AND bepusu.ROL = " + ModeloRol.ID_ROL_CANDIDATO
+			+ "     AND bepusu.FLGBORRADO = 'N'";
+	}
 }

@@ -165,7 +165,7 @@ public class ModeloValidar {
 				|| usuario.getRol().getValor().equals(ModeloRol.ROL_DIRECTOR_DEPARTAMENTO);
 		
 		String consulta = 
-				"SELECT bepbol.*, bepare.*, bepsbm.BEPMER_CODNUM, bepsbm.CODNUM AS BEPSBM_CODNUM"
+				"   SELECT bepbol.*, bepsbm.BEPMER_CODNUM, bepsbm.CODNUM AS BEPSBM_CODNUM"
 				+ "	FROM TBEP_BOLSAS bepbol"
 				+ "	INNER JOIN TBEP_AREAS bepare ON bepare.CODNUM = bepbol.BEPARE_CODNUM"
 				+ "	INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepbol.CODNUM = bepsbo.BEPBOL_CODNUM"
@@ -315,10 +315,8 @@ public class ModeloValidar {
 		boolean evaluador = usuario.getRol().getValor().equals(ModeloRol.ROL_MIEMBRO_COMISION) 
 				|| usuario.getRol().getValor().equals(ModeloRol.ROL_DIRECTOR_DEPARTAMENTO);
 		
-		String consulta = 
-				"SELECT bepbol.CODNUM, bepbol.BEPARE_CODNUM, bepbol.ESTADO, bepbol.FLGBAREMABLE, bepbol.FECHAACTUALIZACION,"
-				+ "		bepbol.FECHABLOQUEO, bepbol.FECHADEBLOQUEO, bepbol.FECHABAREMACION,"
-				+ "		counts.COUNT_NO_VALIDADOS, counts.COUNT_VALIDADOS, counts.COUNT_EXCLUIDOS, counts.COUNT_TOTAL"
+		String consulta =
+				"   SELECT bepbol.*, counts.COUNT_NO_VALIDADOS, counts.COUNT_VALIDADOS, counts.COUNT_EXCLUIDOS, counts.COUNT_TOTAL"
 				+ "	FROM TBEP_BOLSAS bepbol"
 				+ "	INNER JOIN TBEP_AREAS bepare ON bepare.CODNUM = bepbol.BEPARE_CODNUM"
 				+ (evaluador ? " INNER JOIN TBEP_EVALUADORES bepeva ON bepeva.BEPARE_CODNUM = bepare.CODNUM AND bepeva.FLGACTIVO = 'S'" : "")
@@ -415,8 +413,7 @@ public class ModeloValidar {
 		}
 		
 		String consulta = 
-				"SELECT bepbol.CODNUM, bepbol.BEPARE_CODNUM, bepbol.ESTADO, bepbol.FLGBAREMABLE, bepbol.FECHAACTUALIZACION, "
-				+ "	bepbol.FECHABLOQUEO, bepbol.FECHADEBLOQUEO, bepbol.FECHABAREMACION, bepare.ID_AREA_CONOCIMIENTO"
+				"SELECT bepbol.*, bepare.ID_AREA_CONOCIMIENTO"
 				+ "	FROM TBEP_BOLSAS bepbol"
 				+ "	INNER JOIN TBEP_AREAS bepare ON bepare.CODNUM = bepbol.BEPARE_CODNUM"
 				+ "	INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepbol.CODNUM = bepsbo.BEPBOL_CODNUM"
@@ -642,9 +639,8 @@ public class ModeloValidar {
 			return dataTable;
 		}
 		
-		String consulta = "SELECT bepbol.CODNUM, bepbol.BEPARE_CODNUM, bepbol.ESTADO, bepbol.FLGBAREMABLE, bepbol.FECHAACTUALIZACION,"
-				+ "		bepbol.FECHABLOQUEO, bepbol.FECHADEBLOQUEO, bepbol.FECHABAREMACION, bepsbm.CODNUM AS BEPSBM_CODNUM, bepsol.BEPCON_CODNUM,"
-				+ "		bepsbm.UID_USUARIO AS UID_EVALUADOR"
+		String consulta = ""
+				+ " SELECT bepbol.*, bepsbm.CODNUM AS BEPSBM_CODNUM, bepsol.BEPCON_CODNUM, bepsbm.UID_USUARIO AS UID_EVALUADOR"
 				+ "	FROM TBEP_BOLSAS bepbol"
 				+ "	INNER JOIN TBEP_AREAS bepare ON bepare.CODNUM = bepbol.BEPARE_CODNUM"
 				+ "	INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepbol.CODNUM = bepsbo.BEPBOL_CODNUM"
