@@ -469,7 +469,8 @@ public class ModeloPlazaOfertada {
 			+ " INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.BEPCON_CODNUM = bepcon.CODNUM "
 			+ " INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbo.BEPSOL_CODNUM = bepsol.CODNUM "
 			+ " WHERE 1=1 "
-			+ "		AND bepcon.ESTADO IN ('CERRADA', 'FINALIZADA') AND bepcon.FECHACIERRE < ? "
+			+ "		AND bepcon.ESTADO IN ('CERRADA', 'FINALIZADA') "
+			+ "		AND bepcon.FECHACIERRE <= ? "
 			+ "		AND bepsol.ESTADO = 'CERRADA' "
 			+ "		AND bepsbo.BEPBOL_CODNUM = ? "
 			+ " ORDER BY bepcon.FECHACIERRE DESC "
@@ -805,13 +806,7 @@ public class ModeloPlazaOfertada {
 	public BolsaEmpleoDataTable<OfertaCandidato> listadoCandidatosDisponibles(Map<String, String[]> params, PlazaOfertada plaza) throws SQLException, UVException {
 		List<OfertaCandidato> rows = new ArrayList<>();
 		BolsaEmpleoDataTable<OfertaCandidato> dataTable = new BolsaEmpleoDataTable<>(params);
-		
-		Bolsa bolsa = ModeloPlazaOfertada.obtenerInstancia().getBolsaConContracionHabilitadaPlaza(plaza);
-		Convocatoria convocatoria = ModeloPlazaOfertada.obtenerInstancia().getConvocatoriaConSolicitudesParaPlaza(plaza);
-		if (bolsa == null || convocatoria == null) {
-			return dataTable;
-		}
-		
+					
 		String estadosCandidato = "'" + ModeloEstadoCandidato.ESTADO_DISPONIBLE + "','" 
 				+ ModeloEstadoCandidato.ESTADO_SUSPENSION_PROVISIONAL + "','" 
 				+ ModeloEstadoCandidato.ESTADO_NO_DISPONIBLE + "'";
@@ -859,6 +854,13 @@ public class ModeloPlazaOfertada {
 		dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE_CANDIDATOS, whereNombre, DataTableColumn.COLUMN_TYPE_TEXT);
 		dataTable.setColumn(ORDER_COLUMN_INDEX_PUNTUACION_CANDIDATOS, "bepsob.TOTAL", DataTableColumn.COLUMN_TYPE_DOUBLE);
 		dataTable.setQuery(consulta);
+		
+		Bolsa bolsa = ModeloPlazaOfertada.obtenerInstancia().getBolsaConContracionHabilitadaPlaza(plaza);
+		Convocatoria convocatoria = ModeloPlazaOfertada.obtenerInstancia().getConvocatoriaConSolicitudesParaPlaza(plaza);
+		if (bolsa == null || convocatoria == null) {
+			dataTable.setData(rows);
+			return dataTable;
+		}
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
