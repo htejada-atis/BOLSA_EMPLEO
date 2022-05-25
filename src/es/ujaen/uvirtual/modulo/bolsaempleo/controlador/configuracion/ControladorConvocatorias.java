@@ -227,12 +227,10 @@ public class ControladorConvocatorias extends HttpServlet {
 			throws UVException, SQLException, IOException {
 		bean.setVista(JSP_FORM_CONVOCATORIA);
 		ModeloConvocatoria modelo = ModeloConvocatoria.obtenerInstancia();
-		
-		if (modelo.hayConvocatoriaNoFinalizada()) {
-			BolsaEmpleoUtils.addMensajeDeError(MENSAJE_ERROR_EXISTE_CONVOCATORIA_NO_FINALIZADA, bean, request);
-			datos.setRespuestaEnviada(true);
-			response.sendRedirect(request.getServletPath());
-		} else if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_CONVOCATORIA_DESCRIPCION)) != null) {
+			
+		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_CONVOCATORIA_DESCRIPCION)) != null) {
+			modelo.chequearCreacionConvocatoria();
+			
 			Convocatoria convocatoria = this.validateConvocatoria(request);
 			
 			// creamos convocatoria, por defecto cerrada
