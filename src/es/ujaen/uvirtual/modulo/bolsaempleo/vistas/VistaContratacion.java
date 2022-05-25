@@ -31,6 +31,7 @@ public class VistaContratacion extends Vista implements Serializable {
 	private PlazaOfertada plazaOfertada;
 	private String vista;
 	private UsuarioBolsaEmpleo usuarioLogeado;
+	private String infoEstadoBolsa;
 	
 	public String getVista() {
 		return vista;
@@ -38,6 +39,14 @@ public class VistaContratacion extends Vista implements Serializable {
 	
 	public void setVista(String vista) {
 		this.vista = vista;
+	}
+	
+	public String getInfoEstadoBolsa() {
+		return this.infoEstadoBolsa;
+	}
+	
+	public void setInfoEstadoBolsa(String infoEstadoBolsa) {
+		this.infoEstadoBolsa = infoEstadoBolsa;
 	}
 	
 	public UsuarioBolsaEmpleo getUsuarioLogeado() {

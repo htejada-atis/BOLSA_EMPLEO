@@ -27,6 +27,7 @@ import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.CandidatoEstado;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Contratacion;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.OfertaCandidato;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ParametrosConfiguracion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.PlazaOfertada;
@@ -93,7 +94,7 @@ public class ControladorContratacion extends HttpServlet {
 	public static final String ACCION_SELECCIONAR_PLAZA_OFERTADA = "seleccionarplazaofertada";
 	public static final String ACCION_REABRIR_PLAZA_OFERTADA = "reabrirplazaofertada";
 
-	// Parámetros
+	// parámetros
 	public static final String PARAM_ACCION = "a";
 	public static final String PARAM_AREA = "area";
 	public static final String PARAM_CANDIDATO = "candidato";
@@ -237,7 +238,7 @@ public class ControladorContratacion extends HttpServlet {
 				case ACCION_MARCAR_ACEPTACION_CANDIDATO:
 				case ACCION_PLAZA_ABIERTA:
 				case ACCION_PLAZA_CERRADA:
-				case ACCION_PLAZA_APROBACION:					
+				case ACCION_PLAZA_APROBACION:
 				case ACCION_RECHAZAR_CONTRATACION_CANDIDATO:
 				case ACCION_REENVIAR_CITA_CONTRATACION:
 				case ACCION_SELECCIONAR_PLAZA_OFERTADA:
@@ -251,9 +252,10 @@ public class ControladorContratacion extends HttpServlet {
 					exportarPlazas(datos, response);
 					break;
 				case ACCION_INDEX:
-					bean.setCursos(ModeloPlazaOfertada.obtenerInstancia().listadoCursosPlazasOfertadas());
+					bean.setVista(JSP_INDEX);
 					break;
 				case ACCION_NUEVA_PLAZA_OFERTADA:
+					bean.setCursos(ModeloPlazaOfertada.obtenerInstancia().listadoCursosPlazasOfertadas());
 					nuevaPlazaOfertada(bean, datos, request, response, parametros);
 					break;
 				case ACCION_PREFERENCIAS_CANDIDATO:
@@ -298,6 +300,8 @@ public class ControladorContratacion extends HttpServlet {
 			if (!contains) {
 				throw new UVException(MENSAJE_ERROR_SIN_PERMISO);
 			}
+			
+			bean.setCursos(ModeloPlazaOfertada.obtenerInstancia().listadoCursosPlazasOfertadas());
 		} catch (UVException e) {
 			LOGGER.log(Level.WARNING, e.toString());
 			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, e.getMessage());
@@ -335,7 +339,11 @@ public class ControladorContratacion extends HttpServlet {
 				&& !ModeloEvaluador.obtenerInstancia().checkEvaluadorArea(plaza.getArea(), bean.getUsuarioLogeado())) {
 			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, MENSAJE_ERROR_SIN_PERMISO);
 		}
-
+		
+		if (bean.getUsuarioLogeado().isServicioPersonal()) {
+			this.setInfoEstadoBolsa(bean, plaza);
+		}
+		
 		bean.setPlazaOfertada(plaza);
 
 		switch (nombreAccion) {
@@ -816,7 +824,7 @@ public class ControladorContratacion extends HttpServlet {
 		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
 
 		try (PrintWriter writer = response.getWriter()) {
-			try {				
+			try {
 				BolsaEmpleoDataTable<CandidatoEstado> dataTable = ModeloEstadoCandidato.obtenerInstancia().listaEstadosCandidatoDisponiblesPlaza(
 						request.getParameterMap(), bean.getPlazaOfertada());
 				bean.setDatatableCandidatosEstado(dataTable);
@@ -968,4 +976,21 @@ public class ControladorContratacion extends HttpServlet {
 		return plaza;
 	}
 
+	private void setInfoEstadoBolsa(VistaContratacion bean, PlazaOfertada plaza) throws SQLException, UVException {
+		Bolsa bolsa = ModeloBolsa.obtenerInstancia().getBolsaByArea(plaza.getArea());
+		Convocatoria convocatoria = ModeloConvocatoria.obtenerInstancia().getConvocatoriaByCurso(plaza.getCurso());
+		
+		if (bolsa == null) {
+			bean.setInfoEstadoBolsa("No hay bolsa asociada a la plaza");
+		} else if (bolsa.getFechaHabilitarContratos() == null) {
+			bean.setInfoEstadoBolsa("La bolsa no tiene fecha de habilitar contratación");
+		} else if (convocatoria == null) {
+			bean.setInfoEstadoBolsa("No hay convocatoria asociada al curso");
+		} else if (!convocatoria.getEstado().equals(ModeloConvocatoria.CONVOCATORIA_ESTADO_CERRADA) 
+				&& !convocatoria.getEstado().equals(ModeloConvocatoria.CONVOCATORIA_ESTADO_FINALIZADA)) {
+			bean.setInfoEstadoBolsa("La convocatoria no está cerrada o finalizada");
+		} else if (convocatoria.getFechaCierre().after(bolsa.getFechaHabilitarContratos())) {
+			bean.setInfoEstadoBolsa("La fecha de habilitar contrato para la bolsa es inferior para la fecha de cierre de la convocatoria");
+		}
+	}
 }

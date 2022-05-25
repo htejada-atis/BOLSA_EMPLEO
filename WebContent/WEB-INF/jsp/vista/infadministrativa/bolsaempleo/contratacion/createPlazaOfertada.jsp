@@ -20,7 +20,7 @@ String area = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PAR
 String centroDestino = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_CENTRO_DESTINO, "");
 String codigo = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_CODIGO, "");
 String cuatrimestre = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_CUATRIMESTRE, "");
-String curso = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_CURSO, BolsaEmpleoUtils.getCurrentCourse());
+String curso = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_CURSO, "");
 String dedicacion = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_DEDICACION, "0");
 String duracionPrevista = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_DURACION_PREVISTA, "");
 String fechaFinOferta = BolsaEmpleoUtils.getParamForm(request, ControladorContratacion.PARAM_FECHA_FIN_OFERTA, "");
@@ -96,8 +96,12 @@ String justificacion = BolsaEmpleoUtils.getParamForm(request, ControladorContrat
 		<div class="form-group-container col2">
 			<div class="form-group">
 				<label for="plaza_curso" class="bold-label">Curso académico:</label>
-				<input class="form-input-custom" type="text" name="<%=ControladorContratacion.PARAM_CURSO%>" id="plaza_curso" value="<%=curso%>" required 
-					pattern="<%= ModeloPlazaOfertada.FORMATO_CURSO %>"/>
+				<select id="plaza_curso" name="<%=ControladorContratacion.PARAM_CURSO%>" style="width:100%;" required>
+					<option value="">----------------</option>
+					<%	for(String cursoSelect: bean.getCursos()) { %>
+							<option value="<%=cursoSelect%>" <%= curso.equals(cursoSelect) ? "selected" : "" %>><%= cursoSelect %></option>
+					<%	} %>
+				</select>
 			</div>
 		<%	if (bean.getUsuarioLogeado().isServicioPersonal()) { %>
 					<div class="form-group">

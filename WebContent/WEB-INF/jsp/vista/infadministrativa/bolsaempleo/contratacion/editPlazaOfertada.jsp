@@ -125,8 +125,12 @@ String justificacion = BolsaEmpleoUtils.getParamForm(request, ControladorContrat
 		<div class="form-group-container col2">
 			<div class="form-group">
 				<label for="plaza_curso" class="bold-label">Curso académico:</label>
-				<input class="form-input-custom" type="text" name="<%=ControladorContratacion.PARAM_CURSO%>" id="plaza_curso" value="<%=curso%>" required <%= editable ? "" : "readonly disabled " %> 
-					pattern="<%= ModeloPlazaOfertada.FORMATO_CURSO %>"/>
+				<select id="plaza_curso" name="<%=ControladorContratacion.PARAM_CURSO%>" style="width:100%;" required <%= editable ? "" : "readonly disabled " %>>
+					<option value="">----------------</option>
+					<%	for(String cursoSelect: bean.getCursos()) { %>
+							<option value="<%=cursoSelect%>" <%= curso.equals(cursoSelect) ? "selected" : "" %>><%= cursoSelect %></option>
+					<%	} %>
+				</select>
 			</div>
 			<div class="form-group">
 				<label for="plaza_duracion_prevista" <%= extraRequeridos ? "class='bold-label'" : "" %>>Duración prevista:</label>
@@ -175,21 +179,30 @@ String justificacion = BolsaEmpleoUtils.getParamForm(request, ControladorContrat
 		<br/>
 		<div class="form-group-container col2">
 			<div class="form-group">
-		<%	if (estadoCreacion || estadoAprobacion) { %>
-				<button id="plaza_eliminar" style="float:left;" <%= personal ? "" : "disabled" %>>Eliminar</button>
-		<%	} %>
+				<%	if (estadoCreacion || estadoAprobacion) { %>
+						<button id="plaza_eliminar" style="float:left;" <%= personal ? "" : "disabled" %>>Eliminar</button>
+				<%	} %>
 			</div>
 			<div class="form-group">
-		<%	if (editable) { %>
-				<input id="plaza_enviar" type="submit" name="<%=ControladorContratacion.PARAM_ENVIAR%>" value="Guardar cambios" style="float:right;"/>
-		<%	} %>
-		<%	if (estadoCreacion) { %>
-				<button id="plaza_estado_aprobacion" style="float:right; margin-right: 12px;" <%= personal ? "" : "disabled" %>>Aprobación</button>
-		<%	} else if (estadoAprobacion) { %>
-				<button id="plaza_estado_abierta" style="float:right; margin-right: 12px;" <%= personal ? "" : "disabled" %>>Abrir plaza</button>
-		<%	} %>
+				<%	if (editable) { %>
+						<input id="plaza_enviar" type="submit" name="<%=ControladorContratacion.PARAM_ENVIAR%>" value="Guardar cambios" style="float:right;"/>
+				<%	} %>
+				<%	if (estadoCreacion) { %>
+						<button id="plaza_estado_aprobacion" style="float:right; margin-right: 12px;" <%= personal ? "" : "disabled" %>>Aprobación</button>
+				<%	} else if (estadoAprobacion) { %>
+						<button id="plaza_estado_abierta" style="float:right; margin-right: 12px;" <%= personal ? "" : "disabled" %>>Abrir plaza</button>
+				<%	} %>
 			</div>
 		</div>
+		
+		<% if (personal && bean.getInfoEstadoBolsa() != null)  { %>
+			<div class="form-group-container col1">
+				<div class="form-group">
+					<h3 style="padding: 10px;border: 1px solid #049FE1;"><%= bean.getInfoEstadoBolsa() %></h3>
+				</div>
+			</div>		
+		<% } %>
+		
 	</form>
 	
 <%	if ((mostrarCandidatos || estadoCerrada) && personal) { %>

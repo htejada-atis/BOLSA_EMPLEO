@@ -251,6 +251,31 @@ public class ModeloConvocatoria {
 			}
 		}
 	}
+	
+	/**
+	 * Devuelve una convocatoria por el curso.
+	 * @param curso .
+	 * @return .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	public Convocatoria getConvocatoriaByCurso(String curso) throws SQLException, UVException {
+		String consulta = "SELECT bepcon.*"
+				+ " FROM TBEP_CONVOCATORIAS bepcon"
+				+ " WHERE bepcon.CURSO = ?";
+
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			stmt.setString(1, curso);
+
+			try (ResultSet rs = stmt.executeQuery()) {
+				if (!rs.next()) {
+					throw new UVException(MENSAJE_ERROR_NO_EXISTE_CONVOCATORIA);
+				}
+				
+				return createFromResultSet(rs);
+			}
+		}
+	}
 
 	/**
 	 * Devuelve numero de solicitudes asociadas a convocatoria .
