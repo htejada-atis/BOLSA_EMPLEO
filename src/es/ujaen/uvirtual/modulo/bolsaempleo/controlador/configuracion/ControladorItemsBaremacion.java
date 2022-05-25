@@ -183,9 +183,9 @@ public class ControladorItemsBaremacion extends HttpServlet {
 				case ACCION_EDITAR_APARTADO:
 				case ACCION_EDITAR_APARTADO_CONFIRM:	
 				case ACCION_DESACTIVAR_APARTADO:
-				case ACCION_ACTIVAR_APARTADO:				
+				case ACCION_ACTIVAR_APARTADO:
 				case ACCION_APARTADO_SELECCIONADO:
-					accionesApartados(bean, datos, request, response, nombreAccion);					
+					accionesApartados(bean, datos, request, response, nombreAccion);
 					break;
 					
 				case ACCION_DATATABLE_BLOQUES:
@@ -194,9 +194,9 @@ public class ControladorItemsBaremacion extends HttpServlet {
 				case ACCION_EDITAR_BLOQUE:
 				case ACCION_EDITAR_BLOQUE_CONFIRM:	
 				case ACCION_DESACTIVAR_BLOQUE:
-				case ACCION_ACTIVAR_BLOQUE:				
+				case ACCION_ACTIVAR_BLOQUE:
 				case ACCION_BLOQUE_SELECCIONADO:
-					accionesBloques(bean, datos, request, response, nombreAccion);					
+					accionesBloques(bean, datos, request, response, nombreAccion);
 					break;
 				
 				case ACCION_DATATABLE_ITEMS:
@@ -205,12 +205,12 @@ public class ControladorItemsBaremacion extends HttpServlet {
 				case ACCION_EDITAR_ITEM:
 				case ACCION_EDITAR_ITEM_CONFIRM:	
 				case ACCION_DESACTIVAR_ITEM:
-				case ACCION_ACTIVAR_ITEM:				
+				case ACCION_ACTIVAR_ITEM:
 				case ACCION_ITEM_SELECCIONADO:
 				case ACCION_DATATABLE_ITEMS_EXCLUYENTES:
 				case ACCION_ITEM_EXCLUYENTE_SELECCIONADO:
 				case ACCION_ITEM_EXCLUYENTE_DESELECCIONADO:
-					accionesItems(bean, datos, request, response, nombreAccion);					
+					accionesItems(bean, datos, request, response, nombreAccion);
 					break;
 				
 				default:
