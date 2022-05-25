@@ -26,6 +26,7 @@ VistaConvocatorias bean = (VistaConvocatorias) uvdatos.getVistas().get(VistaConv
 		<tr>
 			<th scope="col" style="width:30px" title="Id de la convocatoria">Id</th>
 			<th scope="col" class="descripcion" style="width:100%">Descripción</th>
+			<th scope="col" style="width:80px">Curso</th>
 			<th scope="col" style="width:100px">Estado</th>
 			<th scope="col" style="width:100px">Fecha cierre</th>
 			<th scope="col" style="width:100px">Fecha finalización</th>
@@ -34,7 +35,7 @@ VistaConvocatorias bean = (VistaConvocatorias) uvdatos.getVistas().get(VistaConv
 		</tbody>
 		<tfoot>
 			<tr>
-				<th colspan="6" style="width:100%"></th>
+				<th colspan="7" style="width:100%"></th>
 			</tr>
 		</tfoot>
 	</table>
@@ -60,6 +61,7 @@ VistaConvocatorias bean = (VistaConvocatorias) uvdatos.getVistas().get(VistaConv
 			"columns": [
 				{'data': 'codNum'},
 				{'data': 'descripcion'},
+				{'data': 'curso'},
 				{'data': 'estado'},
 				{'data': 'fechaCierre'},
 				{'data': 'fechaFinalizacion'}

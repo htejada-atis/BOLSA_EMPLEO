@@ -33,6 +33,7 @@ public class ModeloConvocatoria {
 	public static final String CONVOCATORIA_ESTADO_FINALIZADA = "FINALIZADA";
 	
 	public static final int COLUMN_DESCRIPCION_MAXLENGTH = 150;
+	public static final int COLUMN_CURSO_MAXLENGTH = 50;
 	
 	public static final String MENSAJE_ERROR_NO_EXISTE_CONVOCATORIA = "No existe la convocatoria";
 	
@@ -204,13 +205,14 @@ public class ModeloConvocatoria {
 			throw new UVException("No se puede insertar una convocatoria vacio");
 		}
 
-		String consulta = "INSERT INTO TBEP_CONVOCATORIAS (DESCRIPCION, FECHACIERRE, ESTADO, NUMBOLSASMAXIMO, NUMMERITOSPORBLOQUE, UID_USUARIO) "
-				+ "VALUES (?, ?, ?, ?, ?, ?)";
+		String consulta = "INSERT INTO TBEP_CONVOCATORIAS (DESCRIPCION,CURSO,FECHACIERRE,ESTADO,NUMBOLSASMAXIMO,NUMMERITOSPORBLOQUE,UID_USUARIO) "
+				+ "VALUES (?, ?, ?, ?, ?, ?, ?)";
 
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); 
 				PreparedStatement stmt = conexion.prepareStatement(consulta, new String[]{"CODNUM"})) {
 			int parameterIndex = 1;
 			stmt.setString(parameterIndex++, convocatoria.getDescripcion());
+			stmt.setString(parameterIndex++, convocatoria.getCurso());
 			stmt.setDate(parameterIndex++, new java.sql.Date(convocatoria.getFechaCierre().getTime()));
 			stmt.setString(parameterIndex++, convocatoria.getEstado());
 			stmt.setInt(parameterIndex++, convocatoria.getNumBolsasMaximo());
@@ -312,12 +314,13 @@ public class ModeloConvocatoria {
 	public void actualizaConvocatoria(Convocatoria conv, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
 		validateConvocatoria(conv);
 
-		String consulta = "UPDATE tbep_convocatorias SET DESCRIPCION=?, FECHACIERRE=?, ESTADO=?, NUMBOLSASMAXIMO=?, NUMMERITOSPORBLOQUE=?, UID_USUARIO=? "
+		String consulta = "UPDATE tbep_convocatorias SET DESCRIPCION=?, CURSO=?, FECHACIERRE=?, ESTADO=?, NUMBOLSASMAXIMO=?, NUMMERITOSPORBLOQUE=?, UID_USUARIO=? "
 				+ " WHERE codnum=?";
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int parameterIndex = 1;
 			stmt.setString(parameterIndex++, conv.getDescripcion());
+			stmt.setString(parameterIndex++, conv.getCurso());
 			stmt.setDate(parameterIndex++, new java.sql.Date(conv.getFechaCierre().getTime()));
 			stmt.setString(parameterIndex++, conv.getEstado());
 			stmt.setInt(parameterIndex++, conv.getNumBolsasMaximo());
@@ -451,6 +454,38 @@ public class ModeloConvocatoria {
 
 		return false;
 	}
+	
+	/**
+	 * Comprueba si el curso no se está usando en otra convocatoria.
+	 * @param c .
+	 * @return .
+	 * @throws SQLException .
+	 */
+	public boolean checkCursoUnico(Convocatoria c) throws SQLException {
+		String query = "SELECT COUNT(*) total FROM TBEP_CONVOCATORIAS bepcon WHERE bepcon.CURSO = ?";
+		
+		if (c.getCodNum() != null) {
+			query += " AND bepcon.CODNUM <> ?";
+		}
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(query)) {
+			int parameIndex = 1;
+			
+			stmt.setString(parameIndex++, c.getCurso());
+			
+			if (c.getCodNum() != null) {
+				stmt.setInt(parameIndex++, c.getCodNum());
+			}
+			
+			try (ResultSet rs = stmt.executeQuery()) {
+				if (rs.next() && rs.getInt("total") > 0) {
+					return false;
+				}
+			}
+		}
+		
+		return true;
+	}
 
 	/**
 	 * Cierra la convocatoria, y ajusta el estado de las bolsas.
@@ -553,7 +588,7 @@ public class ModeloConvocatoria {
 			stmt.executeUpdate();
 		}
 	}
-
+	
 	/**
 	 * Devuelve si la convocatoria está cerrada o no.
 	 * @param c conv.
@@ -574,6 +609,7 @@ public class ModeloConvocatoria {
 		Convocatoria convocatoria = new Convocatoria();
 		convocatoria.setCodNum(rs.getInt("CODNUM"));
 		convocatoria.setDescripcion(rs.getString("DESCRIPCION"));
+		convocatoria.setCurso(rs.getString("CURSO"));
 		convocatoria.setFechaCierre(rs.getDate("FECHACIERRE"));
 		convocatoria.setFechaFinalizacion(rs.getDate("FECHA_FINALIZACION"));
 		convocatoria.setEstado(rs.getString("ESTADO"));
@@ -581,7 +617,7 @@ public class ModeloConvocatoria {
 		convocatoria.setNumMeritosPorBloque(rs.getInt("NUMMERITOSPORBLOQUE"));
 		return convocatoria;
 	}
-
+		
 	private void validateConvocatoria(Convocatoria conv) throws UVException {
 		if (conv == null) {
 			throw new UVException("Convocatoria obligatorio");

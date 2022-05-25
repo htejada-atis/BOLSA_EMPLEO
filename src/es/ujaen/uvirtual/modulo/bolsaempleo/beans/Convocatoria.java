@@ -11,6 +11,7 @@ public class Convocatoria implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private Integer codNum;
 	private String descripcion;
+	private String curso;
 	private Date fechaCierre;
 	private Date fechaFinalizacion;
 	private String estado;
@@ -26,15 +27,17 @@ public class Convocatoria implements Serializable {
 	/** Constructor con parametros.
 	 * @param pcodNum .
 	 * @param pdescripcion .
+	 * @param pcurso .
 	 * @param pfechaCierre .
 	 * @param pestado .
 	 * @param pnumBolsasMaximo .
 	 * @param pnumMeritosPorBloque .
 	 */
-	public Convocatoria(Integer pcodNum, String pdescripcion, Date pfechaCierre, String pestado, Integer pnumBolsasMaximo, Integer pnumMeritosPorBloque) {
+	public Convocatoria(Integer pcodNum, String pdescripcion, String pcurso, Date pfechaCierre, String pestado, Integer pnumBolsasMaximo, Integer pnumMeritosPorBloque) {
 		super();
 		this.codNum = pcodNum;
 		this.descripcion = pdescripcion;
+		this.curso = pcurso;
 		this.fechaCierre = pfechaCierre;
 		this.estado = pestado;
 		this.numBolsasMaximo = pnumBolsasMaximo;
@@ -57,6 +60,7 @@ public class Convocatoria implements Serializable {
 	public Convocatoria(Convocatoria copia) {
 		this.codNum = copia.codNum;
 		this.descripcion = copia.descripcion;
+		this.curso = copia.curso;
 		this.fechaCierre = copia.fechaCierre;
 		this.estado = copia.estado;
 		this.numBolsasMaximo = copia.numBolsasMaximo;
@@ -77,6 +81,14 @@ public class Convocatoria implements Serializable {
 
 	public void setDescripcion(String descripcion) {
 		this.descripcion = descripcion;
+	}
+	
+	public String getCurso() {
+		return curso;
+	}
+
+	public void setCurso(String curso) {
+		this.curso = curso;
 	}
 	
 	public Date getFechaCierre() {
@@ -125,7 +137,7 @@ public class Convocatoria implements Serializable {
 	
 	@Override
 	public String toString() {
-		return "Convocatoria [codNum=" + codNum + ", descripcion=" + descripcion + ", fechaCierre=" + fechaCierre 
+		return "Convocatoria [codNum=" + codNum + ", descripcion=" + descripcion + ", curso=" + curso + ", fechaCierre=" + fechaCierre 
 				+ ", estado=" + estado + ", numBolsasMaximo=" + numBolsasMaximo + ", numMeritosPorBloque=" + numMeritosPorBloque 
 				+ ", fechaFinalizacion=" + fechaFinalizacion + "]";
 	}
@@ -136,6 +148,7 @@ public class Convocatoria implements Serializable {
 		int result = 1;
 		result = prime * result + ((codNum == null) ? 0 : codNum.hashCode());
 		result = prime * result + ((descripcion == null) ? 0 : descripcion.hashCode());
+		result = prime * result + ((curso== null) ? 0 : curso.hashCode());
 		result = prime * result + ((fechaCierre == null) ? 0 : fechaCierre.hashCode());
 		result = prime * result + ((estado == null) ? 0 : estado.hashCode());
 		result = prime * result + ((numBolsasMaximo == null) ? 0 : numBolsasMaximo.hashCode());
@@ -169,6 +182,13 @@ public class Convocatoria implements Serializable {
 				return false;
 			}
 		} else if (!fechaCierre.equals(other.fechaCierre)) {
+			return false;
+		}
+		if (curso == null) {
+			if (other.curso != null) {
+				return false;
+			}
+		} else if (!curso.equals(other.curso)) {
 			return false;
 		}
 		if (fechaCierre == null) {
