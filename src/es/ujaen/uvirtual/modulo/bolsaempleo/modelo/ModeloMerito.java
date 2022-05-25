@@ -522,9 +522,9 @@ public class ModeloMerito {
 	public Merito createMeritoFromResultset(ResultSet rs, Boolean withUsuario, Boolean withFile) throws SQLException, UVException {
 		ModeloBaremacionItems modeloBar = ModeloBaremacionItems.obtenerInstancia();
 		
-		Merito mer = new Merito();		
+		Merito mer = new Merito();
 		mer.setCodNum(rs.getInt("CODNUM"));
-		mer.setItemBaremacion(modeloBar.getItemBaremacionById(rs.getInt("BEPITE_CODNUM")));		
+		mer.setItemBaremacion(modeloBar.getItemBaremacionById(rs.getInt("BEPITE_CODNUM")));
 		mer.setValor(rs.getDouble("VALOR"));
 		mer.setDescripcion(rs.getString("DESCRIPCION"));
 		mer.setObservacion(rs.getString("OBSERVACION"));

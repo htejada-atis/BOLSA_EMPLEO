@@ -13,6 +13,7 @@ import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ApartadoBaremacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BloqueBaremacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ItemBaremacion;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Merito;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable.DataTableColumn;
@@ -287,11 +288,8 @@ public class ModeloBaremacionItems {
 	 */
 	public void actualizaItem(ItemBaremacion item, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
 		this.chequearItemParaInsertarOActualizar(item);
-		
-		if (this.chequearUsandose(item)) {
-			throw new UVException(ERROR_ITEM_USANDOSE);
-		}
-		
+		this.chequearCanEdit(item);
+				
 		String consulta = "UPDATE TBEP_ITEMSBAREMACION SET "
 				+ "CODIGO = ?, "
 				+ "NOMBRE = ?, "
@@ -667,19 +665,18 @@ public class ModeloBaremacionItems {
 	}
 	
 	/**
-	 * Comprueba si el item está usandose en algun mérito.
-	 * 
+	 * Comprueba si el item está usandose en algun mérito, excepción si hay error.
 	 * @param item .
-	 * @return .
+	 * @throws UVException .
 	 * @throws SQLException .
 	 */
-	private boolean chequearUsandose(ItemBaremacion item) throws SQLException {
+	private void chequearCanEdit(ItemBaremacion item) throws SQLException, UVException {
 		String sql = ""
-			+ " SELECT COUNT(*) AS TOTAL "
+			+ " SELECT bepmer.* "
 			+ " FROM TBEP_APARTADOSBAREMACION bepapa "
 			+ " INNER JOIN TBEP_BLOQUESBAREMACION bepblo ON bepblo.BEPAPA_CODNUM = bepapa.CODNUM "
 			+ " INNER JOIN TBEP_ITEMSBAREMACION bepite ON bepite.BEPBLO_CODNUM = bepblo.CODNUM "
-			+ " INNER JOIN TBEP_MERITOS bepmer ON bepmer.BEPITE_CODNUM = bepite.CODNUM "			
+			+ " INNER JOIN TBEP_MERITOS bepmer ON bepmer.BEPITE_CODNUM = bepite.CODNUM "
 			+ " WHERE bepite.CODNUM = ? ";
 		
 		try (Connection con = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = con.prepareStatement(sql)) {
@@ -687,12 +684,20 @@ public class ModeloBaremacionItems {
 			stmt.setInt(parameterIndex++, item.getCodNum());
 			
 			try (ResultSet rs = stmt.executeQuery()) {
-				if (rs.next()) {
-					return rs.getInt("TOTAL") > 0;
+				while (rs.next()) {
+					Merito m = ModeloMerito.obtenerInstancia().createMeritoFromResultset(rs, false, false);
+					
+					if (m.getValor() < item.getValorMinimo()) {
+						throw new UVException("Existe un mérito con valor [" + m.getValor().toString() + "] que se sale del límite inferior [" 
+							+ item.getValorMinimo() + "]");
+					}
+					
+					if (m.getValor() > item.getValorMaximo()) {
+						throw new UVException("Existe un mérito con valor [" + m.getValor().toString() + "] que se sale del límite superior [" 
+							+ item.getValorMaximo() + "]");
+					}
 				}
 			}
 		}
-		
-		return false;
 	}
 }
