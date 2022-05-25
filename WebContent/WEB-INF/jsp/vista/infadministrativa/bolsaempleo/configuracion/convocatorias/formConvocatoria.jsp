@@ -61,6 +61,17 @@ if (convocatoria != null) {
 		</div>
 		<div class="form-group-container col2">
 			<div class="form-group">
+				<label for="curso" class="bold-label">Curso: (ej. 21/22)</label>
+				<input id="curso"
+					class="form-input-custom"
+					type="text"
+					autocomplete="off"
+					name="<%= ControladorConvocatorias.PARAM_CONVOCATORIA_CURSO %>" 
+					value="<%= BolsaEmpleoUtils.getParamForm(request, ControladorConvocatorias.PARAM_CONVOCATORIA_CURSO, convocatoria != null ? convocatoria.getCurso() : "") %>"
+					required
+					<%= estadoFinalizada ? " readonly disabled" : "" %>/>
+			</div>
+			<div class="form-group">
 				<label for="fechaCierre" class="bold-label">Fecha cierre: </label>
 				<input id="fechaCierre"
 					class="form-input-custom"
@@ -72,7 +83,6 @@ if (convocatoria != null) {
 					<%= estadoFinalizada ? " readonly disabled" : "" %>/>
 			</div>
 		</div>
-		
 		<div class="form-group-container col2">
 			<div class="form-group">
 				<label for="numMaximoBolsas" class="bold-label">Nº bolsa máximo de participación de candidato: </label>

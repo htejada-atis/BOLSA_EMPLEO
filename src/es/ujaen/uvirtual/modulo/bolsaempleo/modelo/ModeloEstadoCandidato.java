@@ -166,17 +166,16 @@ public class ModeloEstadoCandidato {
 			throws SQLException, UVException {
 		List<CandidatoEstado> estados = new ArrayList<>();
 		BolsaEmpleoDataTable<CandidatoEstado> dataTable = new BolsaEmpleoDataTable<>(params);
-					
-		String consulta = this.getQueryCandidatosEstadoPlaza();
-		
-		dataTable.setQuery(consulta);
 		
 		Bolsa bolsa = ModeloPlazaOfertada.obtenerInstancia().getBolsaConContracionHabilitadaPlaza(plaza);
-		Convocatoria convocatoria = ModeloPlazaOfertada.obtenerInstancia().getConvocatoriaConSolicitudesParaPlaza(plaza);
+		Convocatoria convocatoria = ModeloConvocatoria.obtenerInstancia().getConvocatoriaByCurso(plaza.getCurso());
 		if (bolsa == null || convocatoria == null) {
 			dataTable.setData(estados);
 			return dataTable;
 		}
+		
+		String consulta = this.getQueryCandidatosEstadoPlaza();
+		dataTable.setQuery(consulta);
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
@@ -217,7 +216,7 @@ public class ModeloEstadoCandidato {
 		List<CandidatoEstado> estados = new ArrayList<>();
 		
 		Bolsa bolsa = ModeloPlazaOfertada.obtenerInstancia().getBolsaConContracionHabilitadaPlaza(plaza);
-		Convocatoria convocatoria = ModeloPlazaOfertada.obtenerInstancia().getConvocatoriaConSolicitudesParaPlaza(plaza);
+		Convocatoria convocatoria = ModeloConvocatoria.obtenerInstancia().getConvocatoriaByCurso(plaza.getCurso());
 		if (bolsa == null || convocatoria == null) {
 			return estados;
 		}

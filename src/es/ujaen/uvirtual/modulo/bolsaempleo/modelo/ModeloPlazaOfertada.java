@@ -376,14 +376,17 @@ public class ModeloPlazaOfertada {
 		return rows;
 	}
 	
-	/** Devuelve el listado de cursos de las plazas ofertadas .
+	/** Devuelve el listado de cursos de las plazas ofertadas (por convocatoria) .
 	 * @return cursos .
 	 * @throws SQLException en caso de error de base de datos .
 	 */
 	public List<String> listadoCursosPlazasOfertadas() throws SQLException {
 		List<String> cursos = new ArrayList<>();
 		
-		String consulta = String.format("SELECT DISTINCT %s FROM TBEP_PLAZAS_OFERTADAS WHERE %s = 'S' ORDER BY %s DESC", CURSO, FLGACTIVA, CURSO);
+		String consulta = ""
+			+ " SELECT DISTINCT bepcon.CURSO "
+			+ " FROM TBEP_CONVOCATORIAS bepcon "
+			+ " ORDER BY bepcon.CURSO DESC";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			try (ResultSet rs = stmt.executeQuery()) {
@@ -441,56 +444,6 @@ public class ModeloPlazaOfertada {
 			return null;
 		}
 		return bolsa;
-	}
-	
-	/**
-	 * Devuelve la convocatoria con solicitudes para una plaza, dependiendo de la fecha de habilitar
-	 * contratación de la bolsa asociado a la plaza.
-	 * @param plaza .
-	 * @return .
-	 * @throws SQLException .
-	 * @throws UVException .
-	 */
-	public Convocatoria getConvocatoriaConSolicitudesParaPlaza(PlazaOfertada plaza) throws SQLException, UVException {
-		// bolsa asociada a la plaza
-		Bolsa bolsa = this.getBolsaConContracionHabilitadaPlaza(plaza);
-		if (bolsa == null) {
-			return null;
-		}
-		
-		// buscamos convocatoria:
-		//	- con solicitudes para la bolsa
-		//	- con fecha de cierre menor que la fecha de habilitar contratos de la bolsa
-		//	- la última solicitud cerrada o finalizada (año anterior)
-		
-		String queryConv = ""
-			+ " SELECT bepcon.CODNUM "
-			+ " FROM TBEP_CONVOCATORIAS bepcon "
-			+ " INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.BEPCON_CODNUM = bepcon.CODNUM "
-			+ " INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbo.BEPSOL_CODNUM = bepsol.CODNUM "
-			+ " WHERE 1=1 "
-			+ "		AND bepcon.ESTADO IN ('CERRADA', 'FINALIZADA') "
-			+ "		AND bepcon.FECHACIERRE <= ? "
-			+ "		AND bepsol.ESTADO = 'CERRADA' "
-			+ "		AND bepsbo.BEPBOL_CODNUM = ? "
-			+ " ORDER BY bepcon.FECHACIERRE DESC "
-			+ " FETCH FIRST 1 ROWS ONLY";
-		
-		Convocatoria c = null;
-		
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(queryConv)) {
-			int paramIndex = 1;
-			stmt.setDate(paramIndex++, new java.sql.Date(bolsa.getFechaHabilitarContratos().getTime()));
-			stmt.setInt(paramIndex++, bolsa.getCodNum());
-			
-			try (ResultSet rs = stmt.executeQuery()) {
-				if (rs.next()) {
-					c = ModeloConvocatoria.obtenerInstancia().getConvocatoriaById(rs.getInt("CODNUM"));
-				}
-			}
-		}
-		
-		return c;
 	}
 	
 	/** inserta plaza ofertada .
@@ -856,7 +809,8 @@ public class ModeloPlazaOfertada {
 		dataTable.setQuery(consulta);
 		
 		Bolsa bolsa = ModeloPlazaOfertada.obtenerInstancia().getBolsaConContracionHabilitadaPlaza(plaza);
-		Convocatoria convocatoria = ModeloPlazaOfertada.obtenerInstancia().getConvocatoriaConSolicitudesParaPlaza(plaza);
+		// Convocatoria convocatoria = ModeloPlazaOfertada.obtenerInstancia().getConvocatoriaConSolicitudesParaPlaza(plaza);
+		Convocatoria convocatoria = ModeloConvocatoria.obtenerInstancia().getConvocatoriaByCurso(plaza.getCurso());
 		if (bolsa == null || convocatoria == null) {
 			dataTable.setData(rows);
 			return dataTable;

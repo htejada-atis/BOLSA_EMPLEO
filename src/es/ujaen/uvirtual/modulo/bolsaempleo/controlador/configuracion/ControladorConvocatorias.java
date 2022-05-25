@@ -41,10 +41,11 @@ import es.ujaen.uvirtual.utilidades.UVException;
 			"/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/convocatorias",
 			"/srv/en/ajax/informacionadministrativa/bolsaempleo/configuracion/convocatorias"
 })
-public class ControladorConvocatorias extends HttpServlet {	
+public class ControladorConvocatorias extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static final String NOMBREDEESTACLASE = ControladorConvocatorias.class.getName();
 	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
+	
 	public static final String PARAM_ACCION = "a";
 	public static final String PARAM_ACCION_ENVIAR = "enviar"; 
 	public static final String PARAM_CONVOCATORIA_DESCRIPCION = "descripcion";
@@ -52,6 +53,7 @@ public class ControladorConvocatorias extends HttpServlet {
 	public static final String PARAM_CONVOCATORIA_ID = "id";
 	public static final String PARAM_CONVOCATORIA_NUMEROBOLSASMAXIMO = "numBolsasMaximo";
 	public static final String PARAM_CONVOCATORIA_NUMEROMERITOSPORBLOQUE = "numMeritosPorBloque";
+	public static final String PARAM_CONVOCATORIA_CURSO = "curso";
 	
 	// acciones
 	public static final String ACCION_ABRIR_CONVOCATORIA = "abrirConvocatoria";
@@ -91,6 +93,9 @@ public class ControladorConvocatorias extends HttpServlet {
 	public static final String MENSAJE_ERROR_SIN_BOLSAS_BAREMABLES = "Antes de abrir una convocatoria debe de tener areas baremables";
 	public static final String MENSAJE_ERROR_SIN_PERMISO_PERSONAL = "No tienes permiso de personal";
 	public static final String MENSAJE_ERROR_CONVOCATORIA_DEBE_ESTAR_CERRADA = "La convocatoria debe estar finalizada";
+	public static final String MENSAJE_ERROR_CURSO_NO_UNICO = "El curso ya se está usando en otra convocatoria";
+	public static final String MENSAJE_ERROR_CURSO_LARGO = "El curso no puede ser superior a %d";
+	public static final String MENSAJE_ERROR_CURSO_VACIO = "El curso no puede estar vacío";
 	public static final String MENSAJE_EXITO_ABRIR_CONVOCATORIA = "Convocatoria editada correctamente";
 	public static final String MENSAJE_EXITO_CERRAR_CONVOCATORIA = "Convocatoria cerrada correctamente";
 	public static final String MENSAJE_EXITO_EDITAR_CONVOCATORIA = "Convocatoria editada correctamente";
@@ -231,7 +236,7 @@ public class ControladorConvocatorias extends HttpServlet {
 		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_CONVOCATORIA_DESCRIPCION)) != null) {
 			modelo.chequearCreacionConvocatoria();
 			
-			Convocatoria convocatoria = this.validateConvocatoria(request);
+			Convocatoria convocatoria = this.validateConvocatoria(request, null);
 			
 			// creamos convocatoria, por defecto cerrada
 			convocatoria.setEstado(ModeloConvocatoria.CONVOCATORIA_ESTADO_CERRADA);
@@ -360,11 +365,12 @@ public class ControladorConvocatorias extends HttpServlet {
 		if (solicitudes > 0) {
 			BolsaEmpleoUtils.addMensajeDeError(MENSAJE_ERROR_EDITAR_CONVOCATORIA_CON_SOLICITUDES, bean, request);
 		} else {
-			Convocatoria convocatoriaForm = this.validateConvocatoria(request);
+			Convocatoria convocatoriaForm = this.validateConvocatoria(request, bean.getConvocatoria().getCodNum());
 			
 			Convocatoria conFinal = new Convocatoria(
 					bean.getConvocatoria().getCodNum(),
 					convocatoriaForm.getDescripcion(),
+					convocatoriaForm.getCurso(),
 					convocatoriaForm.getFechaCierre(),
 					bean.getConvocatoria().getEstado(),
 					convocatoriaForm.getNumBolsasMaximo(),
@@ -448,8 +454,9 @@ public class ControladorConvocatorias extends HttpServlet {
 		}
 	}
 	
-	private Convocatoria validateConvocatoria(HttpServletRequest request) throws UVException {
+	private Convocatoria validateConvocatoria(HttpServletRequest request, Integer codNum) throws UVException, SQLException {
 		Convocatoria c = new Convocatoria();
+		c.setCodNum(codNum);
 		
 		c.setDescripcion(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_CONVOCATORIA_DESCRIPCION)));
 		if (c.getDescripcion() == null || c.getDescripcion().isBlank()) {
@@ -457,6 +464,17 @@ public class ControladorConvocatorias extends HttpServlet {
 		}
 		if (c.getDescripcion().length() > ModeloConvocatoria.COLUMN_DESCRIPCION_MAXLENGTH) {
 			throw new UVException(String.format(MENSAJE_ERROR_DESCRIPCION_LARGA, ModeloConvocatoria.COLUMN_DESCRIPCION_MAXLENGTH));
+		}
+		
+		c.setCurso(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_CONVOCATORIA_CURSO)));
+		if (c.getCurso() == null || c.getCurso().isBlank()) {
+			throw new UVException(MENSAJE_ERROR_CURSO_VACIO);
+		}
+		if (c.getCurso().length() > ModeloConvocatoria.COLUMN_CURSO_MAXLENGTH) {
+			throw new UVException(String.format(MENSAJE_ERROR_CURSO_LARGO, ModeloConvocatoria.COLUMN_CURSO_MAXLENGTH));
+		}
+		if (!ModeloConvocatoria.obtenerInstancia().checkCursoUnico(c)) {
+			throw new UVException(MENSAJE_ERROR_CURSO_NO_UNICO);
 		}
 		
 		c.setFechaCierre(Formateador.leeParametroFecha(request.getParameter(PARAM_CONVOCATORIA_FECHACIERRE), Formateador.FORMATO_FECHA_DDMMYYYY, "/"));
