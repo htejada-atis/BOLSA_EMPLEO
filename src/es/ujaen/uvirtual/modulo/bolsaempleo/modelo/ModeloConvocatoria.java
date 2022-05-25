@@ -98,23 +98,24 @@ public class ModeloConvocatoria {
 		return dataTable;
 	}
 	
-	/** Comprueba si hay convocatorias no finalizadas.
-	 * @return true o false .
+	/**
+	 * Comprueba si todas las convocatorias estan finalizadas. Error en otro caso.
+	 * @throws UVException .
 	 * @throws SQLException .
 	 */
-	public boolean hayConvocatoriaNoFinalizada() throws SQLException {
-		String consulta = "SELECT COUNT(*) count_convocatorias FROM TBEP_CONVOCATORIAS bepcon WHERE bepcon.ESTADO != ?";
+	public void chequearCreacionConvocatoria() throws SQLException, UVException {
+		String consulta = "SELECT bepcon.* FROM TBEP_CONVOCATORIAS bepcon";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
-			stmt.setString(1, CONVOCATORIA_ESTADO_FINALIZADA);
 			try (ResultSet rs = stmt.executeQuery()) {
-				if (rs.next() && rs.getInt("count_convocatorias") > 0) {
-					return true;
+				while (rs.next()) {
+					Convocatoria c = this.createFromResultSet(rs);
+					if (!c.getEstado().equals(CONVOCATORIA_ESTADO_FINALIZADA)) {
+						throw new UVException("No se puede crear. Existen convocatorias no finalizadas");
+					}
 				}
 			}
 		}
-		
-		return false;
 	}
 	
 	/** Consulta convocatorias en BBDD y las devuelve .
