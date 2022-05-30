@@ -61,6 +61,7 @@ public class ModeloUsuarioBolsaEmpleo {
 	public static final String EXCLUSION_TIPO_TEMPORAL = "T";
 	public static final String EXCLUSION_TIPO_INDEFINIDO = "I";
 
+	public static final int COLUMN_CODCUENTA_MAXLENGTH = 100;
 	public static final int COLUMN_NOMBRE_MAXLENGTH = 20;
 	public static final int COLUMN_PRIMER_APELLIDO_MAXLENGTH = 40;
 	public static final int COLUMN_SEGUNDO_APELLIDO_MAXLENGTH = 40;
@@ -794,15 +795,21 @@ public class ModeloUsuarioBolsaEmpleo {
 		// comprobamos si está borrado o excluido
 		if (Boolean.TRUE.equals(usuario.getExcluido())) {
 			throw new UVException(usuario.getRazonBorrado() != null
-					? String.format("No puede acceder, su perfil ha sido excluido: [%s]. Razón: %s", usuario.getCodCuenta(), usuario.getRazonBorrado())
-					: String.format("No puede acceder, su perfil ha sido excluido: [%s].", usuario.getCodCuenta()));
+				? String.format("No puede acceder, su perfil ha sido excluido: [%s]. Razón: %s. Contacte con %s", 
+						usuario.getCodCuenta(), usuario.getRazonBorrado(), ModeloParametrosConfiguracion.CORREO_SOPORTE)
+				: String.format("No puede acceder, su perfil ha sido excluido: [%s]. Contacte con %s", 
+						usuario.getCodCuenta(), ModeloParametrosConfiguracion.CORREO_SOPORTE)
+			);
 		} else if (Boolean.TRUE.equals(usuario.getBorrado())) {
 			throw new UVException(usuario.getRazonBorrado() != null
-					? String.format("No puede acceder, su perfil ha sido dado de baja: [%s]. Razón: %s", usuario.getCodCuenta(), usuario.getRazonBorrado())
-					: String.format("No puede acceder, su perfil ha sido dado de baja: [%s].", usuario.getCodCuenta()));
+				? String.format("No puede acceder, su perfil ha sido dado de baja: [%s]. Razón: %s. Contacte con %s", 
+						usuario.getCodCuenta(), usuario.getRazonBorrado(), ModeloParametrosConfiguracion.CORREO_SOPORTE)
+				: String.format("No puede acceder, su perfil ha sido dado de baja: [%s]. Contacte con %s", 
+						usuario.getCodCuenta(), ModeloParametrosConfiguracion.CORREO_SOPORTE)
+			);
 		}
 		
-		return usuario; 
+		return usuario;
 	}
 	
 	/**
@@ -836,7 +843,8 @@ public class ModeloUsuarioBolsaEmpleo {
 			// comprobamos que no existe otro candidato con el mismo dni
 			UsuarioBolsaEmpleo usuDni = this.getFirstUsuarioByPrsnif(usuArcos.getDocumentoNumero());
 			if (usuDni != null && create) {
-				throw new UVException("Ya existe un candidado con su mismo documento de identificación");
+				throw new UVException("Ya existe un candidado con su mismo documento de identificación [" 
+						+ usuArcos.getDocumentoNumero() + "]. Consulte con " + ModeloParametrosConfiguracion.CORREO_SOPORTE);
 			}
 			
 			if (create) {
@@ -969,7 +977,40 @@ public class ModeloUsuarioBolsaEmpleo {
 		
 		refrescarUsuarioBEP(usuario);
 	}
+	
+	/**
+	 * Cambia el codcuenta del usuario.
+	 * @param usuario .
+	 * @param nuevoLogin .
+	 * @param usuarioQueActualiza .
+	 * @throws SQLException .
+	 * @throws UVException . 
+	 */
+	public void cambiarLoginCandidato(UsuarioBolsaEmpleo usuario, String nuevoLogin, UsuarioBolsaEmpleo usuarioQueActualiza) throws SQLException, UVException {
+		// comprobamos que no existe un usuario con el nuevo login
+		UsuarioBolsaEmpleo usuarioExiste = this.compruebaUsuarioByCodCuenta(nuevoLogin);
+		if (usuarioExiste != null) {
+			throw new UVException("Ya existe un usuario con el login " + nuevoLogin);
+		}
 		
+		if (nuevoLogin.length() > ModeloUsuarioBolsaEmpleo.COLUMN_CODCUENTA_MAXLENGTH) {
+			throw new UVException("El login demasiado largo. Máximo: " + ModeloUsuarioBolsaEmpleo.COLUMN_CODCUENTA_MAXLENGTH);
+		}
+		
+		String query = "UPDATE TBEP_USUARIOS SET UID_USUARIO=?,CODCUENTA=? WHERE CODNUM=?";
+
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(query)) {
+			int indexParam = 1;
+			stmt.setString(indexParam++, usuarioQueActualiza.getCodCuenta());
+			stmt.setString(indexParam++, nuevoLogin);
+			stmt.setInt(indexParam++, usuario.getCodNum());
+			stmt.executeUpdate();
+		}
+		
+		Memcache mc = Memcache.getInstance();
+		mc.delete("usuarioBEP." + usuario.getCodCuenta());
+	}
+	
 	/**
 	 * Dar de baja a todos los usuarios que no tengan solicitudes.
 	 * @param usuarioQueBorra .

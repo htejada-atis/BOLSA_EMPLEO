@@ -148,7 +148,7 @@ public class Convocatoria implements Serializable {
 		int result = 1;
 		result = prime * result + ((codNum == null) ? 0 : codNum.hashCode());
 		result = prime * result + ((descripcion == null) ? 0 : descripcion.hashCode());
-		result = prime * result + ((curso== null) ? 0 : curso.hashCode());
+		result = prime * result + ((curso == null) ? 0 : curso.hashCode());
 		result = prime * result + ((fechaCierre == null) ? 0 : fechaCierre.hashCode());
 		result = prime * result + ((estado == null) ? 0 : estado.hashCode());
 		result = prime * result + ((numBolsasMaximo == null) ? 0 : numBolsasMaximo.hashCode());

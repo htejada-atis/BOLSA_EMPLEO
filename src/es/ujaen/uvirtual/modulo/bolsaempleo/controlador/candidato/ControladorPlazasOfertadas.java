@@ -18,6 +18,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
+import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.OfertaCandidato;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.PlazaOfertada;
@@ -160,6 +161,10 @@ public class ControladorPlazasOfertadas extends HttpServlet {
 		
 		try {
 			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getAndRefreshUsuario(datos));
+			if (bean.getUsuarioLogeado().getCodNum() == null) {
+				Usuario usuArcos = datos.getUsuario();
+				throw new UVException(String.format("No existe el usuario [%s]", usuArcos != null ? usuArcos.getUid() : "-"));
+			}
 			
 			// personal, direccion
 			int[] rolesValidos = {ModeloRol.ID_ROL_CANDIDATO};

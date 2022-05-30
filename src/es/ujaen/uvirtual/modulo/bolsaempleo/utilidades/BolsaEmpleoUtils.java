@@ -140,6 +140,23 @@ public final class BolsaEmpleoUtils {
 
 		return m.matches();
 	}
+	
+	/**
+	 * Comprueba si un correo es válido.
+	 * @param value . 
+	 * @return . 
+	 */
+	public static boolean isCorreo(String value) {
+		if (value == null) {
+			return false;
+		}
+		
+		String regex = "^(.+)@(\\\\S+)$";
+		Pattern p = Pattern.compile(regex);
+		Matcher m = p.matcher(value);
+
+		return m.matches();
+	}
 
 	/**
 	 * Trata de convertir a Float el valor recibido como parámetro. Si la conversión

@@ -25,6 +25,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
+import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Titulacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.TitulacionUsuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMisTitulaciones;
@@ -176,6 +177,10 @@ public class ControladorMisTitulaciones extends HttpServlet {
 		
 		try {
 			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getAndRefreshUsuario(datos));
+			if (bean.getUsuarioLogeado().getCodNum() == null) {
+				Usuario usuArcos = datos.getUsuario();
+				throw new UVException(String.format("No existe el usuario [%s]", usuArcos != null ? usuArcos.getUid() : "-"));
+			}
 
 			if (!bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRol.ID_ROL_CANDIDATO)) {
 				throw new UVException("No eres un candidato");

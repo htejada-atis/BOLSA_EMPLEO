@@ -24,6 +24,7 @@ public class ModeloParametrosConfiguracion {
 	public static final String JS_BOLSA_EMPLEO = "/js/bolsaempleo/bolsaempleo20220523.min.js";
 	public static final String CSS_BOLSA_EMPLEO = "/css/ujaen_bolsa_empleo.css";
 	public static final String JS_TINY = "/js/tinymce/tinymce.min.js";
+	public static final String CORREO_SOPORTE = "bolsapdi@ujaen.es";
 	
 	public static final String PARAMETRO_PLANTILLA_APERTURA_PLAZA = "bolsaempleo.local.idPlantillaAperturaPlaza";
 	public static final String PARAMETRO_PLANTILLA_APROBACION_PLAZA = "bolsaempleo.local.idPlantillaAprobacionPlaza";
