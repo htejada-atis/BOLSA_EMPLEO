@@ -119,7 +119,8 @@ public final class BolsaEmpleoUtils {
 	}
 
 	/**
-	 * Devuleve si la cadena contiene un valor float o no.
+	 * Devuelve si la cadena contiene un valor float o no.
+	 * https://www.baeldung.com/java-email-validation-regex
 	 * 
 	 * @param value .
 	 * @return .

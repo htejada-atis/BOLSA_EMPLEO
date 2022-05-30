@@ -67,7 +67,7 @@ VistaEstadoBolsas bean = (VistaEstadoBolsas) uvdatos.getVistas().get(VistaEstado
 			<th scope="col" style="width:80px">Estado</th>
 			<th scope="col" style="width:68px">Bloqueo</th>
 			<th scope="col" style="width:68px">Desbloqueo</th>
-			<th scope="col" style="width:70px">Baremación</th>
+			<th scope="col" style="width:80px">Baremación</th>
 			<th scope="col" style="width:70px">Contratación</th>
 			<th scope="col" class="center" style="width:48px">Baremable</th>
 		</tr>
