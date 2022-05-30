@@ -151,7 +151,7 @@ public final class BolsaEmpleoUtils {
 			return false;
 		}
 		
-		String regex = "^(.+)@(\\\\S+)$";
+		String regex = "^(.+)@(\\S+)$";
 		Pattern p = Pattern.compile(regex);
 		Matcher m = p.matcher(value);
 
