@@ -143,6 +143,11 @@ public class ControladorMisDatos extends HttpServlet {
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		try {
 			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getAndRefreshUsuario(datos));
+			if (bean.getUsuarioLogeado().getCodNum() == null) {
+				Usuario usuArcos = datos.getUsuario();
+				throw new UVException(String.format("No existe el usuario [%s]", usuArcos != null ? usuArcos.getUid() : "-"));
+			}
+			
 		} catch (UVException e) {
 			LOGGER.log(Level.WARNING, e.toString());
 			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, e.getMessage());

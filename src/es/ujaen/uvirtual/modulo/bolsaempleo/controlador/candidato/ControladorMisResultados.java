@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.google.gson.Gson;
 import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
+import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaResultado;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.CandidatoResultadoTable;
@@ -155,6 +156,10 @@ public class ControladorMisResultados extends HttpServlet {
 		
 		try {
 			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getAndRefreshUsuario(datos));
+			if (bean.getUsuarioLogeado().getCodNum() == null) {
+				Usuario usuArcos = datos.getUsuario();
+				throw new UVException(String.format("No existe el usuario [%s]", usuArcos != null ? usuArcos.getUid() : "-"));
+			}
 
 			if (!bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRol.ID_ROL_CANDIDATO)) {
 				throw new UVException(MENSAJE_ERROR_SIN_PERMISO_CANDIDATO);

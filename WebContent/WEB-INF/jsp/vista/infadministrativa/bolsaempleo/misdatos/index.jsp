@@ -126,7 +126,7 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
     			<label for="usuario_lista_dist">Lista Distribucion:</label>
     			<input class="params" type="checkbox" id="usuario_lista_dist" 
     				   name="<%= ControladorMisDatos.PARAM_LISTA %>"
-    				   value="true" <%= (lista_dist ? "checked=''" : "") %>/>
+    				   value="true" <%= (lista_dist != null ? "checked=''" : "") %>/>
     		</div>
     	</div>
 

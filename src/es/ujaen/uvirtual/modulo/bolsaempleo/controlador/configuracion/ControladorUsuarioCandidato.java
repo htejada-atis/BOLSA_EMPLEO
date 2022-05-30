@@ -59,10 +59,10 @@ import es.ujaen.uvirtual.utilidades.UVException;
 	name = "informacionadministrativa.bolsaempleo.configuracion.candidatos", 
 	description = "Gestión de usuarios candidatos", 
 	urlPatterns = {
-			"/srv/es/informacionadministrativa/bolsaempleo/configuracion/candidatos", 
-			"/srv/en/informacionadministrativa/bolsaempleo/configuracion/candidatos",
-			"/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/candidatos",
-			"/srv/en/ajax/informacionadministrativa/bolsaempleo/configuracion/candidatos"
+		"/srv/es/informacionadministrativa/bolsaempleo/configuracion/candidatos", 
+		"/srv/en/informacionadministrativa/bolsaempleo/configuracion/candidatos",
+		"/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/candidatos",
+		"/srv/en/ajax/informacionadministrativa/bolsaempleo/configuracion/candidatos"
 	})
 public class ControladorUsuarioCandidato extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -89,6 +89,8 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 	public static final String PARAM_SOLICITUD = "solicitud";
 	public static final String PARAM_RAZON_EXCLUSION_SOLICITUD = "razonexclusionsolicitud";
 	public static final String PARAM_CONVOCATORIA = "convocatoria";
+	public static final String PARAM_TIPOLOGIN = "tipologin";
+	public static final String PARAM_LOGINNUEVO = "nuevologin";
 	
 	// acciones
 	public static final String ACCION_ACREDITACIONES_CANDIDATO = "acreditacionescandidato";
@@ -121,6 +123,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 	public static final String ACCION_INCLUIR_SOLICITUD = "incluirsolicitudcandidato";
 	public static final String ACCION_EXPORTAR = "exportarcandidatos";
 	public static final String ACCION_DAR_BAJA_CANDIDATOS = "darbajacandidatos";
+	public static final String ACCION_CAMBIAR_LOGIN_CANDIDATO = "cambiarlogincandidato";
 
 	// mensajes
 	public static final String MENSAJE_ERROR_ACCION_NO_CONTEMPLADA = "Acción no contemplada";
@@ -220,6 +223,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 				case ACCION_VOLVER_CANDIDATO:
 				case ACCION_EXCLUIR_SOLICITUD:
 				case ACCION_INCLUIR_SOLICITUD:
+				case ACCION_CAMBIAR_LOGIN_CANDIDATO:
 					accionesCandidato(bean, datos, request, response, nombreAccion);
 					break;
 				case ACCION_INDEX:
@@ -375,6 +379,9 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 				break;
 			case ACCION_VOLVER_CANDIDATO:
 				redireccionConCandidatoSeleccionado(bean, datos, request, response, ACCION_SOLICITUDES_CANDIDATO);
+				break;
+			case ACCION_CAMBIAR_LOGIN_CANDIDATO:
+				cambiarLoginCandidato(bean, datos, request, response);
 				break;
 			default:
 				errorFatal(bean, MENSAJE_ERROR_ACCION_NO_CONTEMPLADA);
@@ -998,6 +1005,39 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 		Map<String, String> params = new HashMap<>();
 		params.put(PARAM_ACCION, ACCION_INDEX);
 		BolsaEmpleoUtils.redirectWithParams(datos, request, response, params);
+	}
+	
+	private void cambiarLoginCandidato(VistaCandidatos bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) 
+			throws UVException, IOException, SQLException {
+		if (bean.getCandidato().getBorrado()) {
+			throw new UVException("El usuario está dado de baja.");
+		}
+		
+		String tipoLogin = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_TIPOLOGIN));
+		if (!"externo".equals(tipoLogin) && !"tic".equals(tipoLogin)) {
+			throw new UVException("Indique si el nuevo login es para usuario externo o para usuario con cuenta tic");
+		}
+		
+		String nuevoLogin = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_LOGINNUEVO)).trim();
+		if (nuevoLogin.length() == 0) {
+			throw new UVException("Introduzca un nuevo login");
+		}
+		
+		if ("externo".equals(tipoLogin) && !BolsaEmpleoUtils.isCorreo(nuevoLogin)) {
+			throw new UVException("Para una cuenta externa, debe ser un email.");
+		}
+		
+		if ("tic".equals(tipoLogin) && BolsaEmpleoUtils.isCorreo(nuevoLogin)) {
+			throw new UVException("Para una cuenta tic, no debe ser un email.");
+		}
+		
+		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
+		modelo.cambiarLoginCandidato(bean.getCandidato(), nuevoLogin, bean.getUsuarioLogeado());
+		
+		BolsaEmpleoUtils.addMensajeDeExito(String.format("Usuario actualizado correctamente. Recuerde indicarle a informática el cambio: %s => %s", 
+				bean.getCandidato().getCodCuenta(), nuevoLogin), bean, request);
+		datos.setRespuestaEnviada(true);
+		response.sendRedirect(request.getServletPath());
 	}
 	
 	/**

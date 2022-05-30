@@ -85,7 +85,9 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 		<div class="form-group-container">
 			<div class="form-group">
 				<label for="nickname">Usuario: </label>
-				<input class="form-input-custom" id="nickname" type="text" name="<%= ControladorUsuarioCandidato.PARAM_NOMBRE_USUARIO%>" value="<%= usuario %>" disabled/>
+				<input class="form-input-custom" id="nickname" type="text" name="<%= ControladorUsuarioCandidato.PARAM_NOMBRE_USUARIO%>" value="<%= usuario %>" disabled
+					style="width: 250px; float: left;"/>
+				<button id="btn-change-nickname" style="float: left; margin-left: 5px;">Cambiar</button>
 			</div>
 			<div class="form-group">
 				<label for="nombre">Nombre: </label>
@@ -455,6 +457,54 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 				'<%=ControladorUsuarioCandidato.PARAM_ACCION%>': '<%=ControladorUsuarioCandidato.ACCION_CONTRATACIONES_CANDIDATO%>',
 				'<%=ControladorUsuarioCandidato.PARAM_CANDIDATO%>': <%= codnum %>
 			});
+		});
+		
+		document.getElementById("btn-change-nickname").addEventListener("click", function(event) {
+			event.preventDefault();
+			
+			var mensaje = " <p>Se cambiará el login del usuario.<br/>Tenga en cuenta que tiene que comunicar el cambio de usuario a informática para que tenga validez.</p>"
+				mensaje += "<br/>";
+				mensaje += "<div class='form-group-container col1'>";
+				mensaje += "    <div class='form-group-dialog'>";
+				mensaje += "        <label class='bold-label' for='dialog-nickname-old'>Antiguo login: </label>";
+				mensaje += "        <input class='form-input-custom' id='dialog-nickname-old' type='text' value='<%= usuario %>' disabled/>";
+				mensaje += "    </div>";
+				mensaje += "</div><br/><br/>";
+				mensaje += "<div class='form-group-container col1'>";
+				mensaje += "    <div class='form-group-dialog'>";
+				mensaje += "        <label class='bold-label' for='dialog-nickname-tipo'>¿Nuevo login es para un usuario externo o para usuario con cuenta tic?: </label>";
+				mensaje += "        <select id='dialog-nickname-tipo' required>";
+				mensaje += "            <option value=''>--</option>";
+				mensaje += "            <option value='externo'>Externo (con email)</option>";
+				mensaje += "            <option value='tic'>Cuenta tic (sin email)</option>";
+				mensaje += "        </select>";
+				mensaje += "    </div>";
+				mensaje += "</div><br/>";
+				mensaje += "<div class='form-group-container col1'>";
+				mensaje += "    <div class='form-group-dialog'>";
+				mensaje += "        <label class='bold-label' for='dialog-nickname-new'>Nuevo login: </label>";
+				mensaje += "        <input class='form-input-custom' id='dialog-nickname-new' type='text' value=''/>";
+				mensaje += "    </div>";
+				mensaje += "</div>";
+				
+				Atis.confirmDialog("Cambiar login del candidato", mensaje, {
+					'Confirmar': function() {
+						var selectTipo = this.querySelector('#dialog-nickname-tipo');
+						var nuevoLogin = this.querySelector('#dialog-nickname-new');
+						
+						var params = {
+								"<%= ControladorUsuarioCandidato.PARAM_ACCION %>": "<%= ControladorUsuarioCandidato.ACCION_CAMBIAR_LOGIN_CANDIDATO %>",
+								"<%= ControladorUsuarioCandidato.PARAM_CANDIDATO %>": <%= bean.getCandidato().getCodNum() %>,
+								"<%= ControladorUsuarioCandidato.PARAM_TIPOLOGIN %>": selectTipo.value,
+								"<%= ControladorUsuarioCandidato.PARAM_LOGINNUEVO %>": nuevoLogin.value
+						};
+						Atis.sendForm("<%= request.getRequestURI() %>", params);
+						$(this).dialog("close");
+					},
+					'No': function() {
+						$(this).dialog("close");
+					}
+				});
 		});
 		
 	<%	if (bean.getApartadoSolicitudes() != null) { %>
