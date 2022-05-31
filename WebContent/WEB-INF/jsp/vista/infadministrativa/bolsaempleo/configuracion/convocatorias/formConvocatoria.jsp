@@ -202,7 +202,7 @@ if (convocatoria != null) {
 				
 				document.getElementById("convocatoria_estado_abierta").addEventListener("click", function(e) {
 					e.preventDefault();
-					Atis.confirmDialog("Cambiar estado de la convocatoria", "La convocatoria pasará a estado abierta.<br/><br/>Revise áreas a baremar, titulaciones preferentes, items de baremación etc.<br/><br/>Recuerde que el estado de las bolsas debe ser 'desbloqueado'.", {
+					Atis.confirmDialog("Cambiar estado de la convocatoria", "La convocatoria pasará a estado abierta.<br/><br/>Las fechas de baremación provisionales y definitivas de las bolsas se pondrán en blanco.<br/><br/>Revise áreas a baremar, titulaciones preferentes, items de baremación etc.<br/><br/>Recuerde que el estado de las bolsas debe ser 'desbloqueado'.", {
 						'Si': function() {
 							var params = {
 									"<%= ControladorConvocatorias.PARAM_ACCION %>": "<%=ControladorConvocatorias.ACCION_ABRIR_CONVOCATORIA %>",

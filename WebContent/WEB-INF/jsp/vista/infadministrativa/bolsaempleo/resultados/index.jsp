@@ -39,7 +39,6 @@ VistaResultados bean = (VistaResultados)uvdatos.getVistas().get(VistaResultados.
 			<th scope="col" style="width:50px">Id.</th>
 			<th scope="col" style="width:100px" title="Código área">Cod. Area.</th>
 			<th scope="col" style="width:100%; min-width:100px" class="area">Area</th>
-			<th scope="col" style="width:120px" class="area">Fecha baremación</th>
 			<th scope="col" style="width:90px" class="center"></th>
 		</tr>
 		<tbody>
@@ -79,10 +78,6 @@ $(document).ready(function() {
 			{'data': 'codNum', 'filter': {'type': 'number'}},
 			{'data': 'area.idAreaExterno', 'filter': {'type': 'number'}},
 			{'data': 'area.descripcion', 'filter': true, 'overflow': 'auto'},
-			{'data': 'fechaBaremacion', 'filter': {'type': 'date'}, 'render': function(row) {
-					return row.resultadoActual ? row.fechaBaremacion : '';
-				}
-			},
 			{'data': 'codnum', 'buttons': [{'label': 'Ver resultados',
 					'onClick': function(row) {
 						var params = {
