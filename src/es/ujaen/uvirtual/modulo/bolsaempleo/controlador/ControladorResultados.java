@@ -331,15 +331,9 @@ public class ControladorResultados extends HttpServlet {
 		response.setHeader("Content-Disposition", "attachment; filename=\"resultados-convocatoria-" + c.getCodNum().toString() + ".csv\"");
 		
 		String separator = ";";
-		List<String[]> rows = ModeloResultados.obtenerInstancia().listadoResultadosCandidatosConvocatoriaCsv(c, separator);
 		
-		try (ServletOutputStream stream = response.getOutputStream()) {
-			try (PrintWriter printer = new PrintWriter(stream)) {
-				for (String[] row : rows) {
-					printer.println(String.join(separator, row));
-				}
-			}
-			stream.flush();
+		try {
+			ModeloResultados.obtenerInstancia().exportarResultadosCandidatosConvocatoriaCsv(c, separator, response);
 		} catch (Exception ex) {
 			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(ex));
 			LOGGER.log(Level.SEVERE, ex.toString());

@@ -1,5 +1,7 @@
 package es.ujaen.uvirtual.modulo.bolsaempleo.modelo;
 
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.sql.Clob;
 import java.sql.Connection;
 import java.sql.Date;
@@ -13,6 +15,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaResultado;
@@ -453,11 +459,13 @@ public class ModeloResultados {
 	 * Devuelve el listado de candidatos y areas y sus resultados resultados para exportar en csv.
 	 * @param convocatoria .
 	 * @param separator .
-	 * @return .
+	 * @param response .
+	 * @throws IOException .
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	public List<String[]> listadoResultadosCandidatosConvocatoriaCsv(Convocatoria convocatoria, String separator) throws SQLException, UVException {
+	public void exportarResultadosCandidatosConvocatoriaCsv(Convocatoria convocatoria, String separator, HttpServletResponse response) 
+			throws SQLException, UVException, IOException {
 		String consulta = ""
 				+ " SELECT bepare.ID_AREA_CONOCIMIENTO, bepare.DES_AREA_CONOCIMIENTO, bepusu.*, bepsob.TOTAL"
 				+ " FROM TBEP_SOLICITUD_BOLSAS bepsob"
@@ -469,34 +477,34 @@ public class ModeloResultados {
 				+ "     AND bepsol.ESTADO = '" + ModeloSolicitud.SOLICITUD_ESTADO_CERRADA + "'"
 				+ "     AND bepusu.FLGBORRADO = 'N'";
 		
-		List<String[]> rows = new ArrayList<>();
-		
-		rows.add(new String[] {"COD. AREA", "AREA", "NIF", "NOMBRE", "EMAIL", "TOTAL"});
-		
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
-			int paramIndex = 1;
-			stmt.setInt(paramIndex++, convocatoria.getCodNum());
+		try (ServletOutputStream stream = response.getOutputStream(); PrintWriter printer = new PrintWriter(stream)) {
+			printer.println(String.join(separator, new String[] {"COD. AREA", "AREA", "NIF", "NOMBRE", "EMAIL", "TOTAL"}));
 			
-			try (ResultSet rs = stmt.executeQuery()) {
-				while (rs.next()) {
-					UsuarioBolsaEmpleo usuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioById(rs.getInt(CODNUM));
-					
-					String idArea = BolsaEmpleoUtils.string2csv(rs.getString("ID_AREA_CONOCIMIENTO"), separator);
-					String area = BolsaEmpleoUtils.string2csv(rs.getString("DES_AREA_CONOCIMIENTO"), separator);
-					String nif = BolsaEmpleoUtils.string2csv(usuario.getPrsNif(), separator);
-					String nombre = BolsaEmpleoUtils.string2csv(
-							String.format("%s %s %s", usuario.getNombre() != null ? usuario.getNombre() : "",
-									usuario.getPrimerApellido() != null ? usuario.getPrimerApellido() : "",
-									usuario.getSegundoApellido() != null ? usuario.getSegundoApellido() : ""), separator);
-					String email = BolsaEmpleoUtils.string2csv(usuario.getEmail(), separator);
-					String total = BolsaEmpleoUtils.string2csv(String.valueOf(rs.getDouble(TOTAL)), separator);
-					
-					rows.add(new String[] {idArea, area, nif, nombre, email, total});
+			try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+				int paramIndex = 1;
+				stmt.setInt(paramIndex++, convocatoria.getCodNum());
+				
+				try (ResultSet rs = stmt.executeQuery()) {
+					while (rs.next()) {
+						UsuarioBolsaEmpleo usuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioById(rs.getInt(CODNUM));
+						
+						String idArea = BolsaEmpleoUtils.string2csv(rs.getString("ID_AREA_CONOCIMIENTO"), separator);
+						String area = BolsaEmpleoUtils.string2csv(rs.getString("DES_AREA_CONOCIMIENTO"), separator);
+						String nif = BolsaEmpleoUtils.string2csv(usuario.getPrsNif(), separator);
+						String nombre = BolsaEmpleoUtils.string2csv(
+								String.format("%s %s %s", usuario.getNombre() != null ? usuario.getNombre() : "",
+										usuario.getPrimerApellido() != null ? usuario.getPrimerApellido() : "",
+										usuario.getSegundoApellido() != null ? usuario.getSegundoApellido() : ""), separator);
+						String email = BolsaEmpleoUtils.string2csv(usuario.getEmail(), separator);
+						String total = BolsaEmpleoUtils.string2csv(String.valueOf(rs.getDouble(TOTAL)), separator);
+						
+						printer.println(String.join(separator, new String[] {idArea, area, nif, nombre, email, total}));
+					}
 				}
 			}
+			
+			stream.flush();
 		}
-		
-		return rows;
 	}
 	
 	/** Devuelve los méritos validados con valoraciones de la bolsa en una solicitud .
