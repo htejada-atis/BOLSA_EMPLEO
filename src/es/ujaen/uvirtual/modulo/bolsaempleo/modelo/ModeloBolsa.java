@@ -148,16 +148,12 @@ public class ModeloBolsa {
 				|| usuario.getRol().getValor().equals(ModeloRol.ROL_DIRECTOR_DEPARTAMENTO);
 		
 		String consulta = ""
-				+ " SELECT bepbol.*,"
-				+ "		("
-				+ "		SELECT"
-				+ "			CASE"
-				+ "				WHEN bepbol.FECHABAREMACION > bepcon.FECHACIERRE THEN 1"
-				+ "				ELSE 0"
-				+ "			END"
-				+ "		FROM TBEP_CONVOCATORIAS bepcon"
-				+ "		WHERE bepcon.CODNUM = ?"
-				+ "		) AS RESULTADOS_ACTUALES"
+				+ " SELECT bepbol.*, "
+				+ "		(SELECT CASE "
+				+ "		 	WHEN bepcon.ESTADO = 'CERRADA' THEN 1 "
+				+ "		 	WHEN bepcon.ESTADO = 'FINALIZADA' THEN 1 "
+				+ "			ELSE 0 "
+				+ "		END FROM TBEP_CONVOCATORIAS bepcon WHERE bepcon.CODNUM = ?) AS RESULTADOS_ACTUALES"
 				+ "	FROM TBEP_BOLSAS bepbol"
 				+ "	INNER JOIN TBEP_AREAS bepare ON bepare.CODNUM = bepbol.BEPARE_CODNUM"
 				+ (evaluador ? " INNER JOIN TBEP_EVALUADORES bepeva ON bepeva.BEPARE_CODNUM = bepare.CODNUM AND bepeva.FLGACTIVO = 'S'" : "")
@@ -167,7 +163,6 @@ public class ModeloBolsa {
 		dataTable.setColumn(ORDER_COLUMN_INDEX_ID_RESULTADOS, "bepbol.CODNUM", DataTableColumn.COLUMN_TYPE_NUMBER);
 		dataTable.setColumn(ORDER_COLUMN_INDEX_COD_AREA_RESULTADOS, "bepare.ID_AREA_CONOCIMIENTO");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_DESC_AREA_RESULTADOS, "bepare.DES_AREA_CONOCIMIENTO");
-		dataTable.setColumn(ORDER_COLUMN_INDEX_FECHA_BAREMACION_RESULTADOS, "bepbol.FECHABAREMACION", DataTableColumn.COLUMN_TYPE_DATE);
 		dataTable.setQuery(consulta);
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();

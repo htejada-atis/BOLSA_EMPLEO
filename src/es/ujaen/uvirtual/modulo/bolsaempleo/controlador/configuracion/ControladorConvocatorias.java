@@ -308,9 +308,7 @@ public class ControladorConvocatorias extends HttpServlet {
 		} else if (ModeloBaremacionApartados.obtenerInstancia().checkSumaPorcentagesApartadosInvalido()) {
 			BolsaEmpleoUtils.addMensajeDeError(MENSAJE_ERROR_APARTADOS_PORCENTAGES, bean, request);
 		} else {
-			Convocatoria convocatoria = bean.getConvocatoria();
-			convocatoria.setEstado(ModeloConvocatoria.CONVOCATORIA_ESTADO_ABIERTA);
-			modelo.cambiaEstadoConvocatoria(convocatoria, bean.getUsuarioLogeado());
+			modelo.abrirConvocatoria(bean.getConvocatoria(), bean.getUsuarioLogeado());
 			
 			BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_ABRIR_CONVOCATORIA, bean, request);
 		}

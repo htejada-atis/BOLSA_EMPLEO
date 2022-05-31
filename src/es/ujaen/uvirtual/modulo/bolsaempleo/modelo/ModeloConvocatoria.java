@@ -511,6 +511,51 @@ public class ModeloConvocatoria {
 		
 		return true;
 	}
+	
+	/**
+	 * Abre la convocatoria, y ajusta las fechas de baremación de las bolsas.
+	 * 
+	 * @param conv convocatoria a cerrar .
+	 * @param usuario .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	public void abrirConvocatoria(Convocatoria conv, UsuarioBolsaEmpleo usuario) throws UVException, SQLException {
+		validateConvocatoria(conv);
+		
+		String usuarioUpdate = usuario != null ? usuario.getCodCuenta() : "TAREA_PROGRAMADA";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia()) {
+			conexion.setAutoCommit(false);
+			
+			try {
+				// cambiamos estado de la convocatoria
+				String updateConvocatoria = "UPDATE TBEP_CONVOCATORIAS SET ESTADO=?, UID_USUARIO=? WHERE CODNUM=?";
+				try (PreparedStatement stmt = conexion.prepareStatement(updateConvocatoria)) {
+					int parameterIndex = 1;
+					stmt.setString(parameterIndex++, CONVOCATORIA_ESTADO_ABIERTA);
+					stmt.setString(parameterIndex++, usuarioUpdate);
+					stmt.setInt(parameterIndex++, conv.getCodNum());
+					stmt.executeUpdate();
+				}
+				
+				// cambiamos estado de las bolsas a revisión
+				String updateBolsas = "UPDATE TBEP_BOLSAS SET FECHABAREMACION=NULL, FECHABAREMACIONFIN=NULL, UID_USUARIO=?";
+				try (PreparedStatement stmt = conexion.prepareStatement(updateBolsas)) {
+					int parameterIndex = 1;
+					stmt.setString(parameterIndex++, usuarioUpdate);
+					stmt.executeUpdate();
+				}
+				
+				conexion.commit();
+			} catch (Exception e) {
+				conexion.rollback();
+				throw e;
+			} finally {
+				conexion.setAutoCommit(true);
+			}
+		}
+	}
 
 	/**
 	 * Cierra la convocatoria, y ajusta el estado de las bolsas.
