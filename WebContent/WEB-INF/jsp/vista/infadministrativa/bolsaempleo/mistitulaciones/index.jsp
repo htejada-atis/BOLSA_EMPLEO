@@ -22,7 +22,7 @@ VistaTitulaciones bean = (VistaTitulaciones) uvdatos.getVistas().get(VistaTitula
     	<% if (bean.getSePuedeAgregar()) { %>
 	    	<button class="link-btn" id="nueva_titulacion">Añadir titulación</button>
 	    <% } else { %>
-			<p>La convocatoria se está evaluando.</p>
+			<p>La convocatoria se está evaluando o solicitud cerrada.</p>
 		<% } %>
 	</div>
 		

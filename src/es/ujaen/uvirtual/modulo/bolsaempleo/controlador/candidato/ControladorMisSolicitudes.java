@@ -853,9 +853,9 @@ public class ControladorMisSolicitudes extends HttpServlet {
 		List<TitulacionUsuario> titulaciones = modeloTitulacion.listaTitulacionesCandidato(bean.getUsuarioLogeado().getCodNum(), false);
 		bean.setListaTitulaciones(titulaciones);
 		
-		List<MeritoPreferenteUsuario> preferentes = modeloMeritoPreferentes.listaMeritosPreferentesCandidato(bean.getUsuarioLogeado());
+		List<MeritoPreferenteUsuario> preferentes = modeloMeritoPreferentes.listaMeritosPreferentesCandidato(bean.getUsuarioLogeado(), Boolean.TRUE);
 		bean.setListaMeritosPreferentes(preferentes);
-						
+		
 		// comprobamos que el total de méritos sea mayor que 0
 		Integer totalMeritos = modeloSolicitud.obtenerTotalMeritosSolicitud(solicitud);
 		

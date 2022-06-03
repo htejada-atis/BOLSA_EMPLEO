@@ -1629,6 +1629,23 @@ public class ModeloSolicitud {
 	} 
 		
 	/**
+	 * Comprueba si el usuario tiene solicitud cerrada en ua convocatoria. Devuelve true, si tiene solicitud cerrada o false,
+	 * en caso contrario.
+	 * @param usuario .
+	 * @param c .
+	 * @return .
+	 * @throws SQLException .
+	 */
+	public boolean isSolicitudCerradaPorConvocatoriaUsuario(UsuarioBolsaEmpleo usuario, Convocatoria c) throws SQLException {
+		try {
+			this.getSolicitudCerradaByConvocatoriaUsuario(usuario, c);
+			return true;
+		} catch (UVException err) {
+			return false;
+		}
+	}
+	
+	/**
 	 * Comprueba los méritos que tienen afinidad y no tienen valoración .
 	 * @param solicitud .
 	 * @return booleano que devuelve si hay méritos con afinidad sin valorar .
@@ -1736,7 +1753,38 @@ public class ModeloSolicitud {
 		Convocatoria c = ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoria();
 		boolean convocatoriaCerrada = ModeloConvocatoria.obtenerInstancia().isConvocatoriaCerrada(c);
 
-		return !merito.isValidado() && !convocatoriaCerrada;
+		return !merito.isValidado() && !convocatoriaCerrada && !this.isSolicitudCerradaPorConvocatoriaUsuario(merito.getUsuario(), c);
+	}
+	
+	/**
+	 * Comprueba si la acreditación puede ser desactivada.
+	 * @param merito .
+	 * @return .
+	 * @throws UVException .
+	 * @throws SQLException .
+	 */
+	public boolean comprobarMeritoPreferentePuedeSerDesactivado(MeritoPreferenteUsuario merito) throws SQLException {
+		// si la convocatoria está cerrada, no se puede
+		Convocatoria c = ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoria();
+		boolean convocatoriaCerrada = ModeloConvocatoria.obtenerInstancia().isConvocatoriaCerrada(c);
+		
+		return !convocatoriaCerrada && !this.isSolicitudCerradaPorConvocatoriaUsuario(merito.getUsuario(), c);
+	}
+	
+	/**
+	 * Comprueba si la acreditación puede ser activada. Solo puede haber una acreditación activa por usuario.
+	 * @param merito .
+	 * @return .
+	 * @throws UVException .
+	 * @throws SQLException .
+	 */
+	public boolean comprobarMeritoPreferentePuedeSerActivado(MeritoPreferenteUsuario merito) throws SQLException, UVException {
+		Convocatoria c = ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoria();
+		boolean convocatoriaCerrada = ModeloConvocatoria.obtenerInstancia().isConvocatoriaCerrada(c);
+		
+		return !convocatoriaCerrada 
+			&& !this.isSolicitudCerradaPorConvocatoriaUsuario(merito.getUsuario(), c) 
+			&& ModeloMeritosPreferentesCandidato.obtenerInstancia().compruebaSoloUnTipoDeMeritoPrefenteActivo(merito);
 	}
 	
 	/**
@@ -1744,38 +1792,44 @@ public class ModeloSolicitud {
 	 * @param t .
 	 * @return .
 	 * @throws UVException .
+	 * @throws UVException .
 	 * @throws SQLException .
 	 */
-	public boolean comprobarTitulacionUsuarioPuedeSerBorrada(TitulacionUsuario t) throws SQLException {
+	public boolean comprobarTitulacionUsuarioPuedeSerBorrada(TitulacionUsuario t) throws SQLException, UVException {
 		// si la convocatoria está cerrada, no se puede
 		Convocatoria c = ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoria();
 		boolean convocatoriaCerrada = ModeloConvocatoria.obtenerInstancia().isConvocatoriaCerrada(c);
-		
-		return !t.getValidada() && !convocatoriaCerrada;
+				
+		return !t.getValidada() 
+			&& !convocatoriaCerrada 
+			&& !this.isSolicitudCerradaPorConvocatoriaUsuario(t.getUsuario(), c);
 	}
 	
 	/**
 	 * Comprueba si el mérito preferente se puede crear.
+	 * @param usu .
 	 * @return .
 	 * @throws UVException .
 	 * @throws SQLException .
 	 */
-	public boolean comprobarMeritoPreferentePuedeSerCreado() throws SQLException {
-		return this.comprobarTitulacionPuedeSerCreada();
+	public boolean comprobarMeritoPreferentePuedeSerCreado(UsuarioBolsaEmpleo usu) throws SQLException {
+		return this.comprobarTitulacionPuedeSerCreada(usu);
 	}
 	
 	/**
 	 * Comprueba si la titulación se puede crear.
+	 * @param usu .
 	 * @return .
 	 * @throws UVException .
 	 * @throws SQLException .
 	 */
-	public boolean comprobarTitulacionPuedeSerCreada() throws SQLException {
+	public boolean comprobarTitulacionPuedeSerCreada(UsuarioBolsaEmpleo usu) throws SQLException {
 		// si la convocatoria está cerrada, no se puede
 		Convocatoria c = ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoria();
 		boolean convocatoriaCerrada = ModeloConvocatoria.obtenerInstancia().isConvocatoriaCerrada(c);
 
-		return !convocatoriaCerrada;
+		return !convocatoriaCerrada
+			&& !this.isSolicitudCerradaPorConvocatoriaUsuario(usu, c);
 	}
 
 	/**
@@ -1785,7 +1839,7 @@ public class ModeloSolicitud {
 	 * @throws UVException .
 	 * @throws SQLException .
 	 */
-	public void comprobarSolicitudCorrecta(Solicitud solicitud, boolean personal) throws SQLException, UVException {			
+	public void comprobarSolicitudCorrecta(Solicitud solicitud, boolean personal) throws SQLException, UVException {
 		// comprobamos datos de usuario completos
 		if (ModeloUsuarioBolsaEmpleo.obtenerInstancia().compruebaUsuarioMisDatosValidos(solicitud.getUsuario())) {
 			throw new UVException(personal ? MENSAJE_ERROR_FALTAN_DATOS_CONFIRMAR_SOLICITUD_PERSONAL : MENSAJE_ERROR_FALTAN_DATOS_CONFIRMAR_SOLICITUD);

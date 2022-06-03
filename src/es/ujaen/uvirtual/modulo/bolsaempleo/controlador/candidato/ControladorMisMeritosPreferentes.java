@@ -68,6 +68,8 @@ public class ControladorMisMeritosPreferentes extends HttpServlet {
 	public static final String ACCION_AGREGAR_MERITO_CONFIRM = "agregarmeritoconfirm";
 	public static final String ACCION_ELIMINAR_MERITOS = "eliminarmeritos";
 	public static final String ACCION_LISTADO_OPCIONES = "opciones";
+	public static final String ACCION_DESACTIVAR_MERITO = "desactivarmerito";
+	public static final String ACCION_ACTIVAR_MERITO = "activarmerito";
 	
 	// parámetros
 	public static final String PARAM_ACCION = "a";
@@ -157,7 +159,7 @@ public class ControladorMisMeritosPreferentes extends HttpServlet {
 				throw new UVException("No eres un candidato");
 			}
 			
-			bean.setSePuedeAgregar(ModeloSolicitud.obtenerInstancia().comprobarMeritoPreferentePuedeSerCreado());
+			bean.setSePuedeAgregar(ModeloSolicitud.obtenerInstancia().comprobarMeritoPreferentePuedeSerCreado(bean.getUsuarioLogeado()));
 		} catch (UVException e) {
 			LOGGER.log(Level.WARNING, e.toString());
 			
@@ -207,6 +209,12 @@ public class ControladorMisMeritosPreferentes extends HttpServlet {
 				break;
 			case ACCION_LISTADO_OPCIONES:
 				listadoOpciones(bean, datos, request, response);
+				break;
+			case ACCION_DESACTIVAR_MERITO:
+				desactivarMerito(bean, datos, request, response);
+				break;
+			case ACCION_ACTIVAR_MERITO:
+				activarMerito(bean, datos, request, response);
 				break;
 			default:
 				errorFatal(bean, "Acción no contemplada");
@@ -283,8 +291,8 @@ public class ControladorMisMeritosPreferentes extends HttpServlet {
 		formularioAgregarMerito(bean);
 		
 		// comprobamos si se puede añadir meritos preferentes.
-		if (!ModeloSolicitud.obtenerInstancia().comprobarMeritoPreferentePuedeSerCreado()) {
-			throw new UVException("No se puede añadir, la convocatoria está cerrada");
+		if (!ModeloSolicitud.obtenerInstancia().comprobarMeritoPreferentePuedeSerCreado(bean.getUsuarioLogeado())) {
+			throw new UVException("No se puede añadir, la convocatoria está cerrada o solicitud cerrada");
 		}
 				
 		// leemos los parametros del form, chequeando el fichero
@@ -339,6 +347,43 @@ public class ControladorMisMeritosPreferentes extends HttpServlet {
 		response.sendRedirect(request.getServletPath());
 	}
 	
+	private void desactivarMerito(VistaMeritosPreferentesCandidato bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) 
+			throws UVException, NumberFormatException, SQLException {
+		String merito = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_MERITOS));
+		ModeloMeritosPreferentesCandidato modelo = ModeloMeritosPreferentesCandidato.obtenerInstancia();
+		
+		MeritoPreferenteUsuario m = modelo.getMeritoPreferenteUsuarioById(Integer.parseInt(merito));
+		if (!m.getUsuario().getCodNum().equals(bean.getUsuarioLogeado().getCodNum())) {
+			throw new UVException("No tienes permisos");
+		}
+		
+		if (!ModeloSolicitud.obtenerInstancia().comprobarMeritoPreferentePuedeSerDesactivado(m)) {
+			BolsaEmpleoUtils.addMensajeDeError(String.format("La acreditación %s no puede ser desactivada", 
+					m.getMeritoPreferente().getNombre()), bean, request);
+		} else {
+			modelo.desactivaAcreditacion(m, bean.getUsuarioLogeado(), bean.getUsuarioLogeado());
+			BolsaEmpleoUtils.addMensajeDeExito("Acreditación desactiva correctamente", bean, request);
+		}
+	}
+	
+	private void activarMerito(VistaMeritosPreferentesCandidato bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) 
+			throws UVException, SQLException {
+		String merito = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_MERITOS));
+		ModeloMeritosPreferentesCandidato modelo = ModeloMeritosPreferentesCandidato.obtenerInstancia();
+		
+		MeritoPreferenteUsuario m = modelo.getMeritoPreferenteUsuarioById(Integer.parseInt(merito));
+		if (!m.getUsuario().getCodNum().equals(bean.getUsuarioLogeado().getCodNum())) {
+			throw new UVException("No tienes permisos");
+		}
+		
+		if (!ModeloSolicitud.obtenerInstancia().comprobarMeritoPreferentePuedeSerActivado(m)) {
+			BolsaEmpleoUtils.addMensajeDeError("La acreditación no puede ser activada. Solo puede haber una acreditación activa.", bean, request);
+		} else {
+			modelo.activarAcreditacion(m, bean.getUsuarioLogeado(), bean.getUsuarioLogeado());
+			BolsaEmpleoUtils.addMensajeDeExito("Acreditación activa correctamente", bean, request);
+		}
+	}
+	
 	private MeritoPreferenteUsuario validateMeritoPreferenteUsuario(VistaMeritosPreferentesCandidato bean, HashMap<String, Object> parametros) 
 			throws SQLException, UVException {
 		
@@ -371,9 +416,9 @@ public class ControladorMisMeritosPreferentes extends HttpServlet {
 		
 		// solo puede haber un mérito preferente por tipo y activo y usuario
 		if (!ModeloMeritosPreferentesCandidato.obtenerInstancia().compruebaSoloUnTipoDeMeritoPrefenteActivo(mpu)) {
-			throw new UVException("Ya tiene una acreditación del mismo tipo");
+			throw new UVException("Ya tiene una acreditación del mismo tipo. Desactive la anterior y crea una nueva.");
 		}
-				
+		
 		return mpu;
 	}
 }

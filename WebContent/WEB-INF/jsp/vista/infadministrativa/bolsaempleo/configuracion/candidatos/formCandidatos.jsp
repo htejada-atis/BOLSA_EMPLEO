@@ -301,9 +301,9 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 				<th scope="col" style="width:10%">Id</th>
 				<th scope="col" style="width:10%">Código</th>
 				<th scope="col"	style="width:40%">Nombre</th>
-				<th scope="col"	style="width:20%">Descripción</th>
 				<th scope="col" style="width:10%">Borrada</th>
 				<th scope="col" style="width:10%">Validada</th>
+				<th scope="col" style="width:10%">Activa</th>
 				<th scope="col"	style="width:10%" class="center"></th>
 			</tr>
 			<tbody>		
@@ -624,15 +624,22 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 						return '<%= bean.getCodigoPadreMeritoPreferente() %>.' + row.meritoPreferente.codigo;
 					}},
 					{'data': 'meritoPreferente.nombre', 'order': {'active': false}, 'render': function(row) {
-						return row.meritoPreferente.nombre + (row.meritoPreferenteOpcion ? ' (' + row.meritoPreferenteOpcion.nombre + ')' : '');
+						var merito = row.meritoPreferente.nombre + (row.meritoPreferenteOpcion ? ' (' + row.meritoPreferenteOpcion.nombre + ')' : ''); 
+						return merito + (row.descripcion ? '<br/>Descripción: ' + row.descripcion : '');
 					}},
-					{'data': 'descripcion'},
 					{'data': 'borrado', 'order': {'active': false}, 'filter': {'type': 'select', 'options':{'true': 'Borrada', 'false': 'No borrada'}, 'optionDefault': 'false'}, 'render': function(row) {
 						return row.borrado ? "<div title='Borrada' class='circle-false'></div>" : "";
 					}},
 					{'data': 'validado', 'order': {'active': false}, 'filter': {'type': 'select', 'options':{'true': 'Validada', 'false': 'No validada'}}, 'render': function(row) {
 						return row.validado ? "<div title='Validada' class='circle-true'></div>" : "";
 					}},
+					{'data': 'activo', 'order': {'active': false}, 'filter': {'type': 'select', 'options':{'true': 'Activada', 'false': 'Desactivada'}}, 'render': function(row) {
+		        		if (row.activo) {
+		        			return "<div title='Activa' class='circle-true'></div>"; 
+		        		} else {
+		        			return "<div title='Inactiva' class='circle-false'></div>";
+		        		}
+	        		}},
 					{'data': 'codnum', 'buttons': [
 						{'title': 'Descargar fichero acreditación', 'class': 'only-icon icon-download', 'onClick': function(row) {
 							window.open("<%= ControladorDescargaFicheros.URL_DESCARGA_FICHEROS %>"

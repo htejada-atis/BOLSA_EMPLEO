@@ -38,11 +38,11 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 	<% if (candidato != null) { %>
 		<table class="bluetable bolsaempleo" id="tableAcreditacionesCandidatoFAC">
 			<tr>
-				<th scope="col" style="width:5%"></th>
+				<th scope="col" style="width:8%">Validada</th>
 				<th scope="col" style="width:10%">Id</th>
 				<th scope="col" style="width:10%">Código</th>
-				<th scope="col"	style="width:48%">Nombre</th>
-				<th scope="col"	style="width:15%">Descripción</th>
+				<th scope="col"	style="width:45%">Nombre</th>
+				<th scope="col"	style="width:15%">Activa</th>
 				<th scope="col"	style="width:12%"></th>
 			</tr>
 			<tbody></tbody>
@@ -124,9 +124,16 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 						return '<%= bean.getCodigoPadreMeritoPreferente() %>.' + row.meritoPreferente.codigo;
 					}},
 					{'data': 'meritoPreferente.nombre', 'filter': false, 'order': {'active': false}, 'render': function(row) {
-						return row.meritoPreferente.nombre + (row.meritoPreferenteOpcion ? ' (' + row.meritoPreferenteOpcion.nombre + ')' : '');
+						var merito = row.meritoPreferente.nombre + (row.meritoPreferenteOpcion ? ' (' + row.meritoPreferenteOpcion.nombre + ')' : ''); 
+						return merito + (row.descripcion ? '<br/>Descripción: ' + row.descripcion : '');
 					}},
-					{'data': 'descripcion', 'filter': true},
+					{'data': 'activo', 'filter': false, 'order': {'active': false}, 'render': function(row) {
+		        		if (row.activo) {
+		        			return "<div title='Activa' class='circle-true'></div>"; 
+		        		} else {
+		        			return "<div title='Inactiva' class='circle-false'></div>";
+		        		}
+	        		}},
 					{'data': 'codnum', 'buttons': [
 						{'label': 'Descargar', 'title': 'Descargar fichero del mérito', 'onClick': function(row) {
 							window.open("<%= ControladorDescargaFicheros.URL_DESCARGA_FICHEROS %>"
