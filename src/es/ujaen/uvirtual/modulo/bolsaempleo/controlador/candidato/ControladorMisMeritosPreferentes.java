@@ -260,7 +260,7 @@ public class ControladorMisMeritosPreferentes extends HttpServlet {
 				List<MeritoPreferenteOpcion> opciones = ModeloMeritosPreferentes.obtenerInstancia().listadoOpcionesMeritosPreferentes(ModeloMeritosPreferentes.
 						obtenerInstancia().getMeritoPreferenteById(Formateador.leeParametroInteger(request.getParameter(PARAM_ID))));
 				bean.setOpcionesMerito(opciones);
-				Gson gson = new GsonBuilder().setDateFormat("dd/M/yyyy").create();						
+				Gson gson = new GsonBuilder().setDateFormat("dd/M/yyyy").create();
 				writer.write(gson.toJson(opciones));
 			} catch (UVException | SQLException e) {
 				if (e instanceof SQLException) {
@@ -302,7 +302,7 @@ public class ControladorMisMeritosPreferentes extends HttpServlet {
 			if (item.isFormField()) {
 				parametros.put(item.getFieldName(), item.getString());
 			} else {
-				if (item.getSize() > 0 && item.getName().toLowerCase().endsWith(".pdf")) {									
+				if (item.getSize() > 0 && item.getName().toLowerCase().endsWith(".pdf")) {
 					try (InputStream contenidoDelFichero = item.getInputStream(); ByteArrayOutputStream salida = new ByteArrayOutputStream()) {
 						parametros.put(PARAM_ARCHIVO, BolsaEmpleoUtils.checkFileSize(contenidoDelFichero));
 					}

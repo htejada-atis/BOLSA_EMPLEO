@@ -333,7 +333,7 @@ public class ControladorMisTitulaciones extends HttpServlet {
 			}
 			
 			if (!ModeloSolicitud.obtenerInstancia().comprobarTitulacionUsuarioPuedeSerBorrada(tu)) {
-				BolsaEmpleoUtils.addMensajeDeError(String.format("La titulación %s no puede ser borrada", tu.getTitulacion().getNombre()), bean, request);
+				BolsaEmpleoUtils.addMensajeDeError("La titulación no puede ser borrada", bean, request);
 			} else {
 				titulaciones.add(tu);
 			}
@@ -345,7 +345,7 @@ public class ControladorMisTitulaciones extends HttpServlet {
 		}
 		
 		datos.setRespuestaEnviada(true);
-		response.sendRedirect(request.getServletPath());		
+		response.sendRedirect(request.getServletPath());
 	}
 	
 	private TitulacionUsuario validarTitulacion(HashMap<String, Object> parametros, VistaTitulaciones bean) throws UVException, SQLException {
@@ -359,7 +359,7 @@ public class ControladorMisTitulaciones extends HttpServlet {
 		} else {
 			otraTitulacion = Formateador.leeParametroString((String) parametros.get(PARAM_OTRA_TITULACION));
 			if (otraTitulacion == null) {
-				throw new UVException("Introduce un nombre para la titulación");				
+				throw new UVException("Introduce un nombre para la titulación");
 			}
 			if (otraTitulacion.length() > ModeloMisTitulaciones.COLUMN_OTRATITULACION_MAXLENGTH) {
 				throw new UVException(String.format("El nombre para la titulación debe ser como máximo %d caracteres", 
