@@ -186,7 +186,7 @@ public class ControladorMisTitulaciones extends HttpServlet {
 				throw new UVException("No eres un candidato");
 			}
 			
-			bean.setSePuedeAgregar(ModeloSolicitud.obtenerInstancia().comprobarTitulacionPuedeSerCreada());
+			bean.setSePuedeAgregar(ModeloSolicitud.obtenerInstancia().comprobarTitulacionPuedeSerCreada(bean.getUsuarioLogeado()));
 		} catch (UVException e) {
 			LOGGER.log(Level.WARNING, e.toString());
 			
@@ -289,8 +289,8 @@ public class ControladorMisTitulaciones extends HttpServlet {
 		agregarTitulacionFormulario(bean);
 		
 		// comprobamos si se puede añadir titulaciones.
-		if (!ModeloSolicitud.obtenerInstancia().comprobarTitulacionPuedeSerCreada()) {
-			throw new UVException("No se puede añadir, la convocatoria está cerrada");
+		if (!ModeloSolicitud.obtenerInstancia().comprobarTitulacionPuedeSerCreada(bean.getUsuarioLogeado())) {
+			throw new UVException("No se puede añadir, la convocatoria está cerrada o solicitud cerrada");
 		}
 		
 		// leemos los parametros del form, chequeando el fichero

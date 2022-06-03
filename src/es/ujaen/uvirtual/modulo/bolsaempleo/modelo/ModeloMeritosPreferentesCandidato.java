@@ -28,12 +28,13 @@ public class ModeloMeritosPreferentesCandidato {
 	public static final int ORDER_COLUMN_INDEX_NOMBRE = 3;
 	public static final int ORDER_COLUMN_INDEX_DESCRIPCION = 4;
 	public static final int ORDER_COLUMN_INDEX_VALIDADO = 5;
+	public static final int ORDER_COLUMN_INDEX_ACTIVO = 6;
 	
 	public static final int ORDER_COLUMN_INDEX_ID_CANDIDATO = 0;
 	public static final int ORDER_COLUMN_INDEX_CODIGO_CANDIDATO = 1;
-	public static final int ORDER_COLUMN_INDEX_DESCRIPCION_CANDIDATO = 3;
-	public static final int ORDER_COLUMN_INDEX_BORRADA_CANDIDATO = 4;
-	public static final int ORDER_COLUMN_INDEX_VALIDADA_CANDIDATO = 5;
+	public static final int ORDER_COLUMN_INDEX_BORRADA_CANDIDATO = 3;
+	public static final int ORDER_COLUMN_INDEX_VALIDADA_CANDIDATO = 4;
+	public static final int ORDER_COLUMN_INDEX_ACTIVA_CANDIDATO = 5;
 	
 	public static final int MAX_LENGTH_COLUMN_DESCRIPCION = 250;
 	
@@ -97,6 +98,7 @@ public class ModeloMeritosPreferentesCandidato {
 		dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE, "bepmep.NOMBRE");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_DESCRIPCION, "bepmpu.DESCRIPCION");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_VALIDADO, "bepmpu.FLGVALIDADO", DataTableColumn.COLUMN_TYPE_BOOLEAN);
+		dataTable.setColumn(ORDER_COLUMN_INDEX_ACTIVO, "bepmpu.FLGACTIVO", DataTableColumn.COLUMN_TYPE_BOOLEAN);
 		dataTable.setQuery(consulta);
 
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
@@ -107,14 +109,14 @@ public class ModeloMeritosPreferentesCandidato {
 			stmt.setString(paramIndex, ModeloMeritosPreferentes.TIPO_POSESION);
 			stmtCount.setString(paramIndex++, ModeloMeritosPreferentes.TIPO_POSESION);
 			stmt.setInt(paramIndex, usuario.getCodNum());
-			stmtCount.setInt(paramIndex++, usuario.getCodNum());			
+			stmtCount.setInt(paramIndex++, usuario.getCodNum());
 			dataTable.setFiltersParams(stmt, stmtCount, paramIndex);
 			
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
 					MeritoPreferenteUsuario row = this.createMeritoUsuarioFromResultSet(rs);
-					meritos.add(row);					
-				}				
+					meritos.add(row);
+				}
 			}	
 			
 			dataTable.setRecordsTotalFromQuery(stmtCount);
@@ -132,7 +134,7 @@ public class ModeloMeritosPreferentesCandidato {
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	public BolsaEmpleoDataTable<MeritoPreferenteUsuario> listaAcreditacionesCandidatoDatatable(Map<String, String[]> params, UsuarioBolsaEmpleo usuario) 
+	public BolsaEmpleoDataTable<MeritoPreferenteUsuario> listaAcreditacionesCandidatoDatatable(Map<String, String[]> params, UsuarioBolsaEmpleo usuario)
 			throws SQLException, UVException {
 		if (usuario == null) {
 			throw new UVException("El usuario es requerido");
@@ -149,9 +151,9 @@ public class ModeloMeritosPreferentesCandidato {
 		
 		dataTable.setColumn(ORDER_COLUMN_INDEX_ID_CANDIDATO, "bepmpu.CODNUM");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_CODIGO_CANDIDATO, "bepmep.CODIGO");
-		dataTable.setColumn(ORDER_COLUMN_INDEX_DESCRIPCION_CANDIDATO, "bepmpu.DESCRIPCION");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_BORRADA_CANDIDATO, "bepmpu.FLGBORRADO", DataTableColumn.COLUMN_TYPE_BOOLEAN);
 		dataTable.setColumn(ORDER_COLUMN_INDEX_VALIDADA_CANDIDATO, "bepmpu.FLGVALIDADO", DataTableColumn.COLUMN_TYPE_BOOLEAN);
+		dataTable.setColumn(ORDER_COLUMN_INDEX_ACTIVA_CANDIDATO, "bepmpu.FLGACTIVO", DataTableColumn.COLUMN_TYPE_BOOLEAN);	
 		dataTable.setQuery(consulta);
 
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
@@ -168,8 +170,8 @@ public class ModeloMeritosPreferentesCandidato {
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
 					MeritoPreferenteUsuario row = this.createMeritoUsuarioFromResultSet(rs);
-					meritos.add(row);					
-				}				
+					meritos.add(row);
+				}
 			}	
 			
 			dataTable.setRecordsTotalFromQuery(stmtCount);
@@ -180,14 +182,16 @@ public class ModeloMeritosPreferentesCandidato {
 	}
 	
 	/**
-	 * Listado de meritos preferenetes del candidato.
+	 * Listado de meritos preferentes del candidato. Se puede filtra por active. Si viene active != null, se filtra
+	 * si el merito es activo o no. Si == null, no filtra por campo activo.
 	 * 
 	 * @param usuario .
+	 * @param active .
 	 * @return .
 	 * @throws SQLException .
 	 * @throws UVException  .
 	 */
-	public List<MeritoPreferenteUsuario> listaMeritosPreferentesCandidato(UsuarioBolsaEmpleo usuario) throws SQLException, UVException {
+	public List<MeritoPreferenteUsuario> listaMeritosPreferentesCandidato(UsuarioBolsaEmpleo usuario, Boolean active) throws SQLException, UVException {
 		List<MeritoPreferenteUsuario> meritos = new ArrayList<>();
 
 		String consulta = "" 
@@ -195,10 +199,18 @@ public class ModeloMeritosPreferentesCandidato {
 			+ " FROM TBEP_MER_PRE_USUARIO bepmpu "
 			+ " INNER JOIN TBEP_MERITOS_PREFERENTES bepmep ON bepmep.CODNUM = bepmpu.BEPMEP_CODNUM "
 			+ " WHERE bepmpu.BEPUSU_CODNUM = ? AND bepmpu.FLGBORRADO != 'S'";
+		
+		if (active != null) {
+			consulta += " AND bepmpu.FLGACTIVO = ? ";
+		}
 
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int paramIndex = 1;
 			stmt.setInt(paramIndex++, usuario.getCodNum());
+			
+			if (active != null) {
+				stmt.setString(paramIndex++, active.booleanValue() ? "S" : "N");
+			}
 
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
@@ -215,11 +227,12 @@ public class ModeloMeritosPreferentesCandidato {
 	/**
 	 * Listado de meritos preferenetes del candidato.
 	 * @param usuario .
+	 * @param active filtra (si es != null) si el merito es activo o no.
 	 * @return .
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	public List<MeritoPreferenteUsuario> listaMeritosPreferentesUsuarioPorPosesion(UsuarioBolsaEmpleo usuario) throws SQLException, UVException {
+	public List<MeritoPreferenteUsuario> listaMeritosPreferentesUsuarioPorPosesion(UsuarioBolsaEmpleo usuario, Boolean active) throws SQLException, UVException {
 		List<MeritoPreferenteUsuario> meritos = new ArrayList<>();
 		
 		String consulta = "" 
@@ -228,24 +241,32 @@ public class ModeloMeritosPreferentesCandidato {
 				+ " INNER JOIN TBEP_MERITOS_PREFERENTES bepmep ON bepmep.CODNUM = bepmpu.BEPMEP_CODNUM "
 				+ " WHERE bepmep.TIPO = ? AND bepmpu.BEPUSU_CODNUM = ? AND bepmpu.FLGBORRADO != 'S'";
 		
+		if (active != null) {
+			consulta += " AND bepmpu.FLGACTIVO = ? ";
+		}
+		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int paramIndex = 1;
 			stmt.setString(paramIndex++, ModeloMeritosPreferentes.TIPO_POSESION);
 			stmt.setInt(paramIndex++, usuario.getCodNum());
 			
+			if (active != null) {
+				stmt.setString(paramIndex++, active.booleanValue() ? "S" : "N");
+			}
+			
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
 					MeritoPreferenteUsuario row = this.createMeritoUsuarioFromResultSet(rs);
-					meritos.add(row);					
-				}				
-			}				
+					meritos.add(row);
+				}
+			}
 		}
 		
 		return meritos;
 	}
 	
 	/**
-	 * Listado de méritos preferenetes validados del candidato.
+	 * Listado de méritos preferenetes validados y activos del candidato.
 	 * @param usuario .
 	 * @return méritos preferentes validados .
 	 * @throws SQLException .
@@ -258,7 +279,12 @@ public class ModeloMeritosPreferentesCandidato {
 				+ " SELECT bepmpu.* "
 				+ " FROM TBEP_MER_PRE_USUARIO bepmpu "
 				+ " INNER JOIN TBEP_MERITOS_PREFERENTES bepmep ON bepmep.CODNUM = bepmpu.BEPMEP_CODNUM "
-				+ " WHERE bepmep.TIPO = ? AND bepmpu.FLGVALIDADO = 'S' AND bepmpu.BEPUSU_CODNUM = ? AND bepmpu.FLGBORRADO != 'S'";
+				+ " WHERE "
+				+ "		    bepmep.TIPO = ? "
+				+ "		AND bepmpu.FLGVALIDADO = 'S' "
+				+ "		AND bepmpu.BEPUSU_CODNUM = ? "
+				+ "		AND bepmpu.FLGBORRADO != 'S' "
+				+ "		AND bepmpu.FLGACTIVO = 'S' ";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int paramIndex = 1;
@@ -268,9 +294,9 @@ public class ModeloMeritosPreferentesCandidato {
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
 					MeritoPreferenteUsuario row = this.createMeritoUsuarioFromResultSet(rs);
-					meritos.add(row);					
-				}				
-			}				
+					meritos.add(row);
+				}
+			}
 		}
 		
 		return meritos;
@@ -365,8 +391,14 @@ public class ModeloMeritosPreferentesCandidato {
 	 * @throws SQLException .
 	 */
 	public boolean compruebaSoloUnTipoDeMeritoPrefenteActivo(MeritoPreferenteUsuario mpu) throws SQLException {
-		String query = "SELECT COUNT(*) as count FROM TBEP_MER_PRE_USUARIO bepmpu "
-				+ "WHERE bepmpu.BEPMEP_CODNUM = ? AND bepmpu.BEPUSU_CODNUM = ? AND bepmpu.FLGBORRADO = 'N'";
+		String query = ""
+				+ " SELECT COUNT(*) as count "
+				+ " FROM TBEP_MER_PRE_USUARIO bepmpu "
+				+ " WHERE "
+				+ "		    bepmpu.BEPMEP_CODNUM = ? "
+				+ "		AND bepmpu.BEPUSU_CODNUM = ? "
+				+ "	    AND bepmpu.FLGBORRADO = 'N' "
+				+ "		AND bepmpu.FLGACTIVO = 'S' ";
 		
 		try (Connection con = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = con.prepareStatement(query)) {
 			int param = 1;
@@ -374,10 +406,10 @@ public class ModeloMeritosPreferentesCandidato {
 			stmt.setInt(param++, mpu.getUsuario().getCodNum());
 			
 			try (ResultSet rs = stmt.executeQuery()) {
-				rs.next();
-				
-				if (rs.getInt("count") > 0) {
-					return false;
+				if (rs.next()) {
+					if (rs.getInt("count") > 0) {
+						return false;
+					}
 				}
 			}
 		}
@@ -408,6 +440,7 @@ public class ModeloMeritosPreferentesCandidato {
 		obj.setFechaBorrado(rs.getDate("FECHA_BORRADO"));
 		obj.setValidado(rs.getString("FLGVALIDADO").equals(VALIDADO));
 		obj.setFechaValidado(rs.getDate("FECHA_VALIDADO"));
+		obj.setActivo(rs.getString("FLGACTIVO").equals("S"));
 		return obj;
 	}
 	
@@ -419,7 +452,7 @@ public class ModeloMeritosPreferentesCandidato {
 	 */
 	public void cambiarFlagBorradoMeritos(List<MeritoPreferenteUsuario> meritos, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException {
 		String params = BolsaEmpleoUtils.consultaMultiplesParametros(meritos.size());
-		String query = "UPDATE TBEP_MER_PRE_USUARIO SET FLGBORRADO=?,FECHA_BORRADO=?,UID_USUARIO=? WHERE CODNUM IN (" + params + ")";		
+		String query = "UPDATE TBEP_MER_PRE_USUARIO SET FLGBORRADO=?,FECHA_BORRADO=?,UID_USUARIO=? WHERE CODNUM IN (" + params + ")";
 				
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(query)) {
 			int indexParam = 1;
@@ -470,6 +503,48 @@ public class ModeloMeritosPreferentesCandidato {
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int parameterIndex = 1;
 			stmt.setDate(parameterIndex++, new java.sql.Date(BolsaEmpleoUtils.getCurrentDateTime().getTime()));
+			stmt.setString(parameterIndex++, usuarioUpdate.getCodCuenta());
+			stmt.setInt(parameterIndex++, acreditacion.getCodNum());
+			stmt.setInt(parameterIndex++, candidato.getCodNum());
+			stmt.executeUpdate();
+		}
+	}
+		
+	/**
+	 * Desactiva la acreditación de un candidato.
+	 * @param acreditacion . 
+	 * @param candidato .
+	 * @param usuarioUpdate .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	public void desactivaAcreditacion(MeritoPreferenteUsuario acreditacion, UsuarioBolsaEmpleo candidato, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
+		checkeosValidadDesvalida(acreditacion, candidato);
+		
+		String consulta = "UPDATE TBEP_MER_PRE_USUARIO SET FLGACTIVO='N', UID_USUARIO=? WHERE CODNUM = ? AND BEPUSU_CODNUM = ?";
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			int parameterIndex = 1;
+			stmt.setString(parameterIndex++, usuarioUpdate.getCodCuenta());
+			stmt.setInt(parameterIndex++, acreditacion.getCodNum());
+			stmt.setInt(parameterIndex++, candidato.getCodNum());
+			stmt.executeUpdate();
+		}
+	}
+	
+	/**
+	 * Activa la acreditación. Es necesario que se compruebe que solo existe una acreditación activa por candidato.
+	 * @param acreditacion .
+	 * @param candidato .
+	 * @param usuarioUpdate .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	public void activarAcreditacion(MeritoPreferenteUsuario acreditacion, UsuarioBolsaEmpleo candidato, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
+		checkeosValidadDesvalida(acreditacion, candidato);
+		
+		String consulta = "UPDATE TBEP_MER_PRE_USUARIO SET FLGACTIVO='S', UID_USUARIO=? WHERE CODNUM = ? AND BEPUSU_CODNUM = ?";
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			int parameterIndex = 1;
 			stmt.setString(parameterIndex++, usuarioUpdate.getCodCuenta());
 			stmt.setInt(parameterIndex++, acreditacion.getCodNum());
 			stmt.setInt(parameterIndex++, candidato.getCodNum());

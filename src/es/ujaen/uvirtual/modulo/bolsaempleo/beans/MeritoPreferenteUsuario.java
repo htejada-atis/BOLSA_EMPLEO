@@ -21,6 +21,7 @@ public class MeritoPreferenteUsuario implements Serializable {
 	private Boolean borrado;
 	private Date fechaBorrado;
 	private Boolean validado;
+	private Boolean activo;
 	private Date fechaValidado;
 
 	/**
@@ -45,7 +46,7 @@ public class MeritoPreferenteUsuario implements Serializable {
 	 */
 	public MeritoPreferenteUsuario(Integer pcodNum, MeritoPreferente pmeritoPreferente, MeritoPreferenteOpcion pmeritoPreferenteOpcion, 
 			UsuarioBolsaEmpleo pusuario, String pdescripcion, InputStream parchivo, Boolean pborrado, Date pfechaBorrado, 
-			Boolean pvalidado, Date pfechaValidado) {
+			Boolean pvalidado, Date pfechaValidado, Boolean pactivo) {
 		this.codNum = pcodNum;
 		this.meritoPreferente = pmeritoPreferente;
 		this.meritoPreferenteOpcion = pmeritoPreferenteOpcion;
@@ -56,6 +57,7 @@ public class MeritoPreferenteUsuario implements Serializable {
 		this.fechaBorrado = pfechaBorrado;
 		this.validado = pvalidado;
 		this.fechaValidado = pfechaValidado;
+		this.activo = pactivo;
 	}
 
 	/**
@@ -74,6 +76,7 @@ public class MeritoPreferenteUsuario implements Serializable {
 		this.fechaBorrado = copia.fechaBorrado;
 		this.validado = copia.validado;
 		this.fechaValidado = copia.fechaValidado;
+		this.activo = copia.activo;
 	}
 
 	public Integer getCodNum() {
@@ -148,6 +151,14 @@ public class MeritoPreferenteUsuario implements Serializable {
 		this.validado = validado;
 	}
 	
+	public boolean isActivo() {
+		return activo;
+	}
+
+	public void setActivo(boolean activo) {
+		this.activo = activo;
+	}
+	
 	public Date getFechaValidado() {
 		return fechaValidado;
 	}
@@ -164,7 +175,7 @@ public class MeritoPreferenteUsuario implements Serializable {
 	public String toString() {
 		return "MeritoPreferenteUsuario [codNum=" + codNum + ", meritoPreferente=" + meritoPreferente + ", meritoPreferenteOpcion=" + meritoPreferenteOpcion 
 				+ ", usuario=" + usuario + ", descripcion=" + descripcion + ", archivo=" + archivo + ", borrado=" + borrado + ", fechaBorrado=" + fechaBorrado 
-				+ ", validado=" + validado + ", fechaValidado=" + fechaValidado + "]";
+				+ ", validado=" + validado + ", fechaValidado=" + fechaValidado + ", activo=" + activo + "]";
 	}
 
 	@Override
@@ -181,6 +192,7 @@ public class MeritoPreferenteUsuario implements Serializable {
 		result = prime * result + ((fechaBorrado == null) ? 0 : fechaBorrado.hashCode());
 		result = prime * result + ((validado == null) ? 0 : validado.hashCode());
 		result = prime * result + ((fechaValidado == null) ? 0 : fechaValidado.hashCode());
+		result = prime * result + ((activo == null) ? 0 : activo.hashCode());
 		return result;
 	}
 
@@ -265,6 +277,13 @@ public class MeritoPreferenteUsuario implements Serializable {
 				return false;
 			}
 		} else if (!fechaValidado.equals(other.fechaValidado)) {
+			return false;
+		}
+		if (activo == null) {
+			if (other.activo != null) {
+				return false;
+			}
+		} else if (!activo.equals(other.activo)) {
 			return false;
 		}
 

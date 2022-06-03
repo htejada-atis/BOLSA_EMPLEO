@@ -23,7 +23,7 @@ VistaMeritosPreferentesCandidato bean = (VistaMeritosPreferentesCandidato) uvdat
 		    	 Nueva acreditación
 		    </button>
 		<% } else { %>
-			<p>La convocatoria se está evaluando.</p>
+			<p>La convocatoria se está evaluando o solicitud cerrada.</p>
 		<% } %>
 	</div>
 	
@@ -32,16 +32,17 @@ VistaMeritosPreferentesCandidato bean = (VistaMeritosPreferentesCandidato) uvdat
 			<th scope="col" style="width:5%"></th>
 			<th scope="col" style="width:10%">Id</th>
 			<th scope="col" style="width:8%">Código</th>
-			<th scope="col"	style="width:40%">Nombre</th>
+			<th scope="col"	style="width:30%">Nombre</th>
 			<th scope="col"	style="width:15%">Descripción</th>
 			<th scope="col" style="width:10%">Validada</th>
+			<th scope="col" style="width:10%">Activa</th>
 			<th scope="col"	style="width:12%"></th>
 		</tr>
-		<tbody>		
+		<tbody>
 		</tbody>
 		<tfoot>
 			<tr>
-				<th colspan="7" style="width:100%"></th>
+				<th colspan="8" style="width:100%"></th>
 			</tr>
 		</tfoot>
 	</table>
@@ -82,11 +83,57 @@ VistaMeritosPreferentesCandidato bean = (VistaMeritosPreferentesCandidato) uvdat
 		        		}
 	        		}
 		        },
+		        {'data': 'activo', 'order': {'active': false}, 'filter': {'type': 'select', 'options':{'true': 'Activa', 'false': 'Inactiva'}},
+		    		'render': function(row) {
+		        		if (row.activo) {
+		        			return "<div title='Activa' class='circle-true'></div>"; 
+		        		} else {
+		        			return "<div title='Inactiva' class='circle-false'></div>";
+		        		}
+	        		}
+		        },
 		        {'data': 'codnum', 'buttons': [
-	        		{'label': 'Descargar', 'title': 'Descargar fichero del mérito', 'onClick': function(row) {
+	        		{'label': 'Descargar', 'title': 'Descargar fichero de la acreditación', 'onClick': function(row) {
 	        			window.open("<%= ControladorDescargaFicheros.URL_DESCARGA_FICHEROS %>"
 	        		        	+ "<%= "?a=" + ControladorDescargaFicheros.ACCION_DESCARGAR_ACREDITACION_CANDIDATO + "&" + ControladorDescargaFicheros.PARAM_ACREDITACION %>=" + row.codNum);
-	        		}},
+	        		}}
+	        		<% if (bean.getSePuedeAgregar()) { %>
+		        		,
+		        		{'label': 'Desactivar', 'title': 'Desactiva la acreditación', 'onClick': function(row) {
+		        			Atis.confirmDialog("Desactivar acreditación", "¿Quiere desactivar la acreditación?", {
+						        Si: function() {
+						        	var params = {
+						    			'<%=ControladorMisMeritosPreferentes.PARAM_ACCION%>': '<%=ControladorMisMeritosPreferentes.ACCION_DESACTIVAR_MERITO%>', 
+						    			'<%=ControladorMisMeritosPreferentes.PARAM_MERITOS%>': row.codNum
+						    		};
+					        		Atis.sendForm("<%=request.getRequestURI()%>", params);
+						          	$(this).dialog("close");
+						        },
+						        No: function() {
+						          	$(this).dialog("close");
+						        }
+						    });
+		        		}, 'visible': function(row) {
+							return row.activo;
+						}},
+						{'label': 'Activar', 'title': 'Activa la acreditación', 'onClick': function(row) {
+		        			Atis.confirmDialog("Activar acreditación", "¿Quiere activar la acreditación?", {
+						        Si: function() {
+						        	var params = {
+						    			'<%=ControladorMisMeritosPreferentes.PARAM_ACCION%>': '<%=ControladorMisMeritosPreferentes.ACCION_ACTIVAR_MERITO%>', 
+						    			'<%=ControladorMisMeritosPreferentes.PARAM_MERITOS%>': row.codNum
+						    		};
+					        		Atis.sendForm("<%=request.getRequestURI()%>", params);
+						          	$(this).dialog("close");
+						        },
+						        No: function() {
+						          	$(this).dialog("close");
+						        }
+						    });
+		        		}, 'visible': function(row) {
+							return !row.activo;
+						}}
+					<% } %>
 	   			]}
 		    ],
 		    "actions": [

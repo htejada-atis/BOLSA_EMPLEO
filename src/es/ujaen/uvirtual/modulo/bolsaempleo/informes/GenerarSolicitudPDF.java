@@ -194,7 +194,7 @@ public class GenerarSolicitudPDF extends BolsaEmpleoPDFGenerator {
 		document.add(new Paragraph("\n"));
 		
 		ModeloMeritosPreferentesCandidato modeloAcreditaciones = ModeloMeritosPreferentesCandidato.obtenerInstancia();
-		List<MeritoPreferenteUsuario> listaAcreditaciones = modeloAcreditaciones.listaMeritosPreferentesUsuarioPorPosesion(candidato);
+		List<MeritoPreferenteUsuario> listaAcreditaciones = modeloAcreditaciones.listaMeritosPreferentesUsuarioPorPosesion(candidato, Boolean.TRUE);
 		
 		document.add(new Paragraph("Acreditaciones", fontBold));
 		
