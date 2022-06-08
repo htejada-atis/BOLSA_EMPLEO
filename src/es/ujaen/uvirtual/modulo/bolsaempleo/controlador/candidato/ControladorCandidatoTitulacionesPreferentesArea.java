@@ -138,7 +138,8 @@ public class ControladorCandidatoTitulacionesPreferentesArea extends HttpServlet
 			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getAndRefreshUsuario(datos));
 			if (bean.getUsuarioLogeado().getCodNum() == null) {
 				Usuario usuArcos = datos.getUsuario();
-				throw new UVException(String.format("No existe el usuario [%s]", usuArcos != null ? usuArcos.getUid() : "-"));
+				throw new UVException(String.format("No existe el usuario [%s]. Asegúrese de pulsar el botón 'Participar en la bolsa de empleo'"
+					+ " desde la pantalla principal 'Inicio'.", usuArcos != null ? usuArcos.getUid() : "-"));
 			}
 
 			if (!bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRol.ID_ROL_CANDIDATO)) {
