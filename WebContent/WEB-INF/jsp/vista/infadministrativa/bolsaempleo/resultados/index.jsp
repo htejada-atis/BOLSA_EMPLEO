@@ -22,7 +22,7 @@ VistaResultados bean = (VistaResultados)uvdatos.getVistas().get(VistaResultados.
 		<select id="select_convocatoria">
 			<%	for (Convocatoria conv: bean.getListaConvocatorias()) { %>
 					<option value="<%= conv.getCodNum() %>" <%= bean.getConvocatoria().getCodNum().equals(conv.getCodNum()) ? "selected" : "" %>>
-						<%= conv.getDescripcion() %>
+						<%= EscapaHTML.escapa(conv.getDescripcion()) %>
 					</option>
 			<%	} %>
 		</select>

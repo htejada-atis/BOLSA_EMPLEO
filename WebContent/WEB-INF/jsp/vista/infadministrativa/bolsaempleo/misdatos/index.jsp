@@ -37,19 +37,19 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 	Boolean lista_dist = false;
 	
 	if (bean.getUsuarioLogeado() != null) {
-		if(bean.getUsuarioLogeado().getNombre()!=null) nombre = bean.getUsuarioLogeado().getNombre();
-		if(bean.getUsuarioLogeado().getPrimerApellido()!=null) primer_apellido = bean.getUsuarioLogeado().getPrimerApellido();
-		if(bean.getUsuarioLogeado().getSegundoApellido()!=null) segundo_apellido = bean.getUsuarioLogeado().getSegundoApellido();
-		if(bean.getUsuarioLogeado().getSegundoApellido()!=null) segundo_apellido = bean.getUsuarioLogeado().getSegundoApellido();
-		if(bean.getUsuarioLogeado().getEmail()!=null) email = bean.getUsuarioLogeado().getEmail();
-		if(bean.getUsuarioLogeado().getTipoDocumento()!=null) tipo_documento = bean.getUsuarioLogeado().getTipoDocumento();
-		if(bean.getUsuarioLogeado().getPrsNif()!=null) n_documento = bean.getUsuarioLogeado().getPrsNif();
-		if(bean.getUsuarioLogeado().getDireccion()!=null) direccion = bean.getUsuarioLogeado().getDireccion();
-		if(bean.getUsuarioLogeado().getCodigoPostal()!=null) codigo_postal = bean.getUsuarioLogeado().getCodigoPostal();
-		if(bean.getUsuarioLogeado().getLocalidad()!=null) localidad = bean.getUsuarioLogeado().getLocalidad();
-		if(bean.getUsuarioLogeado().getProvincia()!=null) provincia = bean.getUsuarioLogeado().getProvincia();
-		if(bean.getUsuarioLogeado().getTelefono()!=null) telefono = bean.getUsuarioLogeado().getTelefono();
-		if(bean.getUsuarioLogeado().getNacionalidad()!=null) nacionalidad = bean.getUsuarioLogeado().getNacionalidad();
+		if(bean.getUsuarioLogeado().getNombre()!=null) nombre = EscapaHTML.escapa(bean.getUsuarioLogeado().getNombre());
+		if(bean.getUsuarioLogeado().getPrimerApellido()!=null) primer_apellido = EscapaHTML.escapa(bean.getUsuarioLogeado().getPrimerApellido());
+		if(bean.getUsuarioLogeado().getSegundoApellido()!=null) segundo_apellido = EscapaHTML.escapa(bean.getUsuarioLogeado().getSegundoApellido());
+		if(bean.getUsuarioLogeado().getSegundoApellido()!=null) segundo_apellido = EscapaHTML.escapa(bean.getUsuarioLogeado().getSegundoApellido());
+		if(bean.getUsuarioLogeado().getEmail()!=null) email = EscapaHTML.escapa(bean.getUsuarioLogeado().getEmail());
+		if(bean.getUsuarioLogeado().getTipoDocumento()!=null) tipo_documento = EscapaHTML.escapa(bean.getUsuarioLogeado().getTipoDocumento());
+		if(bean.getUsuarioLogeado().getPrsNif()!=null) n_documento = EscapaHTML.escapa(bean.getUsuarioLogeado().getPrsNif());
+		if(bean.getUsuarioLogeado().getDireccion()!=null) direccion = EscapaHTML.escapa(bean.getUsuarioLogeado().getDireccion());
+		if(bean.getUsuarioLogeado().getCodigoPostal()!=null) codigo_postal = EscapaHTML.escapa(bean.getUsuarioLogeado().getCodigoPostal());
+		if(bean.getUsuarioLogeado().getLocalidad()!=null) localidad = EscapaHTML.escapa(bean.getUsuarioLogeado().getLocalidad());
+		if(bean.getUsuarioLogeado().getProvincia()!=null) provincia = EscapaHTML.escapa(bean.getUsuarioLogeado().getProvincia());
+		if(bean.getUsuarioLogeado().getTelefono()!=null) telefono = EscapaHTML.escapa(bean.getUsuarioLogeado().getTelefono());
+		if(bean.getUsuarioLogeado().getNacionalidad()!=null) nacionalidad = EscapaHTML.escapa(bean.getUsuarioLogeado().getNacionalidad());
 		if(bean.getUsuarioLogeado()!=null) lista_dist = bean.getUsuarioLogeado().getListaDist();	
 	}
 	%>

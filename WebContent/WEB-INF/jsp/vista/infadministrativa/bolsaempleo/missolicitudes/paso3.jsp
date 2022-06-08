@@ -149,12 +149,12 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 						
 						message += "Mis titulaciones: <br/>";						
 						<% for (TitulacionUsuario tu : bean.getListaTitulaciones()) { %>
-							message += "<%= tu.getTitulacion() != null ? tu.getTitulacion().getNombre() : tu.getOtraTitulacion() %><br/>";
+							message += "<%= tu.getTitulacion() != null ? EscapaHTML.escapa(tu.getTitulacion().getNombre()) : EscapaHTML.escapa(tu.getOtraTitulacion()) %><br/>";
 						<% } %>
 						
 						message += "<br/>Mis acreditaciones: <br/>";
 						<% for (MeritoPreferenteUsuario m : bean.getListaMeritosPreferentes()) { %>
-							message += "<%= m.getMeritoPreferente().getNombre() + " " + (m.getMeritoPreferenteOpcion() != null ? m.getMeritoPreferenteOpcion().getNombre() : "") %><br/>";
+							message += "<%= EscapaHTML.escapa(m.getMeritoPreferente().getNombre()) + " " + (m.getMeritoPreferenteOpcion() != null ? EscapaHTML.escapa(m.getMeritoPreferenteOpcion().getNombre()) : "") %><br/>";
 						<% } %>
 						
 					<% } else { %>					

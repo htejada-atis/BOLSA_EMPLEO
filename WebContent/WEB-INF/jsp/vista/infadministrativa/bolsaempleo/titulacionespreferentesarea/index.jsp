@@ -22,9 +22,9 @@ Bolsa bolsa = bean.getArea();
 	<table class="bluetable bolsaempleo" id="tableAreasTPA2">
 		<tr>
 			<th scope="col" style="width:15%" title="Código área">Cod. Área.</th>
-			<th scope="col" style="width:85%" class="area">Nombre del Área</th>			
+			<th scope="col" style="width:85%" class="area">Nombre del Área</th>
 		</tr>
-		<tbody>				
+		<tbody>
 		</tbody>
 		<tfoot>
 			<tr>
@@ -64,7 +64,9 @@ $(document).ready(function() {
     				'<%= ControladorCandidatoTitulacionesPreferentesArea.PARAM_BOLSA %>': row.codNum};
     		Atis.sendForm("<%= request.getRequestURI() %>", params);
 	    }},
-	    <% if (bolsa != null) { %> "selected": <%= bolsa.getCodNum() %>,<% } %>
+	    <% if (bolsa != null) { %> 
+	    	"selected": <%= bolsa.getCodNum() %>,
+	    <% } %>
 	    "columns": [
 	    	{'data': 'area.idAreaExterno', 'filter': true},
 	        {'data': 'area.descripcion', 'filter': true},  
