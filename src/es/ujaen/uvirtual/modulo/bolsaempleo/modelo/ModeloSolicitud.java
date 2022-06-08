@@ -227,8 +227,11 @@ public class ModeloSolicitud {
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
 				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery())
 		) {				
-			stmt.setInt(1, solicitud.getCodNum());
-			stmtCount.setInt(1, solicitud.getCodNum());
+			int indexParam = 1;
+			stmt.setInt(indexParam, solicitud.getCodNum());
+			stmtCount.setInt(indexParam++, solicitud.getCodNum());
+			
+			dataTable.setFiltersParams(stmt, stmtCount, indexParam);
 			
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
