@@ -16,7 +16,7 @@ import es.ujaen.uvirtual.utilidades.UVException;
 /**
  * Clase de modelo para la gestión de parametros de configuracion de la bolsa de
  * empleo .
- * 
+ *
  * @author ATISoluciones
  */
 public class ModeloParametrosConfiguracion {
@@ -25,7 +25,7 @@ public class ModeloParametrosConfiguracion {
 	public static final String CSS_BOLSA_EMPLEO = "/css/ujaen_bolsa_empleo.css";
 	public static final String JS_TINY = "/js/tinymce/tinymce.min.js";
 	public static final String CORREO_SOPORTE = "bolsapdi@ujaen.es";
-	
+
 	public static final String PARAMETRO_PLANTILLA_APERTURA_PLAZA = "bolsaempleo.local.idPlantillaAperturaPlaza";
 	public static final String PARAMETRO_PLANTILLA_APROBACION_PLAZA = "bolsaempleo.local.idPlantillaAprobacionPlaza";
 	public static final String PARAMETRO_PLANTILLA_CITA_CONTRATACION = "bolsaempleo.local.idPlantillaCitaContratacion";
@@ -37,7 +37,7 @@ public class ModeloParametrosConfiguracion {
 
 	// 50MB = 1024 * 1024 * 50 = 52428800
 	public static final int MAX_FILE_SIZE = 52_428_800;
-	
+
 	protected static ModeloParametrosConfiguracion eInstancia;
 
 	/**
@@ -52,7 +52,7 @@ public class ModeloParametrosConfiguracion {
 
 	/**
 	 * Obtiene una instancia de la conexión.
-	 * 
+	 *
 	 * @return instancia
 	 */
 	public static ModeloParametrosConfiguracion obtenerInstancia() {
@@ -69,17 +69,17 @@ public class ModeloParametrosConfiguracion {
 	public String getVersion() {
 		return ModeloParametrosConfiguracion.VERSION;
 	}
-	
+
 	/**
 	 * Consulta los parametros en BBDD y los devuelve.
-	 * 
+	 *
 	 * @return todas las titulaciones de la base de datos .
 	 * @throws SQLException en caso de error de base de datos
 	 */
 	public List<ParametrosConfiguracion> listaParametros() throws SQLException {
 		List<ParametrosConfiguracion> parametros = new ArrayList<>();
 		String consulta = "SELECT * FROM ADM_PARAMETROS WHERE PARAM_CODALF LIKE '%bolsaempleo%'";
-		
+
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			try (ResultSet rs = stmt.executeQuery()) {
@@ -117,7 +117,7 @@ public class ModeloParametrosConfiguracion {
 
 	/**
 	 * Actualiza un parametro de configuración.
-	 * 
+	 *
 	 * @param param ParametrosConfiguracion con los datos nuevos a actualizar
 	 * @param usuarioUpdate .
 	 * @throws SQLException en caso de error en la BD
@@ -147,7 +147,7 @@ public class ModeloParametrosConfiguracion {
 				stmt.setString(parameterIndex++, param.getDescripcion());
 				stmt.setString(parameterIndex++, param.getValor());
 				stmt.setString(parameterIndex++, usuarioUpdate.getCodCuenta());
-				stmt.setString(parameterIndex++, param.getCodNum());				
+				stmt.setString(parameterIndex++, param.getCodNum());
 				stmt.setString(parameterIndex++, param.getNombre());
 				stmt.executeUpdate();
 			}
@@ -156,7 +156,7 @@ public class ModeloParametrosConfiguracion {
 
 	/**
 	 * Devuelve un parametro de configuración.
-	 * 
+	 *
 	 * @param nombre del parametro a buscar .
 	 * @return param .
 	 * @throws SQLException en caso de error en la BD
@@ -176,7 +176,7 @@ public class ModeloParametrosConfiguracion {
 
 				try (ResultSet rs = stmt.executeQuery()) {
 					if (!rs.next()) {
-						throw new UVException("No existe el parametro con nombre" + nombre);
+						throw new UVException("No existe el parametro con nombre: " + nombre);
 					}
 
 					ParametrosConfiguracion param = new ParametrosConfiguracion();
@@ -189,7 +189,7 @@ public class ModeloParametrosConfiguracion {
 				}
 			}
 		}
-		
+
 		String consulta = "SELECT * FROM ADM_PARAMETROS " + " WHERE PARAM_CODALF=?";
 
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
@@ -197,7 +197,7 @@ public class ModeloParametrosConfiguracion {
 
 			try (ResultSet rs = stmt.executeQuery()) {
 				if (!rs.next()) {
-					throw new UVException("No existe el parametro con nombre" + nombre);
+					throw new UVException("No existe el parametro con nombre: " + nombre);
 				}
 
 				ParametrosConfiguracion param = new ParametrosConfiguracion();
@@ -221,5 +221,5 @@ public class ModeloParametrosConfiguracion {
 		Integer maxSize = Formateador.leeParametroInteger(this.getParametroByNombre("bolsaempleo.maxEspacioArchivo").getValor());
 		return BolsaEmpleoUtils.humanReadableByteCountSI(maxSize);
 	}
-	
+
 }

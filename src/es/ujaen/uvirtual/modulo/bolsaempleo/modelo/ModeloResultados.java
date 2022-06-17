@@ -120,7 +120,7 @@ public class ModeloResultados {
 		Double totalSinAplicar = 0.0;
 		
 		LOGGER.log(Level.FINER, String.format("CALCULANDO SOLICITUD [%d] [%d]", solicitud.getCodNum(), solicitud.getUsuario().getCodNum()));
-				
+		
 		List<TitulacionUsuario> listaTitulaciones = ModeloTitulacion.obtenerInstancia().listaTitulacionesPreferentesAlArea(solicitud.getUsuario(), bolsa);
 		List<MeritoPreferenteUsuario> listaAcreditaciones = ModeloMeritosPreferentesCandidato.obtenerInstancia().
 				listaMeritosPreferentesValidadosUsuarioPorPosesion(solicitud.getUsuario());
@@ -719,7 +719,8 @@ public class ModeloResultados {
 				+ "	INNER JOIN TBEP_MER_PRE_OPCIONES bepmpo ON bepmpo.CODNUM = bepmpu.BEPMPO_CODNUM"
 				+ "	WHERE 	bepmpu.BEPUSU_CODNUM = ?"
 				+ "		AND bepmpu.FLGVALIDADO = 'S'"
-				+ "		AND bepmpu.FLGBORRADO = 'N'";
+				+ "		AND bepmpu.FLGBORRADO = 'N'"
+				+ "		AND bepmpu.FLGACTIVO = 'S'";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int indexParam = 1;

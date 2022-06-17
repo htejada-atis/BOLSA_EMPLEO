@@ -124,8 +124,8 @@ Double valor = null;
 				</tfoot>
 			</table>
 			
-			<h3>Evaluar mérito: <%= EscapaHTML.escapa(merito.getMerito().getCodNum() + " - " + merito.getMerito().getItemBaremacion().getFullCode() + " " 
-				+ merito.getMerito().getItemBaremacion().getNombre()) %><br/>
+			<h3>Evaluar mérito: <%= EscapaHTML.escapa(merito.getMerito().getCodNum() + " - " + merito.getItem().getFullCode() + " " 
+				+ merito.getItem().getNombre()) %><br/>
 				<%= EscapaHTML.escapa("Bolsa: " + bolsa.getArea().getDescripcion()) %><br/>
 				<%= "Candidato: " %> 
 				<a class="bolsaempleo-link"
