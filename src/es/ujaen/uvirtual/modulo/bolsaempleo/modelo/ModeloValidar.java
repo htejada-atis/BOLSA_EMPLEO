@@ -557,7 +557,7 @@ public class ModeloValidar {
 			return dataTable;
 		}
 		
-		String consulta = "SELECT bepmer.CODNUM, bepmer.BEPITE_CODNUM, bepmer.VALOR, bepmer.DESCRIPCION,"
+		String consulta = "SELECT bepmer.CODNUM, bepsbm.BEPITE_CODNUM, bepmer.VALOR, bepmer.DESCRIPCION,"
 				+ "		          bepmer.OBSERVACION, bepsbm.FLGEXCLUIDO, bepsbm.FLGVALIDADO"
 				+ " FROM TBEP_SOL_BOL_MERITOS bepsbm"
 				+ "	INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbo.CODNUM = bepsbm.BEPSBO_CODNUM"
@@ -601,7 +601,7 @@ public class ModeloValidar {
 				while (rs.next()) {
 					Merito merito = new Merito();
 					merito.setCodNum(rs.getInt("CODNUM"));
-					merito.setItemBaremacion(ModeloBaremacionItems.obtenerInstancia().getItemBaremacionById(rs.getInt("BEPITE_CODNUM")));	
+					merito.setItemBaremacion(ModeloBaremacionItems.obtenerInstancia().getItemBaremacionById(rs.getInt("BEPITE_CODNUM")));
 					merito.setValor(rs.getDouble("VALOR"));
 					merito.setDescripcion(rs.getString("DESCRIPCION"));
 					merito.setObservacion(rs.getString("OBSERVACION"));
