@@ -90,7 +90,7 @@ VistaCandidatos bean = (VistaCandidatos) uvdatos.getVistas().get(VistaCandidatos
 							<td><%= merito.getCodNum() %></td>
 							<td><%= codigoItem %></td>
 							<td><%= merito.getMerito().getItemBaremacion().getNombre() %></td>
-							<td><%= merito.getMerito().getValor() %></td>
+							<td><%= merito.getMeritoSolicitud().getValor() != 0 ? merito.getMeritoSolicitud().getValor() : merito.getMerito().getValor() %></td>
 							<td><%= merito.getMerito().getDescripcion() %></td>
 							<td>
 						<%	if (merito.getCodNum() != null && merito.getMeritoSolicitud() != null && merito.getMerito().getItemBaremacion().getAfinidad() != null) { %>

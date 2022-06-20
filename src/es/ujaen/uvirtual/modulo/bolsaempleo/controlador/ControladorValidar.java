@@ -364,7 +364,11 @@ public class ControladorValidar extends HttpServlet {
 						modeloValidar.borrarEvaluacionMerito(bean.getMerito(), solicitud, bean.getBolsa(), bean.getUsuarioLogeado());
 					}
 				}
-				ModeloMerito.obtenerInstancia().actualizaMerito(merito, bean.getUsuarioLogeado());
+				
+				if (ModeloMerito.obtenerInstancia().comprobarSiSePuedeActualizarMerito(merito)) {
+					ModeloMerito.obtenerInstancia().actualizaMerito(merito, bean.getUsuarioLogeado());
+				}
+				
 				BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_MERITO_MODIFICAR, bean, request);
 				
 				if (item.getAfinidad() == null) {

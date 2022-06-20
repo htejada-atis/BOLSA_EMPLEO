@@ -1003,7 +1003,7 @@ public class ModeloValidar {
 			stmt.setDouble(indexParam++, merito.getValor());
 			stmt.setInt(indexParam++, merito.getItem().getCodNum());
 			stmt.setString(indexParam++, merito.getObservacionCandidato());
-			stmt.executeUpdate();			
+			stmt.executeUpdate();
 		}
 	}
 	
