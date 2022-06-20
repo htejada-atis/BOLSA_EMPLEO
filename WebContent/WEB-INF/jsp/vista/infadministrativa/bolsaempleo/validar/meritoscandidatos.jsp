@@ -96,8 +96,8 @@ Boolean onlyRead = bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRo
 			
 			<jsp:include page="/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/mensajes.jsp" />
 			
-			<h3>Evaluar mérito: <%= EscapaHTML.escapa(merito.getMerito().getCodNum() + " - " + merito.getMerito().getItemBaremacion().getFullCode() + " " 
-				+ merito.getMerito().getItemBaremacion().getNombre()) %><br/>
+			<h3>Evaluar mérito: <%= EscapaHTML.escapa(merito.getMerito().getCodNum() + " - " + merito.getItem().getFullCode() + " " 
+				+ merito.getItem().getNombre()) %><br/>
 				<%= EscapaHTML.escapa("Bolsa: " + bolsa.getArea().getDescripcion()) %><br/>
 				<%= "Candidato: " %> 
 			<%	if (bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRol.ID_ROL_SERVICIO_PERSONAL)) { %>
