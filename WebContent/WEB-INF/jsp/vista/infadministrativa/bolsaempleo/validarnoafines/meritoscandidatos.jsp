@@ -376,7 +376,8 @@ $(document).ready(function() {
 					},
 				"columns": [
 					{'data': 'convocatoria.fechaCierre', 'render': function(row) {
-						return '<div title="' + row.convocatoria.codNum + ' - ' + row.convocatoria.descripcion + '">' + row.convocatoria.fechaCierre + '</div>';
+						//return '<div title="' + row.convocatoria.codNum + ' - ' + row.convocatoria.descripcion + '">' + row.convocatoria.fechaCierre + '</div>';
+						return '<div title="' + row.convocatoria.codNum + ' - ' + row.convocatoria.descripcion + '">' + row.convocatoria.curso + '</div>';
 					}},
 					{'data': 'bolsa.codNum', 'render': function(row) {
 						var name = row.bolsa.area.idAreaExterno + " : " + row.bolsa.area.descripcion;
