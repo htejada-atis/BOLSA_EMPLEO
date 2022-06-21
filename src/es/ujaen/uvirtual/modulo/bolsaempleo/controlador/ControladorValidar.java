@@ -316,21 +316,16 @@ public class ControladorValidar extends HttpServlet {
 			
 			if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_VALOR)) != null) {
 				Merito merito = new Merito(bean.getMerito().getMerito());
+				
 				// item de baremación
+				
 				Integer idItem = Formateador.leeParametroInteger(request.getParameter(PARAM_ITEM));
 				ItemBaremacion item = ModeloBaremacionItems.obtenerInstancia().getItemBaremacionById(idItem);
 				merito.setItemBaremacion(item);
 				bean.getMerito().setItem(item);
 				
-				// valor
-				Double valor = ModeloMerito.validateValorDelMerito(request.getParameter(PARAM_VALOR), merito);
-				merito.setValor(valor);
-				bean.getMerito().setValor(valor);
-				
-				if (!valor.equals(bean.getMerito().getMerito().getValor()) || !item.equals(bean.getMerito().getMerito().getItemBaremacion())) {
+				if (!item.equals(bean.getMerito().getMerito().getItemBaremacion())) {
 					ModeloSolicitud modeloSolicitud = ModeloSolicitud.obtenerInstancia();
-					ModeloValidar modeloValidar = ModeloValidar.obtenerInstancia();
-					
 					Solicitud solicitud = modeloSolicitud.getSolicitudCerradaByConvocatoriaUsuario(bean.getCandidato(), bean.getConvocatoria());
 					
 					if (!item.equals(bean.getMerito().getMerito().getItemBaremacion())) {
@@ -353,6 +348,21 @@ public class ControladorValidar extends HttpServlet {
 							throw new UVException(MENSAJE_ERROR_NUMERO_MAXIMO_MERITOS_APARTADO);
 						}
 					}
+				}
+				
+				// valor
+				
+				Double valor = ModeloMerito.validateValorDelMerito(request.getParameter(PARAM_VALOR), merito);
+				Double valorActual = bean.getMerito().getValor() != null ? bean.getMerito().getValor() : bean.getMerito().getMerito().getValor();
+				
+				merito.setValor(valor);
+				bean.getMerito().setValor(valor);
+				
+				if (!valor.equals(valorActual)) {
+					ModeloSolicitud modeloSolicitud = ModeloSolicitud.obtenerInstancia();
+					ModeloValidar modeloValidar = ModeloValidar.obtenerInstancia();
+					Solicitud solicitud = modeloSolicitud.getSolicitudCerradaByConvocatoriaUsuario(bean.getCandidato(), bean.getConvocatoria());
+					
 					if (bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRol.ID_ROL_SERVICIO_PERSONAL)) {
 						Collection<String> bolsas = gson.fromJson(request.getParameter(PARAM_BOLSAS), new TypeToken<Collection<String>>() { }.getType());
 						modeloValidar.borrarValoracionesMeritoBolsas(bean.getMerito().getMerito(), solicitud, bolsas, bean.getUsuarioLogeado());
@@ -364,6 +374,8 @@ public class ControladorValidar extends HttpServlet {
 						modeloValidar.borrarEvaluacionMerito(bean.getMerito(), solicitud, bean.getBolsa(), bean.getUsuarioLogeado());
 					}
 				}
+				
+				// update merito base
 				
 				if (ModeloMerito.obtenerInstancia().comprobarSiSePuedeActualizarMerito(merito)) {
 					ModeloMerito.obtenerInstancia().actualizaMerito(merito, bean.getUsuarioLogeado());

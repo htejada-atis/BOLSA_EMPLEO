@@ -1030,7 +1030,7 @@ public class ModeloValidar {
 				+ "	SET UID_USUARIO = ?, FLGEXCLUIDO = 'N', FLGVALIDADO = 'N', VALOR = ?, ITEM = ?,"
 				+ "		OBSERVACION_CANDIDATO = ?";
 		
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(sqlUpdateValoraciones)) {			
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(sqlUpdateValoraciones)) {
 			int indexParam = 1;
 			stmt.setInt(indexParam++, merito.getMerito().getCodNum());
 			stmt.setInt(indexParam++, solicitud.getCodNum());
