@@ -319,40 +319,57 @@ public class ControladorValidar extends HttpServlet {
 				
 				// item de baremación
 				
-				Integer idItem = Formateador.leeParametroInteger(request.getParameter(PARAM_ITEM));
-				ItemBaremacion item = ModeloBaremacionItems.obtenerInstancia().getItemBaremacionById(idItem);
+				ItemBaremacion item = ModeloBaremacionItems.obtenerInstancia().getItemBaremacionById(
+						Formateador.leeParametroInteger(request.getParameter(PARAM_ITEM)));
+				ItemBaremacion itemActual = bean.getMerito().getItem() != null ? bean.getMerito().getItem() : bean.getMerito().getMerito().getItemBaremacion();
+				
 				merito.setItemBaremacion(item);
 				bean.getMerito().setItem(item);
 				
-				if (!item.equals(bean.getMerito().getMerito().getItemBaremacion())) {
+				// comprobamos si es válido el valor según el item, antes de guardar
+				Double valor = ModeloMerito.validateValorDelMerito(request.getParameter(PARAM_VALOR), merito);
+				
+				if (!item.equals(itemActual)) {
 					ModeloSolicitud modeloSolicitud = ModeloSolicitud.obtenerInstancia();
 					Solicitud solicitud = modeloSolicitud.getSolicitudCerradaByConvocatoriaUsuario(bean.getCandidato(), bean.getConvocatoria());
 					
-					if (!item.equals(bean.getMerito().getMerito().getItemBaremacion())) {
-						// comprobamos que el total de méritos por bloque de la solicitud sea menor que
-						// el permitido por la convocatoria
-						Integer totalMeritos = modeloSolicitud.obtenerTotalMeritosPorBloqueSolicitud(solicitud, bean.getBolsa(), merito);
-						if (totalMeritos >= bean.getConvocatoria().getNumMeritosPorBloque()
-								&& !merito.getItemBaremacion().getBloqueBaremacion().getApartadoBaremacion().equals(
-										bean.getMerito().getMerito().getItemBaremacion().getBloqueBaremacion().getApartadoBaremacion())) {
-							throw new UVException(MENSAJE_ERROR_NUMERO_MAXIMO_MERITOS_BLOQUE);
+					// comprobamos que el total de méritos por bloque de la solicitud sea menor que
+					// el permitido por la convocatoria
+					Integer totalMeritos = modeloSolicitud.obtenerTotalMeritosPorBloqueSolicitud(solicitud, bean.getBolsa(), merito);
+					if (totalMeritos >= bean.getConvocatoria().getNumMeritosPorBloque()
+							&& !merito.getItemBaremacion().getBloqueBaremacion().getApartadoBaremacion().equals(
+									bean.getMerito().getMerito().getItemBaremacion().getBloqueBaremacion().getApartadoBaremacion())) {
+						throw new UVException(MENSAJE_ERROR_NUMERO_MAXIMO_MERITOS_BLOQUE);
+					}
+					
+					// comprobamos que el total de méritos por apartado de la solicitud para esta bolsa
+					// sea menor que el permitido por el apartado
+					Integer totalMeritosApartado = modeloSolicitud.obtenerTotalMeritosPorApartadoSolicitud(solicitud, bean.getBolsa(), merito);
+					
+					if (merito.getItemBaremacion().getBloqueBaremacion().getNumeroMaximoMeritos() != null 
+							&& merito.getItemBaremacion().getBloqueBaremacion().getNumeroMaximoMeritos() != 0
+							&& totalMeritosApartado >= merito.getItemBaremacion().getBloqueBaremacion().getNumeroMaximoMeritos()) {
+						throw new UVException(MENSAJE_ERROR_NUMERO_MAXIMO_MERITOS_APARTADO);
+					}
+					
+					ModeloValidar modeloValidar = ModeloValidar.obtenerInstancia();
+					
+					if (bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRol.ID_ROL_SERVICIO_PERSONAL)) {
+						Collection<String> bolsas = gson.fromJson(request.getParameter(PARAM_BOLSAS), 
+								new TypeToken<Collection<String>>() { }.getType());
+						modeloValidar.borrarValoracionesMeritoBolsas(bean.getMerito().getMerito(), solicitud, bolsas, bean.getUsuarioLogeado());
+						modeloValidar.borrarEvaluacionMeritoBolsas(bean.getMerito(), solicitud, bolsas, bean.getUsuarioLogeado());
+					} else {
+						if (!item.getIndividualizado() || !bean.getMerito().getMerito().getItemBaremacion().getIndividualizado()) {
+							modeloValidar.borrarValoracionesMerito(bean.getMerito().getMerito(), solicitud, bean.getBolsa(), 
+									bean.getUsuarioLogeado());
 						}
-						
-						// comprobamos que el total de méritos por apartado de la solicitud para esta bolsa
-						// sea menor que el permitido por el apartado
-						Integer totalMeritosApartado = modeloSolicitud.obtenerTotalMeritosPorApartadoSolicitud(solicitud, bean.getBolsa(), merito);
-						
-						if (merito.getItemBaremacion().getBloqueBaremacion().getNumeroMaximoMeritos() != null 
-								&& merito.getItemBaremacion().getBloqueBaremacion().getNumeroMaximoMeritos() != 0
-								&& totalMeritosApartado >= merito.getItemBaremacion().getBloqueBaremacion().getNumeroMaximoMeritos()) {
-							throw new UVException(MENSAJE_ERROR_NUMERO_MAXIMO_MERITOS_APARTADO);
-						}
+						modeloValidar.borrarEvaluacionMerito(bean.getMerito(), solicitud, bean.getBolsa(), bean.getUsuarioLogeado());
 					}
 				}
 				
 				// valor
 				
-				Double valor = ModeloMerito.validateValorDelMerito(request.getParameter(PARAM_VALOR), merito);
 				Double valorActual = bean.getMerito().getValor() != null ? bean.getMerito().getValor() : bean.getMerito().getMerito().getValor();
 				
 				merito.setValor(valor);

@@ -43,10 +43,10 @@ public class ModeloMerito {
 	public static final int COLUMN_OBSERVACION_MAXLENGTH = 300;
 	
 	// mensajes
-	public static final String MENSAJE_ERROR_VALOR_ENTERO_NO_PERMITIDO = "El valor debe ser entero";
-	public static final String MENSAJE_ERROR_VALOR_DECIMAL_NO_PERMITIDO = "El valor debe ser decimal";
-	public static final String MENSAJE_ERROR_VALOR_MAXIMO_PERMITIDO = "El valor máximo permitido es %s";
-	public static final String MENSAJE_ERROR_VALOR_MINIMO_PERMITIDO = "El valor mínimo permitido es %s";
+	public static final String MENSAJE_ERROR_VALOR_ENTERO_NO_PERMITIDO = "El valor debe ser entero para %s";
+	public static final String MENSAJE_ERROR_VALOR_DECIMAL_NO_PERMITIDO = "El valor debe ser decimal para %s";
+	public static final String MENSAJE_ERROR_VALOR_MAXIMO_PERMITIDO = "El valor máximo permitido es %s para %s";
+	public static final String MENSAJE_ERROR_VALOR_MINIMO_PERMITIDO = "El valor mínimo permitido es %s para %s";
 	
 
 	protected static ModeloMerito eInstancia;
@@ -481,12 +481,12 @@ public class ModeloMerito {
 				break;
 			case ModeloBaremacionItems.ITEM_UNIDADES_MEDICION_ENTERO:
 				if (!BolsaEmpleoUtils.isInteger(valorStr)) {
-					throw new UVException(MENSAJE_ERROR_VALOR_ENTERO_NO_PERMITIDO);
+					throw new UVException(String.format(MENSAJE_ERROR_VALOR_ENTERO_NO_PERMITIDO, merito.getItemBaremacion().getFullCode()));
 				}
 				break;
 			case ModeloBaremacionItems.ITEM_UNIDADES_MEDICION_DECIMAL:
 				if (!BolsaEmpleoUtils.isFloat(valorStr)) {
-					throw new UVException(MENSAJE_ERROR_VALOR_DECIMAL_NO_PERMITIDO);
+					throw new UVException(String.format(MENSAJE_ERROR_VALOR_DECIMAL_NO_PERMITIDO, merito.getItemBaremacion().getFullCode()));
 				}
 				break;
 			default:
@@ -501,10 +501,16 @@ public class ModeloMerito {
 			throw new UVException("El valor no es válido");
 		}
 		if (valor < merito.getItemBaremacion().getValorMinimo()) {
-			throw new UVException(String.format(MENSAJE_ERROR_VALOR_MINIMO_PERMITIDO, merito.getItemBaremacion().getValorMinimo().toString()));
+			throw new UVException(String.format(MENSAJE_ERROR_VALOR_MINIMO_PERMITIDO, 
+				merito.getItemBaremacion().getValorMinimo().toString(),
+				merito.getItemBaremacion().getFullCode()
+			));
 		}
 		if (valor > merito.getItemBaremacion().getValorMaximo()) {
-			throw new UVException(String.format(MENSAJE_ERROR_VALOR_MAXIMO_PERMITIDO, merito.getItemBaremacion().getValorMaximo().toString()));
+			throw new UVException(String.format(MENSAJE_ERROR_VALOR_MAXIMO_PERMITIDO, 
+				merito.getItemBaremacion().getValorMaximo().toString(),
+				merito.getItemBaremacion().getFullCode()
+			));
 		}
 		
 		return valor;
