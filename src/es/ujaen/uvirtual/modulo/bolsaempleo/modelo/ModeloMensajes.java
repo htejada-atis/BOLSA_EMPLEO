@@ -24,6 +24,7 @@ import es.ujaen.uvirtual.utilidades.UVException;
  * @author ATISoluciones
  */
 public class ModeloMensajes {
+	public static final int MENSAJES_COLUMN_INDEX_ID = 0;
 	public static final int MENSAJES_COLUMN_INDEX_FECHACREACION = 1;
 	public static final int MENSAJES_COLUMN_INDEX_TITULO = 2;
 	public static final int MENSAJES_COLUMN_INDEX_ESTADO = 3;
@@ -104,18 +105,20 @@ public class ModeloMensajes {
 		List<Mensaje> mensajes = new ArrayList<>();
 		BolsaEmpleoDataTable<Mensaje> dataTable = new BolsaEmpleoDataTable<>(params);
 
-		String consulta = "SELECT bepmen.* FROM TBEP_MENSAJES bepmen";
+		String consulta = "SELECT bepmen.* FROM TBEP_MENSAJES bepmen WHERE 1=1";
 
-		dataTable.setColumn(MENSAJES_COLUMN_INDEX_FECHACREACION, "bepmen.FECHA_CREACION");
-		dataTable.setColumn(MENSAJES_COLUMN_INDEX_TITULO, "bepmen.TITULO");		
-		dataTable.setColumn(MENSAJES_COLUMN_INDEX_ESTADO, "bepmen.ESTADO");
+		dataTable.setColumn(MENSAJES_COLUMN_INDEX_ID, "bepmen.CODNUM", DataTableColumn.COLUMN_TYPE_NUMBER);
+		dataTable.setColumn(MENSAJES_COLUMN_INDEX_FECHACREACION, "bepmen.FECHA_CREACION", DataTableColumn.COLUMN_TYPE_DATE);
+		dataTable.setColumn(MENSAJES_COLUMN_INDEX_TITULO, "bepmen.TITULO");
+		dataTable.setColumn(MENSAJES_COLUMN_INDEX_ESTADO, "bepmen.ESTADO", DataTableColumn.COLUMN_TYPE_EXACT);
 		dataTable.setQuery(consulta);
 
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
 				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery())) {
 
-			dataTable.setFiltersParams(stmt, stmtCount, 1);
+			int indexParam = 1;
+			dataTable.setFiltersParams(stmt, stmtCount, indexParam);
 
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
@@ -205,52 +208,40 @@ public class ModeloMensajes {
 		if (mensaje == null) {
 			throw new UVException("El mensaje es requerido");
 		}
-			
+		
 		List<UsuarioBolsaEmpleo> destinatarios = new ArrayList<>();
-		BolsaEmpleoDataTable<UsuarioBolsaEmpleo> dataTable = new BolsaEmpleoDataTable<>(params);
-
-		String consulta = ""
-				+ " SELECT bepusu.* "
-				+ " FROM TBEP_USUARIOS bepusu "
-				+ (dataTable.filterExists(DESTINATARIOS_COLUMN_INDEX_CONVOCATORIA) 
-						? "	LEFT JOIN TBEP_SOLICITUDES bepsol ON bepusu.CODNUM = bepsol.BEPUSU_CODNUM" : "")
-				+ (dataTable.filterExists(DESTINATARIOS_COLUMN_INDEX_AREA)
-						? " LEFT JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsol.CODNUM = bepsbo.BEPSOL_CODNUM" : "")
-				+ "	LEFT JOIN TBEP_MEN_DESTINATARIOS bepmde ON bepusu.CODNUM = bepmde.BEPUSU_CODNUM AND bepmde.BEPMEN_CODNUM = ?"
-				+ "	WHERE 1=1 "
-				+ "		AND bepusu.FLGBORRADO = 'N' "
-				+ " 	AND bepmde.BEPUSU_CODNUM IS NULL "
-				+ "		AND bepusu.VUAJA_EMAIL_ALTA IS NOT NULL";
 		
-		String whereConvocatoria = "(SELECT bepsol2.BEPCON_CODNUM FROM TBEP_SOLICITUDES bepsol2"
-				+ "	WHERE bepusu.CODNUM = bepsol2.BEPUSU_CODNUM AND bepsol2.BEPCON_CODNUM = bepsol.BEPCON_CODNUM)";
+		BolsaEmpleoDataTable<UsuarioBolsaEmpleo> dataTable = this.getDatatableUsuarioDisponibles(params);
+		Integer idConvocatoriaSeleccionada = dataTable.getFilterParamInteger(DESTINATARIOS_COLUMN_INDEX_CONVOCATORIA);
+		Integer idAreaSeleccionada = dataTable.getFilterParamInteger(DESTINATARIOS_COLUMN_INDEX_AREA);
 		
-		String whereArea = "(SELECT bepsbo2.BEPBOL_CODNUM FROM TBEP_SOLICITUDES bepsol2"
-				+ "	INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo2 ON bepsol2.CODNUM = bepsbo2.BEPSOL_CODNUM"
-				+ "	WHERE bepusu.CODNUM = bepsol2.BEPUSU_CODNUM AND bepsbo2.BEPBOL_CODNUM = bepsbo.BEPBOL_CODNUM)";
-		
-		String whereNombre = String.format("(%s || ' ' || %s || ' ' || %s)", "bepusu.VUAJA_STRNOMBRE", "bepusu.VUAJA_STRAPELLIDO1", "bepusu.VUAJA_STRAPELLIDO2");
-
-		dataTable.setColumn(DESTINATARIOS_COLUMN_INDEX_DOCUMENTO, "bepusu.VUAJA_PRSNIF");
-		dataTable.setColumn(DESTINATARIOS_COLUMN_INDEX_NOMBRE, whereNombre, DataTableColumn.COLUMN_TYPE_TEXT);
-		dataTable.setColumn(DESTINATARIOS_COLUMN_INDEX_CORREO, "bepusu.VUAJA_EMAIL_ALTA");
-		dataTable.setColumn(DESTINATARIOS_COLUMN_INDEX_ROL, "bepusu.ROL");
-		dataTable.setColumn(DESTINATARIOS_COLUMN_INDEX_DISTRIBUCION, "bepusu.FLGLISTADISTRIBUCION", DataTableColumn.COLUMN_TYPE_BOOLEAN);
-		dataTable.setColumn(DESTINATARIOS_COLUMN_INDEX_CONVOCATORIA, whereConvocatoria, DataTableColumn.COLUMN_TYPE_OPTION);
-		dataTable.setColumn(DESTINATARIOS_COLUMN_INDEX_AREA, whereArea, DataTableColumn.COLUMN_TYPE_OPTION);
-		dataTable.setQuery(consulta);
-
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
 				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery())) {
 
 			int indexParams = 1;
+			
+			// filtro por mensaje
 			stmt.setInt(indexParams, mensaje.getCodNum());
-			stmtCount.setInt(indexParams++, mensaje.getCodNum());	
+			stmtCount.setInt(indexParams++, mensaje.getCodNum());
+			
+			// filtro por convocatoria y area
+			if (idConvocatoriaSeleccionada != null && idAreaSeleccionada != null) {
+				stmt.setInt(indexParams, idAreaSeleccionada);
+				stmtCount.setInt(indexParams++, idAreaSeleccionada);
+				
+				stmt.setInt(indexParams, idConvocatoriaSeleccionada);
+				stmtCount.setInt(indexParams++, idConvocatoriaSeleccionada);
+			} else if (idConvocatoriaSeleccionada != null) {
+				stmt.setInt(indexParams, idConvocatoriaSeleccionada);
+				stmtCount.setInt(indexParams++, idConvocatoriaSeleccionada);
+			}
+			
+			// resto de filtros del datatable
 			dataTable.setFiltersParams(stmt, stmtCount, indexParams);
 
 			try (ResultSet rs = stmt.executeQuery()) {
-				while (rs.next()) {					
+				while (rs.next()) {
 					destinatarios.add(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioById(rs.getInt("CODNUM")));
 				}
 			}
@@ -363,12 +354,46 @@ public class ModeloMensajes {
 	 */
 	public Integer nuevoMensajeEnBorrador(UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
 		Mensaje mensaje = new Mensaje();
+		
 		mensaje.setTitulo(MENSAJE_ESTADO_BORRADOR);
 		mensaje.setEstado(MENSAJE_ESTADO_BORRADOR);
 		mensaje.setFechaCreacion(BolsaEmpleoUtils.getCurrentDateTime());
 		mensaje.setCuerpo(MENSAJE_ESTADO_BORRADOR);
 		
 		return nuevoMensaje(mensaje, usuarioUpdate);
+	}
+	
+	/**
+	 * Crea un nuevo mensaje igual aL pasado pero en estado borrador.
+	 * @param mensajeOld .
+	 * @param usuarioUpdate .
+	 * @return .
+	 * @throws UVException . 
+	 * @throws SQLException .
+	 */
+	public Integer reenviarMensaje(Mensaje mensajeOld, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
+		Mensaje mensaje = new Mensaje();
+		mensaje.setTitulo(mensajeOld.getTitulo());
+		mensaje.setEstado(MENSAJE_ESTADO_BORRADOR);
+		mensaje.setFechaCreacion(BolsaEmpleoUtils.getCurrentDateTime());
+		mensaje.setCuerpo(mensajeOld.getCuerpo());		
+		Integer idMensaje = nuevoMensaje(mensaje, usuarioUpdate);
+		
+		String sql = "INSERT INTO TBEP_MEN_DESTINATARIOS (BEPMEN_CODNUM, BEPUSU_CODNUM, UID_USUARIO, ESTADO, EMAIL) " 
+				   + "SELECT ? AS BEPMEP_CODNUM, bepmde.BEPUSU_CODNUM, ? AS UID_USUARIO, ? AS ESTADO, bepmde.EMAIL "
+				   + "FROM TBEP_MEN_DESTINATARIOS bepmde "
+				   + "WHERE BEPMEN_CODNUM = ?";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(sql)) {
+			int parameterIndex = 1;
+			stmt.setInt(parameterIndex++, idMensaje);
+			stmt.setInt(parameterIndex++, usuarioUpdate.getCodNum());
+			stmt.setString(parameterIndex++, ModeloMensajes.DESTINATARIO_ESTADO_SINENVIAR);
+			stmt.setInt(parameterIndex++, mensajeOld.getCodNum());
+			stmt.executeUpdate();
+		}
+		
+		return idMensaje;
 	}
 	
 	/** Actualiza un mensaje .
@@ -496,7 +521,8 @@ public class ModeloMensajes {
 				
 				try (ResultSet rs = stmt.executeQuery()) {
 					while (rs.next()) {
-						throw new UVException(ERROR_DESTINATARIO_YA_EXISTE);
+						// el usuario ya está como destinatario
+						return;
 					}
 				}
 			}
@@ -508,6 +534,48 @@ public class ModeloMensajes {
 				stmt.setInt(parameterIndex++, destinatario.getCodNum());
 				stmt.setString(parameterIndex++, usuarioUpdate.getCodCuenta());
 				stmt.executeUpdate();
+			}
+		}
+	}
+	
+	/**
+	 * Agrega todos los usuarios como destinatarios.
+	 * @param mensaje .
+	 * @param usuarioUpdate .
+	 * @param params .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	public void agregarDestinatarioUsuarioTodos(Mensaje mensaje, UsuarioBolsaEmpleo usuarioUpdate, Map<String, String[]> params) throws UVException, SQLException {
+		BolsaEmpleoDataTable<UsuarioBolsaEmpleo> dataTable = this.getDatatableUsuarioDisponibles(params);
+		Integer idConvocatoriaSeleccionada = dataTable.getFilterParamInteger(DESTINATARIOS_COLUMN_INDEX_CONVOCATORIA);
+		Integer idAreaSeleccionada = dataTable.getFilterParamInteger(DESTINATARIOS_COLUMN_INDEX_AREA);
+				
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
+				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQueryRaw())) {
+
+			int indexParams = 1;
+			
+			// filtro por mensaje
+			stmt.setInt(indexParams++, mensaje.getCodNum());
+			
+			// filtro por convocatoria y area
+			if (idConvocatoriaSeleccionada != null && idAreaSeleccionada != null) {
+				stmt.setInt(indexParams++, idAreaSeleccionada);
+				stmt.setInt(indexParams++, idConvocatoriaSeleccionada);
+			} else if (idConvocatoriaSeleccionada != null) {
+				stmt.setInt(indexParams++, idConvocatoriaSeleccionada);
+			}
+			
+			// resto de filtros del datatable
+			dataTable.setFiltersParams(stmt, stmtCount, indexParams);
+
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					UsuarioBolsaEmpleo usuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioById(rs.getInt("CODNUM")); 
+					this.agregarDestinatarioUsuario(mensaje, usuario, usuarioUpdate);
+				}
 			}
 		}
 	}
@@ -570,6 +638,42 @@ public class ModeloMensajes {
 				try (PreparedStatement stmt = conexion.prepareStatement(consultaDelete)) {
 					int indexParam = 1;
 					stmt.setInt(indexParam++, destinatario.getCodNum());
+					stmt.executeUpdate();
+				}
+				
+				conexion.commit();
+			} catch (Exception e) {
+				conexion.rollback();
+				throw e;
+			} finally {
+				conexion.setAutoCommit(true);
+			}
+		}
+	}
+	
+	/**
+	 * Elimina todos los destinatarios de un mensaje.
+	 * @param mensaje .
+	 * @param usuarioUpdate .
+	 * @throws SQLException .
+	 */
+	public void eliminarTodosDestinatarios(Mensaje mensaje, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException {
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia()) {
+			conexion.setAutoCommit(false);
+			
+			try {
+				String consultaUpdate = "UPDATE TBEP_MEN_DESTINATARIOS SET UID_USUARIO = ? WHERE BEPMEN_CODNUM = ?";
+				try (PreparedStatement stmt = conexion.prepareStatement(consultaUpdate)) {
+					int indexParam = 1;
+					stmt.setString(indexParam++, usuarioUpdate.getCodCuenta());
+					stmt.setInt(indexParam++, mensaje.getCodNum());
+					stmt.executeUpdate();
+				}
+				
+				String consultaDelete = "DELETE FROM TBEP_MEN_DESTINATARIOS WHERE BEPMEN_CODNUM = ?";
+				try (PreparedStatement stmt = conexion.prepareStatement(consultaDelete)) {
+					int indexParam = 1;
+					stmt.setInt(indexParam++, mensaje.getCodNum());
 					stmt.executeUpdate();
 				}
 				
@@ -807,6 +911,60 @@ public class ModeloMensajes {
 		dest.setEstado(rs.getString(ESTADO));
 		
 		return dest;
+	}
+	
+	/**
+	 * Devuelve el datatable de los usuarios disponibles para un mensaje.
+	 * @param params .
+	 * @return .
+	 * @throws UVException .
+	 */
+	private BolsaEmpleoDataTable<UsuarioBolsaEmpleo> getDatatableUsuarioDisponibles(Map<String, String[]> params) throws UVException {
+		BolsaEmpleoDataTable<UsuarioBolsaEmpleo> dataTable = new BolsaEmpleoDataTable<>(params);
+		
+		Integer idConvocatoriaSeleccionada = dataTable.getFilterParamInteger(DESTINATARIOS_COLUMN_INDEX_CONVOCATORIA);
+		Integer idAreaSeleccionada = dataTable.getFilterParamInteger(DESTINATARIOS_COLUMN_INDEX_AREA);
+
+		String consulta = ""
+				+ " SELECT bepusu.* "
+				+ " FROM TBEP_USUARIOS bepusu "
+				+ "	LEFT JOIN TBEP_MEN_DESTINATARIOS bepmde ON bepusu.CODNUM = bepmde.BEPUSU_CODNUM AND bepmde.BEPMEN_CODNUM = ?"
+				+ "	WHERE 1=1 "
+				+ "		AND bepusu.FLGBORRADO = 'N' "
+				+ " 	AND bepmde.BEPUSU_CODNUM IS NULL "
+				+ "		AND bepusu.VUAJA_EMAIL_ALTA IS NOT NULL";
+		
+		if (idConvocatoriaSeleccionada != null && idAreaSeleccionada != null) {
+			consulta += " AND EXISTS ( "
+				+ "SELECT * "
+				+ "FROM TBEP_SOLICITUD_BOLSAS bepsbo "
+				+ "INNER JOIN TBEP_BOLSAS bepbol ON bepbol.CODNUM = bepsbo.BEPBOL_CODNUM "
+				+ "INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.CODNUM = bepsbo.BEPSOL_CODNUM "
+				+ "WHERE bepsol.BEPUSU_CODNUM = bepusu.CODNUM "
+				+ "		 AND bepbol.BEPARE_CODNUM = ? "
+				+ "		 AND bepsol.BEPCON_CODNUM = ? "
+			+ ") ";
+		} else if (idConvocatoriaSeleccionada != null) {
+			consulta += " AND EXISTS ( "
+					+ "SELECT bepsol.CODNUM "
+					+ "FROM TBEP_SOLICITUDES bepsol "
+					+ "WHERE bepsol.BEPUSU_CODNUM = bepusu.CODNUM "
+					+ "		 AND bepsol.BEPCON_CODNUM = ?"
+			+ ") ";
+		}
+		
+		String whereNombre = String.format("(%s || ' ' || %s || ' ' || %s)", "bepusu.VUAJA_STRNOMBRE", "bepusu.VUAJA_STRAPELLIDO1", "bepusu.VUAJA_STRAPELLIDO2");
+
+		dataTable.setColumn(DESTINATARIOS_COLUMN_INDEX_DOCUMENTO, "bepusu.VUAJA_PRSNIF");
+		dataTable.setColumn(DESTINATARIOS_COLUMN_INDEX_NOMBRE, whereNombre, DataTableColumn.COLUMN_TYPE_TEXT);
+		dataTable.setColumn(DESTINATARIOS_COLUMN_INDEX_CORREO, "bepusu.VUAJA_EMAIL_ALTA");
+		dataTable.setColumn(DESTINATARIOS_COLUMN_INDEX_ROL, "bepusu.ROL");
+		dataTable.setColumn(DESTINATARIOS_COLUMN_INDEX_DISTRIBUCION, "bepusu.FLGLISTADISTRIBUCION", DataTableColumn.COLUMN_TYPE_BOOLEAN);
+		dataTable.setColumn(DESTINATARIOS_COLUMN_INDEX_CONVOCATORIA, "bepusu.CODNUM", DataTableColumn.COLUMN_TYPE_IGNORE);
+		dataTable.setColumn(DESTINATARIOS_COLUMN_INDEX_AREA, "bepusu.CODNUM", DataTableColumn.COLUMN_TYPE_IGNORE);
+		dataTable.setQuery(consulta);
+		
+		return dataTable;
 	}
 	
 }

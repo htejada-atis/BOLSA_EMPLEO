@@ -60,6 +60,7 @@ public class BolsaEmpleoDataTable<T> {
 		public static final int COLUMN_TYPE_IS_NULL = 5;
 		public static final int COLUMN_TYPE_EXACT = 6;
 		public static final int COLUMN_TYPE_DOUBLE = 7;
+		public static final int COLUMN_TYPE_IGNORE = 8;
 		
 		private String columnName;
 		private int columnType;
@@ -182,6 +183,15 @@ public class BolsaEmpleoDataTable<T> {
 	public String getQuery() {
 		return this.query;
 	}
+	
+	/**
+	 * Devuelve la sql sin offset.
+	 * @return .
+	 */
+	public String getQueryRaw() {
+		String[] partes = this.query.split(" OFFSET ");
+		return partes[0];
+	}
 
 	public String getQueryCount() {
 		return this.queryCount;
@@ -248,22 +258,48 @@ public class BolsaEmpleoDataTable<T> {
 		}
 	}
 	
+	/**
+	 * Devuelve el valor del filtro pasado a la tabla o null.
+	 * @param filterKey .
+	 * @return .
+	 */
+	public String getFilterParam(int filterKey) {
+		String value = null;
+		
+		if (Boolean.TRUE.equals(this.isFilterable())) {
+			for (Map.Entry<Integer, String> filter : filters.entrySet()) {
+				Integer key = filter.getKey();
+				if (key.equals(filterKey)) {
+					value = filter.getValue();
+					break;
+				}
+			}
+		}
+		
+		return value;
+	}
+	
+	/**
+	 * Devuelve el valor del filtro pasado a la tabla  (parseando a integer) o null (si no existe o parseo error).
+	 * @param filterKey .
+	 * @return .
+	 */
+	public Integer getFilterParamInteger(int filterKey) {
+		String value = this.getFilterParam(filterKey);
+		try {
+			return Integer.parseInt(value);	
+		} catch (NumberFormatException ex) {
+			return null;
+		}
+	}
+	
 	/** Método para comprobar si se ha enviado un filtro al datatable .
 	 * @param filterKey .
 	 * @return booleano si existe el filtro .
 	 */
 	public boolean filterExists(int filterKey) {
-		boolean exists = false;
-		if (Boolean.TRUE.equals(this.isFilterable())) {
-			for (Map.Entry<Integer, String> filter : filters.entrySet()) {
-				Integer key = filter.getKey();
-				if (key.equals(filterKey)) {
-					exists = true;
-				}
-			}
-		}
-		
-		return exists;
+		String value = this.getFilterParam(filterKey);
+		return value != null;
 	}
 
 	/**
@@ -397,6 +433,8 @@ public class BolsaEmpleoDataTable<T> {
 			String columnName = column.getName();
 
 			switch (this.columns.get(key).getType()) {
+				case DataTableColumn.COLUMN_TYPE_IGNORE:
+					break;
 				case DataTableColumn.COLUMN_TYPE_DATE:
 					consultaResult.append(" AND TO_CHAR(" + columnName + ",'yyyy-mm-dd') LIKE ? ");
 					break;
