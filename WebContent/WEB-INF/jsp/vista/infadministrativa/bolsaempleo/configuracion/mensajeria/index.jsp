@@ -1,3 +1,4 @@
+<%@page import="es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMensajes"%>
 <%@ page trimDirectiveWhitespaces="true"%>
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos"%>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.configuracion.ControladorMensajes"%>
@@ -20,14 +21,14 @@ VistaMensajes bean = (VistaMensajes) uvdatos.getVistas().get(VistaMensajes.class
 	
 	<table class="bluetable bolsaempleo" id="tableMensajesMEN">
 		<tr>
-			<th scope="col" style="width:5%"></th>
-			<th scope="col" style="width:20%" title="Fecha creación">Fecha creación</th>
-			<th scope="col" style="width:55%">Título</th>
-			<th scope="col" class="center" style="width:15%">Estado</th>
+			<th scope="col" style="width:60px"></th>
+			<th scope="col" style="width:120px" title="Fecha creación">Fecha creación</th>
+			<th scope="col">Título</th>
+			<th scope="col" class="center" style="width:95px">Estado</th>
 		</tr>
 		<tbody>
 		</tbody>
-		<tfoot>		
+		<tfoot>
 			<tr>
 				<th colSpan="4" style="width:100%"></th>
 			</tr>
@@ -78,14 +79,20 @@ $(document).ready(function() {
 		"pageSize": 10,
 		"defaultOrderBy": 1,
 		"defaultOrderDirection": 'desc',
+		"filterable": true,
 		"stateSave": true,
 		"action": "<%= ControladorMensajes.ACCION_DATATABLE %>",
 		"clickable": {'onClick': clickRow},
 		"columns": [
-			{'data': 'codNum'},
-			{'data': 'fechaCreacion'},
-			{'data': 'titulo'},
-			{'data': 'estado'},
+			{'data': 'codNum', 'filter': {'type': 'number'}},
+			{'data': 'fechaCreacion', 'filter': {'type': 'date'}},
+			{'data': 'titulo', 'filter': true},
+			{'data': 'estado', 'filter': {'type': 'select', 'options': {
+				'<%= ModeloMensajes.MENSAJE_ESTADO_BORRADOR %>': 'Borrador',
+				'<%= ModeloMensajes.MENSAJE_ESTADO_ENVIADO %>': 'Enviado',
+				'<%= ModeloMensajes.MENSAJE_ESTADO_ENVIANDO %>': 'Enviando'
+				}
+			}},
 		]
 	});	
 }); 
