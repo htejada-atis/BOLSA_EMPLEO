@@ -69,7 +69,8 @@ public class GenerarResultadosPDF extends BolsaEmpleoPDFGenerator {
 			
 			document.add(new Paragraph("Convocatoria: " + convocatoria.getDescripcion(), fontBold));
 			document.add(new Paragraph("Actualizado a fecha de: "
-					+ Formateador.formatoFecha(bolsa.getFechaBaremacion(), Formateador.FORMATO_FECHA_DDMMYYYY_HHMMSS), fontBold));
+					+ Formateador.formatoFecha(bolsa.getFechaBaremacionDefinitiva() != null 
+					? bolsa.getFechaBaremacionDefinitiva() : bolsa.getFechaBaremacion(), Formateador.FORMATO_FECHA_DDMMYYYY_HHMMSS), fontBold));
 			
 			document.add(new Paragraph("Usuario: "
 					+ Formateador.leeParametroString(candidato.getPrsNif()) + " "
