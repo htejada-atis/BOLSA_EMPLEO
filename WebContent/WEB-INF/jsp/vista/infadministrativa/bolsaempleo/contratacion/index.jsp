@@ -24,7 +24,10 @@ VistaContratacion bean = (VistaContratacion) uvdatos.getVistas().get(VistaContra
 		</button>
 		
 	<%	if (bean.getUsuarioLogeado().isServicioPersonal()) { %>
+		<div>
 			<button class="link-btn" id="exportar_plazas" title="Exportar plazas ofertadas a csv">Exportar a csv</button>
+			<button class="link-btn" id="exportar_estado_candidatos" title="Exportar estado de contratación de los candidatos">Exportar estado candidatos a csv</button>
+		</div>
 	<%	} %>
 	</div>
 	
@@ -100,6 +103,9 @@ $(document).ready(function() {
 <% if (bean.getUsuarioLogeado().isServicioPersonal()) { %>
 		$('#exportar_plazas').on('click', function() {
 			window.open("<%= request.getRequestURI() %>?<%= ControladorContratacion.PARAM_ACCION %>=<%= ControladorContratacion.ACCION_EXPORTAR_PLAZAS %>");
+		});
+		$('#exportar_estado_candidatos').on('click', function() {
+			window.open("<%= request.getRequestURI() %>?<%= ControladorContratacion.PARAM_ACCION %>=<%= ControladorContratacion.ACCION_EXPORTAR_ESTADO_CANDIDATOS %>");
 		});
 <%	} %>
 	
