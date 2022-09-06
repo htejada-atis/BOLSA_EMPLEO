@@ -992,10 +992,10 @@ public class ControladorContratacion extends HttpServlet {
 		if (plaza.getCurso().length() > ModeloPlazaOfertada.COLUMN_CURSO_MAXLENGTH) {
 			throw new UVException(String.format(MENSAJE_ERROR_CURSO_LARGO, ModeloPlazaOfertada.COLUMN_CURSO_MAXLENGTH));
 		}
-		if (!Pattern.matches(ModeloPlazaOfertada.FORMATO_CURSO, plaza.getCurso()) || Integer.parseInt(
-				plaza.getCurso().split("/")[0]) != Integer.parseInt(plaza.getCurso().split("/")[1]) - 1) {
-			throw new UVException(MENSAJE_ERROR_FORMATO_CURSO);
-		}
+//		if (!Pattern.matches(ModeloPlazaOfertada.FORMATO_CURSO, plaza.getCurso()) || Integer.parseInt(
+//				plaza.getCurso().split("/")[0]) != Integer.parseInt(plaza.getCurso().split("/")[1]) - 1) {
+//			throw new UVException(MENSAJE_ERROR_FORMATO_CURSO);
+//		}
 
 		if (bean.getUsuarioLogeado().isServicioPersonal()) {
 			if (Formateador.leeParametroInteger(BolsaEmpleoUtils.getParamRequestOrMultipartOrSession(request,
@@ -1056,7 +1056,11 @@ public class ControladorContratacion extends HttpServlet {
 			bean.setInfoEstadoBolsa("La convocatoria no está cerrada o finalizada");
 		} else if (convocatoria.getFechaCierre().after(bolsa.getFechaHabilitarContratos())) {
 			bean.setInfoEstadoBolsa(
-					"La fecha de habilitar contrato para la bolsa es inferior para la fecha de cierre de la convocatoria");
+					"La fecha de habilitar contrato de la bolsa [" 
+							+ (bolsa.getFechaHabilitarContratos() != null ? bolsa.getFechaHabilitarContratos().toString() : "") 
+					+ "] es posterior a la fecha de cierre de la convocatoria [" 
+							+ (convocatoria.getFechaCierre() != null ? convocatoria.getFechaCierre().toString() : "") 
+					+ " - " + convocatoria.getCurso() + "]");
 		}
 	}
 }

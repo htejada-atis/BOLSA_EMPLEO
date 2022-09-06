@@ -385,14 +385,18 @@ public final class BolsaEmpleoUtils {
 	 * @throws SQLException .
 	 */
 	public static String clobToString(Clob clob) throws IOException, SQLException {
-		try (Reader r = clob.getCharacterStream()) {
-			StringBuilder buffer = new StringBuilder();
-			int ch;
-			while ((ch = r.read()) != -1) {
-				buffer.append("" + (char) ch);
+		if (clob != null) {
+			try (Reader r = clob.getCharacterStream()) {
+				StringBuilder buffer = new StringBuilder();
+				int ch;
+				while ((ch = r.read()) != -1) {
+					buffer.append("" + (char) ch);
+				}
+				return buffer.toString();
 			}
-			return buffer.toString();
 		}
+		
+		return "";
 	}
 
 	/**
