@@ -69,6 +69,7 @@ public class VistaMeritosPreferentesCandidato extends Vista implements Serializa
 		this.opcionesMeritoPreferente = opciones;
 	}
 
+	@SuppressWarnings("unused")
 	private List<MeritoPreferenteOpcion> getOpcionesMerito() {
 		return this.opcionesMeritoPreferente;
 	}
