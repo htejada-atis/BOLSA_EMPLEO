@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Pattern;
 import java.util.stream.IntStream;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.annotation.WebServlet;
@@ -130,6 +129,7 @@ public class ControladorContratacion extends HttpServlet {
 	public static final String MENSAJE_ERROR_DURACION_PREVISTA_LARGA = "La duración prevista no puede contener mas de %d caracteres";
 	public static final String MENSAJE_ERROR_ELIMINAR_ESTADO_REQUERIDO = "Es requerido estado de creación o aprobación para poder eliminar la plaza";
 	public static final String MENSAJE_ERROR_ESTADO_CONTRATACION_REQUERIDO = "Es requerido estado de contratación para la plaza";
+	public static final String MENSAJE_ERROR_SOLICITUD_ENCONTRADA = "Solicitud del usuario no encontrada para la convocatoria %s";
 	public static final String MENSAJE_ERROR_ESTADO_CERRADA_REQUERIDO = "Es requerido estado de cerrada para la plaza";
 	public static final String MENSAJE_ERROR_ESTADO_CREACION_REQUERIDO = "Es requerido estado de creación para la plaza";
 	public static final String MENSAJE_ERROR_ESTADO_APROBACION_REQUERIDO = "Es requerido estado de aprobación para la plaza";
@@ -431,8 +431,8 @@ public class ControladorContratacion extends HttpServlet {
 		redireccionConPlazaSeleccionada(bean, datos, request, response, ACCION_SELECCIONAR_PLAZA_OFERTADA);
 	}
 
-	private void cerrarPlaza(VistaContratacion bean, UVDatos datos, HttpServletRequest request,
-			HttpServletResponse response) throws SQLException, UVException, IOException {
+	private void cerrarPlaza(VistaContratacion bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) 
+			throws SQLException, UVException, IOException {
 		if (!bean.getUsuarioLogeado().isServicioPersonal()) {
 			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, MENSAJE_ERROR_SIN_PERMISO);
 		}
@@ -451,18 +451,12 @@ public class ControladorContratacion extends HttpServlet {
 		// para el caso de la plaza que no es desierta se requiere los destinatarios
 		// para comunicar el cierre de la misma
 		if (cadenaEmails != null) {
-			cadenaEmails = cadenaEmails.replaceAll(" ", "");
-			String[] emails = cadenaEmails.split(",");
-
 			Contratacion contratacion = ModeloContratacion.obtenerInstancia().getContratacionByPlazaContratada(plaza);
 			if (contratacion == null) {
 				throw new UVException(MENSAJE_ERROR_SIN_CONTRATO);
 			}
 
-			modeloPlaza.crearMensajeCierrePlaza(plaza, contratacion, emails, bean.getUsuarioLogeado());
-
 			String estadoCandidato = ModeloEstadoCandidato.ESTADO_CONTRATADO;
-
 			if (plaza.getCuatrimestre().equals(ModeloPlazaOfertada.CUATRIMESTRE_PRIMERO)
 					|| plaza.getDedicacion().getTipo().equals(ModeloDedicacion.TIPO_TIEMPO_PARCIAL)) {
 				if (plaza.getCuatrimestre().equals(ModeloPlazaOfertada.CUATRIMESTRE_PRIMERO)) {
@@ -473,11 +467,15 @@ public class ControladorContratacion extends HttpServlet {
 					estadoCandidato = ModeloEstadoCandidato.ESTADO_CONTRATADO_PARCIAL;
 				}
 			}
+			
+			Solicitud solicitud = ModeloSolicitud.obtenerInstancia().getSolicitudByConvocatoriaUsuario(contratacion.getCandidato(), 
+					ModeloConvocatoria.obtenerInstancia().getConvocatoriaByCurso(plaza.getCurso()));
+			if (solicitud == null) {
+				throw new UVException(String.format(MENSAJE_ERROR_SOLICITUD_ENCONTRADA, plaza.getCurso()));
+			}
 
-			Solicitud solicitud = ModeloSolicitud.obtenerInstancia().getSolicitudByConvocatoriaUsuario(
-					contratacion.getCandidato(),
-					ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoriaFinalizada());
-
+			// cambiamos el estado de las áreas a contratado para las áreas del usuario del departamento
+			
 			List<Bolsa> listaBolsas = modeloBolsa.getBolsasByAreaDepartamentoEnSolicitud(plaza.getArea(), solicitud);
 			for (Bolsa bolsa : listaBolsas) {
 				CandidatoEstado candidato = new CandidatoEstado(contratacion.getCandidato());
@@ -486,6 +484,12 @@ public class ControladorContratacion extends HttpServlet {
 				ModeloEstadoCandidato.obtenerInstancia().cambiarEstadoCandidato(candidato, estadoCandidato, bolsa,
 						bean.getUsuarioLogeado());
 			}
+			
+			// creamos mensaje de cierre de plaza
+			
+			cadenaEmails = cadenaEmails.replaceAll(" ", "");
+			String[] emails = cadenaEmails.split(",");
+			modeloPlaza.crearMensajeCierrePlaza(plaza, contratacion, emails, bean.getUsuarioLogeado());
 		}
 
 		modeloPlaza.cerrarPlazaOfertada(plaza, bean.getUsuarioLogeado());
@@ -493,7 +497,7 @@ public class ControladorContratacion extends HttpServlet {
 		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_CERRAR_PLAZA, bean, request);
 		redireccionConPlazaSeleccionada(bean, datos, request, response, ACCION_SELECCIONAR_PLAZA_OFERTADA);
 	}
-
+	
 	private void reabrirPlaza(VistaContratacion bean, UVDatos datos, HttpServletRequest request,
 			HttpServletResponse response) throws SQLException, UVException, IOException {
 		if (!bean.getUsuarioLogeado().isServicioPersonal()) {

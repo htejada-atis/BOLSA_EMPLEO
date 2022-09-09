@@ -1018,8 +1018,6 @@ public class ModeloUsuarioBolsaEmpleo {
 	 * @throws SQLException .
 	 */
 	public void darBajaCandidatosSinSolicitudes(UsuarioBolsaEmpleo usuarioQueBorra) throws SQLException, UVException {
-		ModeloConvocatoria modelo = ModeloConvocatoria.obtenerInstancia();
-		
 		String consulta = ""
 				+ " SELECT bepusu.CODNUM"
 				+ " FROM TBEP_USUARIOS bepusu"
