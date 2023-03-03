@@ -141,18 +141,19 @@ public final class BolsaEmpleoUtils {
 
 		return m.matches();
 	}
-	
+
 	/**
 	 * Comprueba si un correo es válido.
-	 * @param value . 
-	 * @return . 
+	 * 
+	 * @param value .
+	 * @return .
 	 */
 	public static boolean isCorreo(String value) {
 		if (value == null) {
 			return false;
 		}
-		
-		String regex = "^(.+)@(\\S+)$";
+
+		String regex = "^[\\w-\\+]+(\\.[\\w]+)*@[\\w-]+(\\.[\\w]+)*(\\.[a-z]{2,})$";
 		Pattern p = Pattern.compile(regex);
 		Matcher m = p.matcher(value);
 
@@ -395,7 +396,7 @@ public final class BolsaEmpleoUtils {
 				return buffer.toString();
 			}
 		}
-		
+
 		return "";
 	}
 
@@ -653,9 +654,9 @@ public final class BolsaEmpleoUtils {
 		if (value == null) {
 			return "";
 		}
-		
+
 		String parsea = Formateador.formatoFecha(value, Formateador.FORMATO_FECHA_DDMMYYYY);
-		
+
 		return BolsaEmpleoUtils.string2csv(parsea);
 	}
 

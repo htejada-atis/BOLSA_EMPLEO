@@ -516,14 +516,17 @@ public class ModeloEstadoCandidato {
 		return ""
 				+ " SELECT DISTINCT bepusu.CODNUM AS BEPUSU_CODNUM, bepesc.CODNUM, bepesc.ESTADO, bepplo.CODNUM AS BEPPLO_CODNUM, "
 				+ "		bepbol.CODNUM AS BEPBOL_CODNUM, bepcts.CONTRATOS, bepofc.CODNUM AS BEPOFC_CODNUM, bepsob.TOTAL AS PUNTUACION, "
-				+ "     CASE" + "         WHEN bepesc.ESTADO = '"
-				+ ModeloEstadoCandidato.ESTADO_CONTRATADO_PRIMER_CUATRIMESTRE + "'"
+				+ "     CASE" 
+				+ "         WHEN bepesc.ESTADO = '" + ModeloEstadoCandidato.ESTADO_CONTRATADO_PRIMER_CUATRIMESTRE + "'"
 				+ "             AND bepplo.CUATRIMESTRE = '" + ModeloPlazaOfertada.CUATRIMESTRE_SEGUNDO + "' THEN 1"
 				+ "         WHEN bepesc.ESTADO = '" + ModeloEstadoCandidato.ESTADO_CONTRATADO_PARCIAL + "'"
 				+ "             AND bepded.TIPO = '" + ModeloDedicacion.TIPO_TIEMPO_PARCIAL + "' THEN 1"
-				+ "         WHEN bepcts.CONTRATOS > 0 THEN 0" + "         WHEN bepesc.CODNUM IS NULL THEN 1"
+				+ "         WHEN bepcts.CONTRATOS > 0 THEN 0" 
+				+ "         WHEN bepesc.CODNUM IS NULL THEN 1"
 				+ "         WHEN bepesc.ESTADO = '" + ModeloEstadoCandidato.ESTADO_DISPONIBLE + "' THEN 1"
-				+ "         ELSE 0" + "     END AS DISPONIBILIDAD" + " FROM TBEP_USUARIOS bepusu"
+				+ "         ELSE 0" 
+				+ "     END AS DISPONIBILIDAD" 
+				+ " FROM TBEP_USUARIOS bepusu"
 				+ " INNER JOIN TBEP_SOLICITUDES bepsol ON (bepsol.BEPUSU_CODNUM = bepusu.CODNUM AND bepsol.BEPCON_CODNUM = ? "
 				+ "		AND bepsol.ESTADO = '" + ModeloSolicitud.SOLICITUD_ESTADO_CERRADA + "')"
 				+ " INNER JOIN TBEP_SOLICITUD_BOLSAS bepsob ON (bepsob.BEPSOL_CODNUM = bepsol.CODNUM AND bepsob.FECHABAREMACION IS NOT NULL)"
@@ -535,9 +538,12 @@ public class ModeloEstadoCandidato {
 				+ " LEFT JOIN TBEP_OFERTAS_CANDIDATOS bepofc ON (bepofc.BEPUSU_CODNUM = bepusu.CODNUM AND bepofc.BEPPLO_CODNUM = bepplo.CODNUM) "
 				+ " LEFT JOIN ("
 				+ "     SELECT bepesc.BEPUSU_CODNUM AS BEPUSU_CODNUM, COUNT(DISTINCT bepesc.BEPPLO_CODNUM) AS CONTRATOS"
-				+ "     FROM TBEP_ESTADO_CANDIDATOS bepesc" + "     WHERE bepesc.ESTADO NOT IN (" + estadosCandidato
-				+ ")" + "     GROUP BY bepesc.BEPUSU_CODNUM" + " ) bepcts ON bepcts.BEPUSU_CODNUM = bepusu.CODNUM"
-				+ " WHERE bepplo.CODNUM = ?" + "     AND bepusu.ROL = " + ModeloRol.ID_ROL_CANDIDATO
+				+ "     FROM TBEP_ESTADO_CANDIDATOS bepesc" 
+				+ "     WHERE bepesc.ESTADO NOT IN (" + estadosCandidato + ")" 
+				+ "     GROUP BY bepesc.BEPUSU_CODNUM" 
+				+ " ) bepcts ON bepcts.BEPUSU_CODNUM = bepusu.CODNUM"
+				+ " WHERE bepplo.CODNUM = ?" 
+				+ "     AND bepusu.ROL = " + ModeloRol.ID_ROL_CANDIDATO
 				+ "     AND bepusu.FLGBORRADO = 'N'";
 	}
 }

@@ -51,7 +51,7 @@ public final class EnviarMensaje {
 				
 				// enviamos mensajes
 				List<String> emails = new ArrayList<>();
-				emails.add(destinatario.getUsuario() != null ? destinatario.getUsuario().getEmail() : destinatario.getEmail());
+				emails.add(destinatario.getEmail());
 				
 				String nombreArchivo = null;
 				DataSource source = null;

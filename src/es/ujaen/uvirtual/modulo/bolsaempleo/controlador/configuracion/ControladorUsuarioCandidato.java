@@ -530,6 +530,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 			usuarioForm.setProvincia(bean.getCandidato().getProvincia());
 			usuarioForm.setNacionalidad(bean.getCandidato().getNacionalidad());
 			usuarioForm.setTelefono(bean.getCandidato().getTelefono());
+			usuarioForm.setEmail(bean.getCandidato().getEmail());
 			
 			ModeloUsuarioBolsaEmpleo.obtenerInstancia().actualizaUsuario(usuarioForm, bean.getUsuarioLogeado());
 			BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_EDITAR, bean, request);
