@@ -527,11 +527,12 @@ public class ModeloMensajes {
 				}
 			}
 		
-			String consultaInsert = "INSERT INTO TBEP_MEN_DESTINATARIOS (BEPMEN_CODNUM, BEPUSU_CODNUM, UID_USUARIO) VALUES (?, ?, ?)";
+			String consultaInsert = "INSERT INTO TBEP_MEN_DESTINATARIOS (BEPMEN_CODNUM, BEPUSU_CODNUM, EMAIL, UID_USUARIO) VALUES (?, ?, ?, ?)";
 			try (PreparedStatement stmt = conexion.prepareStatement(consultaInsert)) {
 				int parameterIndex = 1;
 				stmt.setInt(parameterIndex++, mensaje.getCodNum());
 				stmt.setInt(parameterIndex++, destinatario.getCodNum());
+				stmt.setString(parameterIndex++, destinatario.getEmail());
 				stmt.setString(parameterIndex++, usuarioUpdate.getCodCuenta());
 				stmt.executeUpdate();
 			}

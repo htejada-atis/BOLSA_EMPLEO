@@ -131,7 +131,7 @@ public class ModeloUsuarioBolsaEmpleo {
 	 */
 	public UsuarioBolsaEmpleo getUsuarioById(int codNum) throws SQLException, UVException {
 		String consulta = "SELECT * FROM TBEP_USUARIOS bepusu WHERE bepusu.CODNUM = ?";
-		
+
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			stmt.setInt(1, codNum);
 
@@ -139,7 +139,7 @@ public class ModeloUsuarioBolsaEmpleo {
 				if (!rs.next()) {
 					throw new UVException(MENSAJE_ERROR_USUARIO_CON_ID_NO_EXISTE);
 				}
-				return getUsuarioFromResultSet(rs);				
+				return getUsuarioFromResultSet(rs);
 			}
 		}
 	}
@@ -477,7 +477,7 @@ public class ModeloUsuarioBolsaEmpleo {
 		
 		stmt.setString(parameterIndex++, usuarioInsertOrUpdate.getCodCuenta());
 		stmt.setInt(parameterIndex++, usuario.getRol().getCodNum());
-		stmt.setString(parameterIndex++, usuario.getCodCuenta());			
+		stmt.setString(parameterIndex++, usuario.getCodCuenta());
 		
 		// arcos
 		stmt.setString(parameterIndex++, usuario.getTipoDocumento());
@@ -540,7 +540,9 @@ public class ModeloUsuarioBolsaEmpleo {
 			throw new UVException(MENSAJE_ERROR_CODNUM_REQUERIDO);
 		}
 
-		String consulta = "UPDATE tbep_usuarios SET UID_USUARIO=?,DIRECCION=?,CODIGOPOSTAL=?,LOCALIDAD=?,PROVINCIA=?,NACIONALIDAD=?,TELEFONO=?,FLGLISTADISTRIBUCION=?"
+		String consulta = "UPDATE tbep_usuarios SET "
+				+ " UID_USUARIO=?,DIRECCION=?,CODIGOPOSTAL=?,LOCALIDAD=?,PROVINCIA=?,NACIONALIDAD=?,TELEFONO=?,"
+				+ " FLGLISTADISTRIBUCION=?,VUAJA_EMAIL_ALTA=?"
 				+ " WHERE codnum=?";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
@@ -553,6 +555,7 @@ public class ModeloUsuarioBolsaEmpleo {
 			stmt.setString(parameterIndex++, usuario.getNacionalidad());
 			stmt.setString(parameterIndex++, usuario.getTelefono());
 			stmt.setString(parameterIndex++, Boolean.TRUE.equals(usuario.getListaDist()) ? "S" : "N");
+			stmt.setString(parameterIndex++, usuario.getEmail());
 			stmt.setInt(parameterIndex++, usuario.getCodNum());
 			stmt.executeUpdate();
 		}

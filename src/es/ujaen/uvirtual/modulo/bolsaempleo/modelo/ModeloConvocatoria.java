@@ -262,7 +262,8 @@ public class ModeloConvocatoria {
 	public Convocatoria getConvocatoriaByCurso(String curso) throws SQLException, UVException {
 		String consulta = "SELECT bepcon.*"
 				+ " FROM TBEP_CONVOCATORIAS bepcon"
-				+ " WHERE bepcon.CURSO = ?";
+				+ " WHERE bepcon.CURSO = ?"
+				+ " ORDER BY bepcon.CODNUM DESC ";
 
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			stmt.setString(1, curso);

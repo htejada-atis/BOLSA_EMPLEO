@@ -39,8 +39,8 @@ public class ControladorMisDatos extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static final String NOMBREDEESTACLASE = ControladorUsuarioBolsaEmpleo.class.getName();
 	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
-    
-    // parámetros
+
+	// parámetros
 	public static final String PARAM_ACCION = "a";
 	public static final String PARAM_ENVIAR = "enviar";
 	public static final String PARAM_ID = "id";
@@ -48,7 +48,7 @@ public class ControladorMisDatos extends HttpServlet {
 	public static final String PARAM_EMAIL = "email";
 	public static final String PARAM_DOCUMENTO = "documento";
 	public static final String PARAM_LISTA = "listadist";
-	
+
 	public static final String PARAM_PRIMER_APELLIDO = "primer_apellido";
 	public static final String PARAM_SEGUNDO_APELLIDO = "segundo_apellido";
 	public static final String PARAM_DIRECCION = "direccion";
@@ -61,12 +61,12 @@ public class ControladorMisDatos extends HttpServlet {
 	public static final String PARAM_DARSE_BAJA = "baja";
 	public static final String PARAM_RAZON_BORRADO = "razonborrado";
 
-    // acciones
+	// acciones
 	public static final String ACCION_INDEX = "index";
 	public static final String ACCION_ENVIAR_MISDATOS = "enviarmisdatos";
 	public static final String ACCION_BAJA_USUARIO = "bajausuario";
 
-    // mensajes
+	// mensajes
 	public static final String MENSAJE_EXITO_ENVIAR = "Datos personales actualizados correctamente";
 	public static final String MENSAJE_EXITO_DARSE_BAJA = "Usuario dado de baja correctamente";
 	public static final String MENSAJE_ERROR_RAZON_BORRADO_VACIO = "La razón de borrado no puede estar vacía";
@@ -79,44 +79,48 @@ public class ControladorMisDatos extends HttpServlet {
 	public static final String MENSAJE_ERROR_PROVINCIA_LARGO = "La provincia no puede contener mas de %d caracteres";
 	public static final String MENSAJE_ERROR_TELEFONO_LARGO = "El telefono no puede contener mas de %d caracteres";
 	public static final String MENSAJE_ERROR_NACIONALIDAD_LARGO = "La nacionalidad no puede contener mas de %d caracteres";
-	
+	public static final String MENSAJE_ERROR_EMAIL_NO_VALIDO = "El email no es válido";
+
 	public static final String JSP_INDEX = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/misdatos/index.jsp";
 
-    /** Peticion GET.
-     * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
-     */
+	/**
+	 * Peticion GET.
+	 * 
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
+	 *      response)
+	 */
 	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		UVDatos datos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
 		datos.setDocType("<!DOCTYPE html>");
 		datos.setContentType("text/html");
-		
-		VistaUsuarioBolsaEmpleo bean = new VistaUsuarioBolsaEmpleo();       
+
+		VistaUsuarioBolsaEmpleo bean = new VistaUsuarioBolsaEmpleo();
 		Usuario usuario = datos.getUsuario();
 		LOGGER.log(Level.FINEST, "usuario que ha entrado en el servlet es {0}", usuario.getUid());
-		
+
 		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
 		if (nombreAccion == null) {
 			nombreAccion = ACCION_INDEX;
 		}
-		
+
 		try {
 			if (!init(bean, datos, request, response)) {
 				return;
 			}
 
 			switch (nombreAccion) {
-				case ACCION_INDEX:
-					index(bean);
-					break;
-				case ACCION_ENVIAR_MISDATOS:
-					enviarMisDatos(request, response, bean, datos);
-					break;
-				case ACCION_BAJA_USUARIO:
-					bajaUsuario(request, datos, response, bean);
-					break;
-				default:
-					errorFatal(bean, "Acción no contemplada");
+			case ACCION_INDEX:
+				index(bean);
+				break;
+			case ACCION_ENVIAR_MISDATOS:
+				enviarMisDatos(request, response, bean, datos);
+				break;
+			case ACCION_BAJA_USUARIO:
+				bajaUsuario(request, datos, response, bean);
+				break;
+			default:
+				errorFatal(bean, "Acción no contemplada");
 			}
 		} catch (UVException e) {
 			LOGGER.log(Level.WARNING, e.toString());
@@ -136,32 +140,34 @@ public class ControladorMisDatos extends HttpServlet {
 			datos.getFicherosCSS().add(ModeloParametrosConfiguracion.CSS_BOLSA_EMPLEO);
 			datos.getFicherosCSS().add("/css/jqueryujaen/jquery-ui-1.8.16.custom.css");
 		}
-    }
-	
-	private boolean init(VistaUsuarioBolsaEmpleo bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+	}
+
+	private boolean init(VistaUsuarioBolsaEmpleo bean, UVDatos datos, HttpServletRequest request,
+			HttpServletResponse response) throws SQLException, UVException, IOException {
 		this.index(bean);
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
 		try {
 			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getAndRefreshUsuario(datos));
 			if (bean.getUsuarioLogeado().getCodNum() == null) {
 				Usuario usuArcos = datos.getUsuario();
-				throw new UVException(String.format("No existe el usuario [%s]", usuArcos != null ? usuArcos.getUid() : "-"));
+				throw new UVException(
+						String.format("No existe el usuario [%s]", usuArcos != null ? usuArcos.getUid() : "-"));
 			}
-			
+
 		} catch (UVException e) {
 			LOGGER.log(Level.WARNING, e.toString());
 			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, e.getMessage());
 			return false;
 		}
-		
+
 		return true;
 	}
-    
+
 	private void errorFatal(VistaUsuarioBolsaEmpleo bean, String mensaje) {
 		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/error.jsp");
 		bean.getMensajesDeError().add(mensaje);
-    }
-    
+	}
+
 	/**
 	 * Redireccion de do post.
 	 * 
@@ -169,62 +175,63 @@ public class ControladorMisDatos extends HttpServlet {
 	 *      response)
 	 */
 	@Override
-    public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		doGet(request, response);
-	}   
-	
+	}
+
 	private void index(VistaUsuarioBolsaEmpleo bean) {
 		bean.setVista(JSP_INDEX);
 	}
-    
-	private void enviarMisDatos(HttpServletRequest request, HttpServletResponse response, VistaUsuarioBolsaEmpleo bean, UVDatos datos) 
-			throws SQLException, UVException, IOException {
+
+	private void enviarMisDatos(HttpServletRequest request, HttpServletResponse response, VistaUsuarioBolsaEmpleo bean,
+			UVDatos datos) throws SQLException, UVException, IOException {
 		bean.setVista(JSP_INDEX);
-                                        
+
 		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 		UsuarioBolsaEmpleo usuario = modelo.getUsuarioById(Formateador.leeParametroInteger(request.getParameter(PARAM_ID)));
-		
+
 		UsuarioBolsaEmpleo usuarioForm = this.validarDatosUsuario(request, datos.getUsuario());
 		usuarioForm.setCodNum(usuario.getCodNum());
 		usuarioForm.setCodCuenta(usuario.getCodCuenta());
-		    
+
 		modelo.actualizaUsuarioMisDatos(usuarioForm, bean.getUsuarioLogeado());
-		
+
 		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_ENVIAR, bean, request);
 		datos.setRespuestaEnviada(true);
 		response.sendRedirect(request.getServletPath());
-    }
-    
-	private void bajaUsuario(HttpServletRequest request, UVDatos datos, HttpServletResponse response, VistaUsuarioBolsaEmpleo bean) 
-			throws SQLException, UVException, IOException {
-		
+	}
+
+	private void bajaUsuario(HttpServletRequest request, UVDatos datos, HttpServletResponse response,
+			VistaUsuarioBolsaEmpleo bean) throws SQLException, UVException, IOException {
+
 		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/misdatos/formBaja.jsp");
-		
+
 		if (EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_RAZON_BORRADO)) != null) {
 			String razonBorrado = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_RAZON_BORRADO));
 			if (razonBorrado == null || razonBorrado.isBlank()) {
 				throw new UVException(MENSAJE_ERROR_RAZON_BORRADO_VACIO);
 			}
 			if (razonBorrado.length() > ModeloUsuarioBolsaEmpleo.COLUMN_RAZON_BORRADO_MAXLENGTH) {
-				throw new UVException(String.format(MENSAJE_ERROR_NOMBRE_LARGO, ModeloUsuarioBolsaEmpleo.COLUMN_RAZON_BORRADO_MAXLENGTH));
+				throw new UVException(String.format(MENSAJE_ERROR_NOMBRE_LARGO,
+						ModeloUsuarioBolsaEmpleo.COLUMN_RAZON_BORRADO_MAXLENGTH));
 			}
 			ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 			UsuarioBolsaEmpleo usu = modelo.getUsuarioById(bean.getUsuarioLogeado().getCodNum());
-			
-			usu.setRazonBorrado(razonBorrado);			
+
+			usu.setRazonBorrado(razonBorrado);
 			modelo.cambiarFlagBorradoUsuarioRazon(usu, bean.getUsuarioLogeado());
-			
-			BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_DARSE_BAJA, bean, request);			
+
+			BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_DARSE_BAJA, bean, request);
 			datos.setRespuestaEnviada(true);
 			response.sendRedirect(request.getServletPath());
 		}
 	}
-    
+
 	/**
 	 * Valida el formulario de Mis Datos.
 	 * 
 	 * @param request .
-	 * @param usu .
+	 * @param usu     .
 	 * @return validator .
 	 * @throws UVException  .
 	 * @throws SQLException .
@@ -233,24 +240,32 @@ public class ControladorMisDatos extends HttpServlet {
 	 */
 	private UsuarioBolsaEmpleo validarDatosUsuario(HttpServletRequest request, Usuario usu) throws UVException {
 		UsuarioBolsaEmpleo u = this.validarDatosUsuarioDireccion(request, new UsuarioBolsaEmpleo());
-		        
+		u.setUsuarioArcos(usu);
+
 		u.setTelefono(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_TELEFONO)));
 		if (u.getTelefono() != null) {
 			if (!BolsaEmpleoUtils.isInteger(u.getTelefono())) {
 				throw new UVException(MENSAJE_ERROR_TELEFONO_STRING);
 			}
 			if (u.getTelefono().length() > ModeloUsuarioBolsaEmpleo.COLUMN_TELEFONO_MAXLENGTH) {
-				throw new UVException(String.format(MENSAJE_ERROR_TELEFONO_LARGO, ModeloUsuarioBolsaEmpleo.COLUMN_TELEFONO_MAXLENGTH));
+				throw new UVException(String.format(MENSAJE_ERROR_TELEFONO_LARGO,
+						ModeloUsuarioBolsaEmpleo.COLUMN_TELEFONO_MAXLENGTH));
 			}
 		}
-		
+
 		u.setNacionalidad(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_NACIONALIDAD)));
 		if (u.getNacionalidad().length() > ModeloUsuarioBolsaEmpleo.COLUMN_NACIONALIDAD_MAXLENGTH) {
-			throw new UVException(String.format(MENSAJE_ERROR_NACIONALIDAD_LARGO, ModeloUsuarioBolsaEmpleo.COLUMN_NACIONALIDAD_MAXLENGTH));
+			throw new UVException(String.format(MENSAJE_ERROR_NACIONALIDAD_LARGO,
+					ModeloUsuarioBolsaEmpleo.COLUMN_NACIONALIDAD_MAXLENGTH));
 		}
-	    
+
 		u.setListaDist("true".equals(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_LISTA))));
 		
+		u.setEmail(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_EMAIL)));
+		if (!BolsaEmpleoUtils.isCorreo(u.getEmail())) {
+			throw new UVException(MENSAJE_ERROR_EMAIL_NO_VALIDO);
+		}
+
 //		u.setTipoDocumento(usu.getDocumentoTipo());
 //		u.setIdNif(AdaptadorDocumentoIdentidad.numeroDocumento(AdaptadorDocumentoIdentidad.UXXIAC, usu));
 //		u.setLetraNif(AdaptadorDocumentoIdentidad.letraNIF(usu.getDocumentoTipo(), usu.getDocumentoNumero()));
@@ -258,13 +273,10 @@ public class ControladorMisDatos extends HttpServlet {
 //		u.setNombre(usu.getNombre());
 //		u.setPrimerApellido(usu.getApellido1());
 //		u.setSegundoApellido(usu.getApellido2());
-//		u.setEmail(usu.getEmailCalculado());
-		
-		u.setUsuarioArcos(usu);
-	
+
 		return u;
 	}
-    
+
 	private UsuarioBolsaEmpleo validarDatosUsuarioDireccion(HttpServletRequest request, UsuarioBolsaEmpleo u)
 			throws UVException {
 		u.setDireccion(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_DIRECCION)));

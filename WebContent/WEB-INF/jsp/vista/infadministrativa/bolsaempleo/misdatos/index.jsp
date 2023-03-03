@@ -109,17 +109,16 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
     			<label for="telefono" class="bold-label">Tel&eacute;fono: </label>
     			<input class="form-input-custom" pattern="[0-9]{1,11}" id="telefono"  type="text" name="<%= ControladorMisDatos.PARAM_TELEFONO %>" value="<%= telefono %>" required/>
     		</div>
-    		    	    <div class="form-group">
+    		<div class="form-group">
     			<label for="nacionalidad">Nacionalidad: </label>
     			<input class="form-input-custom" id="nacionalidad" type="text" name="<%= ControladorMisDatos.PARAM_NACIONALIDAD %>" value="<%= nacionalidad %>"/>
     		</div>
     	</div>
     	
-    	    	    <div class="form-group">
-    			<label for="apellidos" class="bold-label">Email: </label>
-    			<input class="form-input-custom" id="apellidos" type="text" name="<%= ControladorMisDatos.PARAM_EMAIL %>" value="<%= email %>" disabled/>
-    		</div>
-    	
+    	<div class="form-group">
+    		<label for="email" class="bold-label">Email: </label>
+    		<input class="form-input-custom" id="email" type="text" name="<%= ControladorMisDatos.PARAM_EMAIL %>" value="<%= email %>"/>
+    	</div>
     	
     	<div class="form-group-container">
     		<div class="form-check">
