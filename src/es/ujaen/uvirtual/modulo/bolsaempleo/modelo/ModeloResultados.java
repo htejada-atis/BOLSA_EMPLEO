@@ -552,32 +552,36 @@ public class ModeloResultados {
 	
 	 
 	
-	/** Devuelve los méritos validados con valoraciones de la bolsa en una solicitud .
-	 * @param bolsa .
+	/**
+	 * Devuelve los méritos validados con valoraciones de la bolsa en una solicitud.
+	 * 
+	 * @param bolsa     .
 	 * @param solicitud .
 	 * @return .
 	 * @throws SQLException .
-	 * @throws UVException .
+	 * @throws UVException  .
 	 */
-	public List<MeritoResultado> getMeritosSolicitudBolsaValidados(Solicitud solicitud, Bolsa bolsa) throws SQLException, UVException {
+	public List<MeritoResultado> getMeritosSolicitudBolsaValidados(Solicitud solicitud, Bolsa bolsa)
+			throws SQLException, UVException {
 		List<MeritoResultado> meritos = new ArrayList<>();
-		
-		String consulta = this.getMeritosSolicitudBolsaQueryBase()
+
+		String consulta = this.getMeritosSolicitudBolsaQueryBase() 
 				+ " AND bepsbm.FLGVALIDADO = 'S'"
 				+ " AND bepsbm.FLGEXCLUIDO = 'N'";
-		
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+				PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int indexParam = 1;
 			stmt.setInt(indexParam++, bolsa.getCodNum());
 			stmt.setInt(indexParam++, solicitud.getCodNum());
-			
+
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
 					meritos.add(this.createMeritoResultadoFromResultset(rs));
 				}
 			}
 		}
-		
+
 		return meritos;
 	}
 	
@@ -649,11 +653,20 @@ public class ModeloResultados {
 	 */
 	private String getMeritosSolicitudBolsaQueryBase() {
 		return ""
-				+ "	SELECT bepmer.CODNUM, bepmer.BEPITE_CODNUM AS BEPITE_CODNUM, bepmer.VALOR, bepmer.DESCRIPCION, bepmer.OBSERVACION"
-				+ "     , bepsbm.CODNUM AS " + CODNUM_MERITO_SOLICITUD + ", bepsbm.VALOR AS " + VALOR_MERITO_SOLICITUD
-				+ "     , bepsbm.OBSERVACION_CANDIDATO, bepsbm.RESULTADO, bepsbm.DESGLOSE, bepsbm.FLGEXCLUIDO, bepsbm.FLGVALIDADO"
-				+ "     , bepsbm.BEPITE_CODNUM AS ITEM_SBM"
-				+ "     , bepsol.BEPUSU_CODNUM AS USUARIO_CODNUM"
+				+ "	SELECT 	bepmer.CODNUM, "
+				+ "			bepmer.BEPITE_CODNUM AS BEPITE_CODNUM, "
+				+ "			bepmer.VALOR, "
+				+ "			bepmer.DESCRIPCION, "
+				+ "			bepmer.OBSERVACION, "
+				+ "			bepsbm.CODNUM AS " + CODNUM_MERITO_SOLICITUD + ", "
+				+ "			bepsbm.VALOR AS " + VALOR_MERITO_SOLICITUD + ", "
+				+ "			bepsbm.OBSERVACION_CANDIDATO, "
+				+ "			bepsbm.RESULTADO, "
+				+ "			bepsbm.DESGLOSE, "
+				+ "			bepsbm.FLGEXCLUIDO, "
+				+ "			bepsbm.FLGVALIDADO, "
+				+ "			bepsbm.BEPITE_CODNUM AS ITEM_SBM, "
+				+ "			bepsol.BEPUSU_CODNUM AS USUARIO_CODNUM"
 				+ " FROM TBEP_SOL_BOL_MERITOS bepsbm"
 				+ " INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbo.CODNUM  = bepsbm.BEPSBO_CODNUM"
 				+ " INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.CODNUM = bepsbo.BEPSOL_CODNUM"
@@ -666,26 +679,36 @@ public class ModeloResultados {
 				+ "     AND bepsbo.BEPSOL_CODNUM = ?";
 	}
 	
-	/** Devuelve la bolsa con los resultados de la solicitud de un candidato para esa bolsa .
-	 * @param bolsa .
-	 * @param candidato .
+	/**
+	 * Devuelve la bolsa con los resultados de la solicitud de un candidato para esa bolsa .
+	 * 
+	 * @param bolsa        .
+	 * @param candidato    .
 	 * @param convocatoria .
 	 * @return resultado .
 	 * @throws SQLException .
-	 * @throws UVException .
+	 * @throws UVException  .
 	 */
 	public BolsaResultado getBolsaResultado(Bolsa bolsa, UsuarioBolsaEmpleo candidato, Convocatoria convocatoria) throws SQLException, UVException {
-		
-		String consulta = "SELECT bepsob.BEPBOL_CODNUM, bepsob.TOTAL, bepsob.TOTALSINAPLICAR, bepsob.DESGLOSETOTAL, "
-				+ "		bepsob.DESGLOSEDESCRIPCION, bepsob.FECHABAREMACION, bepsol.CODNUM AS BEPSOL_CODNUM,"
-				+ "		bepsob.ACREDITACIONES_VALIDADAS, bepsob.TITULACIONES_VALIDADAS"
-				+ " FROM TBEP_SOLICITUD_BOLSAS bepsob"
-				+ "	INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.CODNUM = bepsob.BEPSOL_CODNUM"
-				+ "	WHERE 	bepsol.BEPCON_CODNUM = ?"
-				+ "		AND bepsob.BEPBOL_CODNUM = ?"
-				+ "		AND bepsol.ESTADO = ?"
-				+ "		AND bepsol.BEPUSU_CODNUM = ?";
-		
+
+		String consulta = 
+				"SELECT bepsob.BEPBOL_CODNUM, "
+				+ "	    bepsob.TOTAL, "
+				+ "		bepsob.TOTALSINAPLICAR, "
+				+ "		bepsob.DESGLOSETOTAL, "
+				+ "		bepsob.DESGLOSEDESCRIPCION, "
+				+ "		bepsob.FECHABAREMACION, "
+				+ "		bepsol.CODNUM AS BEPSOL_CODNUM,"
+				+ "		bepsob.ACREDITACIONES_VALIDADAS, "
+				+ "		bepsob.TITULACIONES_VALIDADAS "
+				+ " FROM TBEP_SOLICITUD_BOLSAS bepsob "
+				+ "	INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.CODNUM = bepsob.BEPSOL_CODNUM "
+				+ "	WHERE 	"
+				+ "		bepsol.BEPCON_CODNUM = ? " 
+				+ "		AND bepsob.BEPBOL_CODNUM = ? "
+				+ "		AND bepsol.ESTADO = ? " 
+				+ "		AND bepsol.BEPUSU_CODNUM = ? ";
+
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int indexParam = 1;
@@ -693,13 +716,12 @@ public class ModeloResultados {
 			stmt.setInt(indexParam++, bolsa.getCodNum());
 			stmt.setString(indexParam++, ModeloSolicitud.SOLICITUD_ESTADO_CERRADA);
 			stmt.setInt(indexParam++, candidato.getCodNum());
-			
-			
+
 			try (ResultSet rs = stmt.executeQuery()) {
 				if (!rs.next()) {
 					throw new UVException("No existe la solicitud para la bolsa");
 				}
-				
+
 				return this.createBolsaResultadoFromResultset(rs);
 			}
 		}
@@ -889,11 +911,13 @@ public class ModeloResultados {
 		return merito;
 	}
 	
-	/** Crea una bolsa resultado a partir de un resultset .
+	/**
+	 * Crea una bolsa resultado a partir de un resultset .
+	 * 
 	 * @param rs .
 	 * @return .
 	 * @throws SQLException .
-	 * @throws UVException .
+	 * @throws UVException  .
 	 */
 	public BolsaResultado createBolsaResultadoFromResultset(ResultSet rs) throws SQLException, UVException {
 		Bolsa bol = ModeloBolsa.obtenerInstancia().getBolsaById(rs.getInt(BEPBOL_CODNUM));
@@ -907,9 +931,9 @@ public class ModeloResultados {
 		List<MeritoResultado> meritosEvaluados = this.getMeritosSolicitudBolsaNoEvaluados(solicitud, bol);
 		Clob acreditaciones = rs.getClob(ACREDITACIONES_VALIDADAS);
 		Clob titulaciones = rs.getClob(TITULACIONES_VALIDADAS);
-		
-		return new BolsaResultado(bol, desgloseTotal, desgloseDescripcion, total, totalSinAplicar, meritos, meritosExcluidos, 
-				meritosEvaluados, acreditaciones, titulaciones);
+
+		return new BolsaResultado(bol, desgloseTotal, desgloseDescripcion, total, totalSinAplicar, meritos,
+				meritosExcluidos, meritosEvaluados, acreditaciones, titulaciones);
 	}
 	
 }
