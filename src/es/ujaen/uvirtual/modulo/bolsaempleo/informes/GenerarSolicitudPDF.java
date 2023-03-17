@@ -117,7 +117,7 @@ public class GenerarSolicitudPDF extends BolsaEmpleoPDFGenerator {
 
 		if (bolsa.getNumeroMeritos() != null && bolsa.getNumeroMeritos() > 0) {
 			for (MeritoSolicitudTable merito: bolsa.getListaMeritos()) {
-				String codigoItem = merito.getCodNum() + " " 
+				String codigoItem = merito.getCodNum() + " "
 						+ merito.getMerito().getItemBaremacion().getBloqueBaremacion().getApartadoBaremacion().getCodigo() + "." 
 						+ merito.getMerito().getItemBaremacion().getBloqueBaremacion().getCodigo() + "." 
 						+ merito.getMerito().getItemBaremacion().getCodigo();

@@ -1204,7 +1204,7 @@ public class ModeloSolicitud {
 				conexion.rollback();
 				throw e;
 			} finally {
-				conexion.setAutoCommit(true);				
+				conexion.setAutoCommit(true);
 			}
 		}
 	}
@@ -1502,7 +1502,8 @@ public class ModeloSolicitud {
 	 */
 	public Integer obtenerTotalMeritosSolicitud(Solicitud solicitud) throws SQLException {
 		Integer total = 0;
-		String consulta = "SELECT COUNT(*) AS total FROM TBEP_SOL_BOL_MERITOS bepsbm"
+		String consulta = "SELECT COUNT(*) AS total "
+				+ " FROM TBEP_SOL_BOL_MERITOS bepsbm"
 				+ "	INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbm.BEPSBO_CODNUM = bepsbo.CODNUM"
 				+ "	WHERE bepsbo.BEPSOL_CODNUM = ? ";
 		
@@ -1663,7 +1664,10 @@ public class ModeloSolicitud {
 					+ "	LEFT JOIN TBEP_SOL_BOL_MER_VALORACION bepsbv ON bepsbv.BEPSBM_CODNUM  = bepsbm.CODNUM"
 					+ "	INNER JOIN TBEP_MERITOS bepmer ON bepmer.CODNUM  = bepsbm.BEPMER_CODNUM"
 					+ "	INNER JOIN TBEP_ITEMSBAREMACION bepite ON bepite.CODNUM = bepmer.BEPITE_CODNUM"
-					+ "	WHERE bepsbo.BEPSOL_CODNUM = ? AND bepite.AFINIDAD IS NOT NULL AND bepsbv.CODNUM IS NULL AND bepite.INDIVIDUALIZADO = 'S'";
+					+ "	WHERE bepsbo.BEPSOL_CODNUM = ? "
+					+ "		AND bepite.AFINIDAD IS NOT NULL "
+					+ "		AND bepsbv.CODNUM IS NULL "
+					+ "		AND bepite.INDIVIDUALIZADO = 'S'";
 			
 			try (PreparedStatement stmt = conexion.prepareStatement(consultaIndividualizados)) {
 				int parameterIndex = 1;
@@ -1712,7 +1716,7 @@ public class ModeloSolicitud {
 		boolean evaluado = false;
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia()) {
-			// si el mérito está asociado a una solicitud, no se puede borrar		
+			// si el mérito está asociado a una solicitud, no se puede borrar
 			String consultaSolicitud = "SELECT besbm.* FROM TBEP_SOL_BOL_MERITOS besbm WHERE besbm.BEPMER_CODNUM = ?";
 			
 			try (PreparedStatement stmt = conexion.prepareStatement(consultaSolicitud)) {
@@ -1720,7 +1724,7 @@ public class ModeloSolicitud {
 				stmt.setInt(parameterIndex++, merito.getCodNum());
 				
 				try (ResultSet rs = stmt.executeQuery()) {
-					asociadoASolicitud = rs.next();				
+					asociadoASolicitud = rs.next();
 				}
 			}
 			
@@ -1732,7 +1736,7 @@ public class ModeloSolicitud {
 				stmt.setInt(parameterIndex++, merito.getCodNum());
 				
 				try (ResultSet rs = stmt.executeQuery()) {
-					evaluado = rs.next();				
+					evaluado = rs.next();
 				}
 			}
 		}
@@ -2089,7 +2093,7 @@ public class ModeloSolicitud {
 				+ "		WHERE bepsbm.BEPMER_CODNUM = ? AND bepsbm.BEPSBO_CODNUM IN ( "
 				+ "			SELECT bepsbo.CODNUM "
 				+ "			FROM TBEP_SOLICITUD_BOLSAS bepsbo "
-				+ "			WHERE bepsbo.BEPSOL_CODNUM = ? AND bepsbo.BEPBOL_CODNUM = ? "						
+				+ "			WHERE bepsbo.BEPSOL_CODNUM = ? AND bepsbo.BEPBOL_CODNUM = ? "
 				+ "		)"
 				+ ")";
 		
@@ -2110,7 +2114,7 @@ public class ModeloSolicitud {
 				+ "		WHERE bepsbm.BEPMER_CODNUM = ? AND bepsbm.BEPSBO_CODNUM IN ( "
 				+ "			SELECT bepsbo.CODNUM "
 				+ "			FROM TBEP_SOLICITUD_BOLSAS bepsbo "
-				+ "			WHERE bepsbo.BEPSOL_CODNUM = ? AND bepsbo.BEPBOL_CODNUM = ? "						
+				+ "			WHERE bepsbo.BEPSOL_CODNUM = ? AND bepsbo.BEPBOL_CODNUM = ? "
 				+ "		)"
 				+ ")";
 		
