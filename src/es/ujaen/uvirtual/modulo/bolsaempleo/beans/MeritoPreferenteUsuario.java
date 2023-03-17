@@ -43,6 +43,7 @@ public class MeritoPreferenteUsuario implements Serializable {
 	 * @param pfechaBorrado .
 	 * @param pvalidado .
 	 * @param pfechaValidado .
+	 * @param pactivo .
 	 */
 	public MeritoPreferenteUsuario(Integer pcodNum, MeritoPreferente pmeritoPreferente, MeritoPreferenteOpcion pmeritoPreferenteOpcion, 
 			UsuarioBolsaEmpleo pusuario, String pdescripcion, InputStream parchivo, Boolean pborrado, Date pfechaBorrado, 
