@@ -69,9 +69,8 @@ public class ModeloBaremacionApartados {
 		return eInstancia;
 	}
 	
-	/********************************************** METODOS PÚBLICOS PARA CONSULTAS APARTADOBAREMACION  ********************************************/
 	
-    /**
+	/**
 	 * Devuelve un apartado de baremación por su id.
 	 * @param codNum .
 	 * @return apartado o excepción si no existe
@@ -82,7 +81,7 @@ public class ModeloBaremacionApartados {
 		if (codNum == null) {
 			throw new UVException(ERROR_BLOQUE_REQUERIDO);	
 		}
-			
+		
 		String sql = "SELECT bepapa.* FROM TBEP_APARTADOSBAREMACION bepapa WHERE bepapa.CODNUM = ?";
 		
 		try (Connection con = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = con.prepareStatement(sql)) {
@@ -93,12 +92,12 @@ public class ModeloBaremacionApartados {
 				if (!rs.next()) {
 					throw new UVException(ERROR_APARTADO_NOEXITE);
 				}
-				return this.createApartadoFromResultSet(rs);									
+				return this.createApartadoFromResultSet(rs);
 			}
 		}
 	}
 	
-    /** Consulta para obtener el último código de los apartados .
+	/** Consulta para obtener el último código de los apartados .
 	 * @return apartado .
 	 * @throws SQLException .
 	 */
@@ -114,7 +113,7 @@ public class ModeloBaremacionApartados {
 				if (!rs.next()) {
 					ultimoCodigo = "0";		
 				} else {
-					ultimoCodigo = rs.getString(CODIGO);					
+					ultimoCodigo = rs.getString(CODIGO);
 				}
 			}
 		}
@@ -150,8 +149,8 @@ public class ModeloBaremacionApartados {
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
 					ApartadoBaremacion apartado = this.createApartadoFromResultSet(rs);
-					apartados.add(apartado);					
-				}				
+					apartados.add(apartado);
+				}
 			}	
 			
 			dataTable.setRecordsTotalFromQuery(stmtCount);
@@ -224,6 +223,28 @@ public class ModeloBaremacionApartados {
 	 * @throws UVException .
 	 */
 	public void activarApartado(ApartadoBaremacion apartado, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
+		// comprobamos si ya existe otro activo con el mismo código
+		String query = ""
+			+ " SELECT COUNT(*) as count "
+			+ " FROM TBEP_APARTADOSBAREMACION bepapa "
+			+ " WHERE bepapa.CODIGO = ? AND bepapa.FLGACTIVO = 'S' ";
+		
+		int count = 0;
+		
+		try (Connection con = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = con.prepareStatement(query)) {
+			int param = 1;
+			stmt.setString(param++, apartado.getCodigo());
+			
+			try (ResultSet rs = stmt.executeQuery()) {
+				rs.next();
+				count = rs.getInt("count");
+			}
+		}
+		
+		if (count > 0) {
+			throw new UVException("Ya existe un bloque activo con el código " + apartado.getCodigo());
+		}
+				
 		this.activaDesactivaApartado(apartado, true, usuarioUpdate);
 	}
 	
@@ -235,10 +256,6 @@ public class ModeloBaremacionApartados {
 	 */
 	public void actualizaApartado(ApartadoBaremacion apartado, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
 		this.chequearApartadoParaInsertarOActualizar(apartado);
-		
-		if (this.chequearUsandose(apartado)) {
-			throw new UVException(ERROR_APARTADO_USANDOSE);
-		}
 		
 		String consulta = ""
 				+ " UPDATE TBEP_APARTADOSBAREMACION SET "
@@ -398,7 +415,7 @@ public class ModeloBaremacionApartados {
 			
 			try (ResultSet rs = stmt.executeQuery()) {
 				if (rs.next()) {
-					acum += rs.getDouble("SUMA");					
+					acum += rs.getDouble("SUMA");
 				}
 			}
 		}
@@ -476,7 +493,7 @@ public class ModeloBaremacionApartados {
 						
 			try (ResultSet rs = stmt.executeQuery()) {
 				if (rs.next()) {
-					return true;									
+					return true;
 				}
 			}
 		}

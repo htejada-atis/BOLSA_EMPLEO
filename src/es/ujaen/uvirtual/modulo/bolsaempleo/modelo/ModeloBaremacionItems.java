@@ -345,10 +345,34 @@ public class ModeloBaremacionItems {
 	 * Activa un item de baremación.
 	 * @param item .
 	 * @param usuarioUpdate .
+	 * @throws UVException .
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	public void activarItem(ItemBaremacion item, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException {
+	public void activarItem(ItemBaremacion item, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
+		// comprobamos si ya existe otro activo con el mismo código
+		String query = ""
+			+ " SELECT COUNT(*) as count "
+			+ " FROM TBEP_ITEMSBAREMACION bepite "
+			+ " WHERE bepite.BEPBLO_CODNUM = ? AND bepite.CODIGO = ? AND bepite.FLGACTIVO = 'S' ";
+		
+		int count = 0;
+		
+		try (Connection con = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = con.prepareStatement(query)) {
+			int param = 1;
+			stmt.setInt(param++, item.getBloqueBaremacion().getCodNum());
+			stmt.setString(param++, item.getCodigo());
+			
+			try (ResultSet rs = stmt.executeQuery()) {
+				rs.next();
+				count = rs.getInt("count");
+			}
+		}
+		
+		if (count > 0) {
+			throw new UVException("Ya existe un item activo con el código " + item.getFullCode());
+		}
+		
 		this.activaDesactivaItem(item, true, usuarioUpdate);
 	}
 
@@ -571,7 +595,7 @@ public class ModeloBaremacionItems {
 							
 				try (ResultSet rs = stmt.executeQuery()) {
 					while (rs.next()) {
-						throw new UVException("Ya existe el ítem excluyente para este ítem");								
+						throw new UVException("Ya existe el ítem excluyente para este ítem");
 					}
 				}
 			}

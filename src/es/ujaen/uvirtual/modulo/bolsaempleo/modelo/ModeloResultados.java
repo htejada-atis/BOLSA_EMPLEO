@@ -470,77 +470,59 @@ public class ModeloResultados {
 			+ " SELECT "
 			+ "		bepare.ID_AREA_CONOCIMIENTO, "
 			+ "		bepare.DES_AREA_CONOCIMIENTO, "
-			+ "		bepusu.CODNUM, "
+			+ "		bepusu.CODCUENTA, "
+			+ "		bepusu.VUAJA_IDNIF || bepusu.VUAJA_LETRANIF AS CANDIDATO_DNI, "
+			+ "		bepusu.VUAJA_STRNOMBRE || ', ' || bepusu.VUAJA_STRAPELLIDO1 || ' ' || bepusu.VUAJA_STRAPELLIDO2 AS CANDIDATO_NOMBRE, "
 			+ "		bepsbo.TOTAL, "
-			+ "		bepsbo.BEPSOL_CODNUM, "
-			+ "		bepsbo.BEPBOL_CODNUM "
-			+ " FROM TBEP_SOLICITUD_BOLSAS bepsbo"
-			+ " 	INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.CODNUM = bepsbo.BEPSOL_CODNUM "
-			+ " 	INNER JOIN TBEP_USUARIOS bepusu ON bepusu.CODNUM = bepsol.BEPUSU_CODNUM "
-			+ " 	INNER JOIN TBEP_BOLSAS bepbol ON bepbol.CODNUM = bepsbo.BEPBOL_CODNUM "
-			+ " 	INNER JOIN TBEP_AREAS bepare ON	bepare.CODNUM = bepbol.BEPARE_CODNUM "
-			+ " WHERE "
-			+ "		bepsol.BEPCON_CODNUM = ?"
-			+ "		AND bepsol.ESTADO = 'CERRADA'"
-			+ "		AND bepusu.FLGBORRADO = 'N'";
-		
-		String itemsSolicitud = ""
-			+ " SELECT bepapa.CODIGO || '.' || bepblo.CODIGO || '.' || bepite.CODIGO AS ITEM, bepsbm.RESULTADO "
-			+ " FROM TBEP_SOL_BOL_MERITOS bepsbm "
-			+ " INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON (bepsbo.CODNUM = bepsbm.BEPSBO_CODNUM AND bepsbo.BEPSOL_CODNUM = ? AND bepsbo.BEPBOL_CODNUM = ?) "
-			+ " INNER JOIN TBEP_ITEMSBAREMACION bepite ON bepite.CODNUM = bepsbm.BEPITE_CODNUM "
-			+ " INNER JOIN TBEP_BLOQUESBAREMACION bepblo ON bepblo.CODNUM = bepite.BEPBLO_CODNUM "
-			+ " INNER JOIN TBEP_APARTADOSBAREMACION bepapa ON bepapa.CODNUM = bepblo.BEPAPA_CODNUM "
-			+ " WHERE bepsbm.FLGEXCLUIDO = 'N' AND bepsbm.FLGVALIDADO = 'S' "
-			+ " ORDER BY LPAD(bepapa.CODIGO, 3) || '.' || LPAD(bepblo.CODIGO, 3) || '.' || LPAD(bepite.CODIGO, 3)";
+			+ "		bepsbm.CODIGO, "
+			+ "		bepsbm.NOMBRE, "
+			+ "		bepsbm.FLGEXCLUIDO, "
+			+ "		bepsbm.FLGVALIDADO, "
+			+ "		bepsbm.DESGLOSE, "
+			+ "		bepsbm.RESULTADO "
+			+ " FROM "
+			+ "		TBEP_SOLICITUD_BOLSAS bepsbo "
+			+ "		INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.CODNUM = bepsbo.BEPSOL_CODNUM "
+			+ "		INNER JOIN TBEP_SOL_BOL_MERITOS bepsbm ON bepsbm.BEPSBO_CODNUM = bepsbo.CODNUM "
+			+ "		INNER JOIN TBEP_MERITOS bepmer ON bepmer.CODNUM = bepsbm.BEPMER_CODNUM "
+			+ "		INNER JOIN TBEP_USUARIOS bepusu ON bepusu.CODNUM = bepsol.BEPUSU_CODNUM "
+			+ "		INNER JOIN TBEP_BOLSAS bepbol ON bepbol.CODNUM = bepsbo.BEPBOL_CODNUM "
+			+ "		INNER JOIN TBEP_AREAS bepare ON bepare.CODNUM = bepbol.BEPARE_CODNUM "
+			+ "	WHERE "
+			+ "		bepsol.BEPCON_CODNUM = ? "
+			+ "		AND bepsol.ESTADO = 'CERRADA' "
+			+ "		AND bepusu.FLGBORRADO = 'N' "
+			+ " ORDER BY bepare.DES_AREA_CONOCIMIENTO, bepusu.VUAJA_IDNIF ";
 		
 		try (ServletOutputStream stream = response.getOutputStream(); PrintWriter printer = new PrintWriter(stream)) {
-			
+
 			try (Connection conexion = ConexionUvirtual.obtenerInstancia()) {
 				// cabecera
-				printer.println(String.join(separator, new String[] {"COD. AREA", "AREA", "NIF", "NOMBRE", "EMAIL", "TOTAL", "ITEMS"}));
-				
+				printer.println(String.join(separator, new String[] {"COD. AREA", "AREA", "CANDIDATO", "DOCUMENTO", 
+						"NOMBRE", "TOTAL BOLSA", "COD. ITEM", "NOM. ITEM", "EXCLUIDO", "VALIDADO", "DESGLOSE", "TOTAL MERITO"}));
+
 				// leemos resultados totales por area
-					
+
 				try (PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 					stmt.setInt(1, convocatoria.getCodNum());
-				
+
 					try (ResultSet rs = stmt.executeQuery()) {
 						while (rs.next()) {
-							UsuarioBolsaEmpleo usuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioById(rs.getInt(CODNUM));
-							
 							String idArea = BolsaEmpleoUtils.string2csv(rs.getString("ID_AREA_CONOCIMIENTO"), separator);
 							String area = BolsaEmpleoUtils.string2csv(rs.getString("DES_AREA_CONOCIMIENTO"), separator);
-							String nif = BolsaEmpleoUtils.string2csv(usuario.getPrsNif(), separator);
-							String nombre = BolsaEmpleoUtils.string2csv(
-									String.format("%s %s %s", usuario.getNombre() != null ? usuario.getNombre() : "",
-											usuario.getPrimerApellido() != null ? usuario.getPrimerApellido() : "",
-											usuario.getSegundoApellido() != null ? usuario.getSegundoApellido() : ""), separator);
-							String email = BolsaEmpleoUtils.string2csv(usuario.getEmail(), separator);
+							String codCuenta = BolsaEmpleoUtils.string2csv(rs.getString("CODCUENTA"), separator);
+							String dni = BolsaEmpleoUtils.string2csv(rs.getString("CANDIDATO_DNI"), separator);
+							String nombre = BolsaEmpleoUtils.string2csv(rs.getString("CANDIDATO_NOMBRE"), separator);
 							String total = BolsaEmpleoUtils.string2csv(String.valueOf(rs.getDouble(TOTAL)), separator);
-
-							printer.print(String.join(separator, new String[] {idArea, area, nif, nombre, email, total, ""}));
-
-							// leemos resultados por items
-							StringBuilder builder = new StringBuilder();
-
-							try (PreparedStatement stmt2 = conexion.prepareStatement(itemsSolicitud)) {
-								stmt2.setInt(1, rs.getInt(BEPSOL_CODNUM));
-								stmt2.setInt(2, rs.getInt(BEPBOL_CODNUM));
-
-								try (ResultSet rs2 = stmt2.executeQuery()) {
-									while (rs2.next()) {
-										builder.append(rs2.getString("ITEM") + ": "
-											+ BolsaEmpleoUtils.string2csv(String.valueOf(rs2.getDouble("RESULTADO")), separator)
-											+ " | "
-										);
-									}
-								}
-
-								builder.delete(builder.length() - 3, builder.length());
-							}
-
-							printer.println(builder.toString());
+							String itemCodigo = BolsaEmpleoUtils.string2csv(rs.getString("CODIGO"), separator);
+							String itemNombre = BolsaEmpleoUtils.string2csv(rs.getString("NOMBRE"), separator);
+							String excluido = BolsaEmpleoUtils.string2csv(rs.getString("FLGEXCLUIDO"), separator);
+							String validado = BolsaEmpleoUtils.string2csv(rs.getString("FLGVALIDADO"), separator);
+							String desglose = BolsaEmpleoUtils.string2csv(rs.getString("DESGLOSE"), separator);
+							String resultado = BolsaEmpleoUtils.string2csv(rs.getString("RESULTADO"), separator);
+							
+							printer.println(String.join(separator, new String[] {idArea, area, codCuenta, dni, nombre, total, itemCodigo,
+									itemNombre, excluido, validado, desglose, resultado}));
 						}
 					}
 				}
@@ -665,8 +647,10 @@ public class ModeloResultados {
 				+ "			bepsbm.DESGLOSE, "
 				+ "			bepsbm.FLGEXCLUIDO, "
 				+ "			bepsbm.FLGVALIDADO, "
+				+ "			bepsbm.NOMBRE, "
+				+ "			bepsbm.CODIGO, "
 				+ "			bepsbm.BEPITE_CODNUM AS ITEM_SBM, "
-				+ "			bepsol.BEPUSU_CODNUM AS USUARIO_CODNUM"
+				+ "			bepsol.BEPUSU_CODNUM AS USUARIO_CODNUM "
 				+ " FROM TBEP_SOL_BOL_MERITOS bepsbm"
 				+ " INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbo.CODNUM  = bepsbm.BEPSBO_CODNUM"
 				+ " INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.CODNUM = bepsbo.BEPSOL_CODNUM"
@@ -895,6 +879,8 @@ public class ModeloResultados {
 		merito.setValor(rs.getDouble(VALOR));
 		merito.setDescripcion(rs.getString(DESCRIPCION));
 		merito.setObservacion(rs.getString(OBSERVACION));
+		merito.setCodigoMerito(rs.getString("CODIGO"));
+		merito.setNombreMerito(rs.getString("NOMBRE"));
 
 		// valores del mérito en la solicitud
 		Integer idMeritoSolicitud = rs.getInt(CODNUM_MERITO_SOLICITUD);

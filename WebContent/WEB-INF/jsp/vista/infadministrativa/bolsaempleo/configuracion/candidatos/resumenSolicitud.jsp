@@ -82,14 +82,13 @@ VistaCandidatos bean = (VistaCandidatos) uvdatos.getVistas().get(VistaCandidatos
 			<tbody>
 			<%	if (bolsa.getListaMeritos() != null && bolsa.getListaMeritos().size() > 0) { %>
 				<%	for (MeritoSolicitudTable merito: bolsa.getListaMeritos()) {
-						String codigoItem = merito.getMeritoSolicitud().getItem().getBloqueBaremacion().getApartadoBaremacion().getCodigo() + "." 
-							+ merito.getMeritoSolicitud().getItem().getBloqueBaremacion().getCodigo() + "." 
-							+ merito.getMeritoSolicitud().getItem().getCodigo();
+						String codigoItem = merito.getCodigoMerito();
+						String nombreItem = merito.getNombreMerito();
 					%>
 						<tr>
 							<td><%= merito.getCodNum() %></td>
 							<td><%= codigoItem %></td>
-							<td><%= merito.getMerito().getItemBaremacion().getNombre() %></td>
+							<td><%= nombreItem %></td>
 							<td><%= merito.getMeritoSolicitud().getValor() != 0 ? merito.getMeritoSolicitud().getValor() : merito.getMerito().getValor() %></td>
 							<td><%= merito.getMerito().getDescripcion() %></td>
 							<td>
