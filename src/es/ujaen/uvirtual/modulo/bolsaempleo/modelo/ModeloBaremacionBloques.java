@@ -156,10 +156,34 @@ public class ModeloBaremacionBloques {
 	 * Actia un apartado de baremación.
 	 * @param bloque .
 	 * @param usuarioUpdate .
+	 * @throws UVException .
 	 * @throws SQLException .
 	 * @throws UVException .
 	 */
-	public void activarBloque(BloqueBaremacion bloque, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException {
+	public void activarBloque(BloqueBaremacion bloque, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
+		// comprobamos si ya existe otro activo con el mismo código
+		String query = ""
+			+ " SELECT COUNT(*) as count "
+			+ " FROM TBEP_BLOQUESBAREMACION bepblo "
+			+ " WHERE bepblo.BEPAPA_CODNUM = ? AND bepblo.CODIGO = ? AND bepblo.FLGACTIVO = 'S' ";
+		
+		int count = 0;
+		
+		try (Connection con = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = con.prepareStatement(query)) {
+			int param = 1;
+			stmt.setInt(param++, bloque.getApartadoBaremacion().getCodNum());
+			stmt.setString(param++, bloque.getCodigo());
+			
+			try (ResultSet rs = stmt.executeQuery()) {
+				rs.next();
+				count = rs.getInt("count");
+			}
+		}
+		
+		if (count > 0) {
+			throw new UVException("Ya existe un bloque activo con el código " + bloque.getCodigo());
+		}
+		
 		this.activaDesactivaBloque(bloque, true, usuarioUpdate);
 	}
 	

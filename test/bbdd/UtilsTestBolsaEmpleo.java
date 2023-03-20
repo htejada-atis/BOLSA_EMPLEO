@@ -145,6 +145,7 @@ public final class UtilsTestBolsaEmpleo {
 			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/migraciones/32-fechasbolsas.sql");
 			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/migraciones/33-convocatoriascontracion.sql");
 			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/migraciones/34-acreditacionesestado.sql");
+			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/migraciones/35-solicitudbolsasmeritosnombrecodigo.sql");
 			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/datos_desarrollo/datos_prueba_migraciones/01-im-solicitudbolsasmeritos.sql");
 			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/datos_desarrollo/datos_prueba_migraciones/02-im-prefijomeritospreferentes.sql");
 			BbddRunner.ejecutar("Documentos/scripts/opc.bolsaempleo/datos_desarrollo/datos_prueba_migraciones/03-im-dedicaciones.sql");
@@ -158,6 +159,7 @@ public final class UtilsTestBolsaEmpleo {
 			
 			UtilsTestBolsaEmpleo.updateItemBaremacionEnSolicitudBolsaMeritos();
 			UtilsTestBolsaEmpleo.updateFechasBolsas();
+			UtilsTestBolsaEmpleo.updateNombreCodigoEnSolicitudBolsaMeritos();
 		}
 	}
 	
@@ -181,6 +183,44 @@ public final class UtilsTestBolsaEmpleo {
 						try (PreparedStatement stmtUpdate = con.prepareStatement(update)) {
 							stmtUpdate.setInt(1, rs.getInt("BEPITE_CODNUM"));
 							stmtUpdate.setInt(2, rs.getInt("CODNUM"));
+							stmtUpdate.executeUpdate();
+						}
+					}
+				}
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * Actualiza los items de baremación en las solicitudes bolsa méritos añadiendo nombre y código de item.
+	 */
+	public static void updateNombreCodigoEnSolicitudBolsaMeritos() {
+		BbddRunner.conectarBd();
+		try (Connection con = BbddRunner.obtenerConexionUvirtual()) {
+			String consulta = ""
+				+ " SELECT 	bepsbm.CODNUM, "
+				+ " 		bepite.NOMBRE, "
+				+ " 		bepite.CODIGO AS ITE_CODIGO, "
+				+ " 		bepblo.CODIGO AS BLO_CODIGO, "
+				+ " 		bepapa.CODIGO AS APA_CODIGO "
+				+ " FROM TBEP_SOL_BOL_MERITOS bepsbm "
+				+ " INNER JOIN TBEP_ITEMSBAREMACION bepite ON bepite.CODNUM = bepsbm.BEPITE_CODNUM "
+				+ " INNER JOIN TBEP_BLOQUESBAREMACION bepblo ON bepblo.CODNUM = bepite.BEPBLO_CODNUM "
+				+ " INNER JOIN TBEP_APARTADOSBAREMACION bepapa ON bepapa.CODNUM = bepblo.BEPAPA_CODNUM ";
+			
+			String update = "UPDATE TBEP_SOL_BOL_MERITOS SET CODIGO = ?, NOMBRE = ? WHERE CODNUM = ?";
+
+			try (PreparedStatement stmt = con.prepareStatement(consulta)) {
+				try (ResultSet rs = stmt.executeQuery()) {
+					while (rs.next()) {
+						try (PreparedStatement stmtUpdate = con.prepareStatement(update)) {
+							int idx = 1;
+							String codigo = rs.getString("APA_CODIGO") + "." + rs.getString("BLO_CODIGO") + "." + rs.getString("ITE_CODIGO"); 
+							stmtUpdate.setString(idx++, codigo);
+							stmtUpdate.setString(idx++, rs.getString("NOMBRE"));
+							stmtUpdate.setInt(idx++, rs.getInt("CODNUM"));
 							stmtUpdate.executeUpdate();
 						}
 					}

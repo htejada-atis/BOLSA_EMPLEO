@@ -306,7 +306,14 @@ public class ModeloSolicitud {
 		BolsaEmpleoDataTable<MeritoSolicitudTable> dataTable = new BolsaEmpleoDataTable<>(params);
 		
 		String consulta = ""
-				+ " SELECT bepmer.CODNUM, bepmer.VALOR, bepite.CODIGO, bepite.NOMBRE, MERITOS_BOLSAS.CODNUM SBM_CODNUM"
+				+ " SELECT "
+				+ "		bepmer.CODNUM, "
+				+ "		bepmer.VALOR, "
+				+ "		bepite.CODIGO, "
+				+ "		bepite.NOMBRE, "
+				+ "		MERITOS_BOLSAS.CODNUM SBM_CODNUM, "
+				+ "		MERITOS_BOLSAS.CODIGO SBM_CODIGO, "
+				+ "		MERITOS_BOLSAS.NOMBRE SBM_NOMBRE "
 				+ " FROM TBEP_MERITOS bepmer"
 				+ " INNER JOIN TBEP_ITEMSBAREMACION bepite ON bepite.CODNUM = bepmer.BEPITE_CODNUM"
 				+ " INNER JOIN TBEP_BLOQUESBAREMACION bepblo ON bepblo.CODNUM = bepite.BEPBLO_CODNUM"
@@ -343,13 +350,13 @@ public class ModeloSolicitud {
 			stmt.setInt(indexParam, solicitud.getCodNum());
 			stmtCount.setInt(indexParam++, solicitud.getCodNum());
 			stmt.setInt(indexParam, usuario.getCodNum());
-			stmtCount.setInt(indexParam++, usuario.getCodNum());			
+			stmtCount.setInt(indexParam++, usuario.getCodNum());
 			
 			dataTable.setFiltersParams(stmt, stmtCount, indexParam);
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
 					Merito merito = ModeloMerito.obtenerInstancia().getMeritoById(rs.getInt(CODNUM), false, false);
-					Integer idMeritoSolicitud = rs.getInt("SBM_CODNUM"); 									
+					Integer idMeritoSolicitud = rs.getInt("SBM_CODNUM");
 					MeritoSolicitud ms = idMeritoSolicitud != 0 ? this.getMeritoSolicitudById(idMeritoSolicitud) : null;
 					List<MeritoSolicitudValoracion> valoraciones = idMeritoSolicitud != null 
 							? this.getValoracionesMeritoSolicitud(idMeritoSolicitud, false) : new ArrayList<>();
@@ -357,8 +364,8 @@ public class ModeloSolicitud {
 					MeritoSolicitud oldMS = getMeritoSolicitudByConvocatoriaAnterior(solicitud.getConvocatoria(), bolsa, merito);
 					boolean anteriorValidacion = oldMS != null;
 					
-					MeritoSolicitudTable row = new MeritoSolicitudTable(merito, ms, valoraciones, 
-							anteriorValidacion && oldMS.isExcluido());
+					MeritoSolicitudTable row = new MeritoSolicitudTable(merito, ms, valoraciones, anteriorValidacion && oldMS.isExcluido(), 
+							rs.getString("SBM_CODIGO"), rs.getString("SBM_NOMBRE"));
 					row.setAnteriorValidacion(anteriorValidacion);
 					meritos.add(row);
 				}
@@ -779,7 +786,11 @@ public class ModeloSolicitud {
 		List<MeritoSolicitudTable> meritos = new ArrayList<>();
 		
 		String consulta = ""
-				+ " SELECT bepsbm.BEPMER_CODNUM, bepsbm.CODNUM "
+				+ " SELECT "
+				+ "		bepsbm.BEPMER_CODNUM, "
+				+ "		bepsbm.CODNUM, "
+				+ "		bepsbm.CODIGO, "
+				+ "		bepsbm.NOMBRE "
 				+ " FROM TBEP_SOL_BOL_MERITOS bepsbm "
 				+ "	INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbo.CODNUM  = bepsbm.BEPSBO_CODNUM "
 				+ " INNER JOIN TBEP_MERITOS bepmer ON bepmer.CODNUM = bepsbm.BEPMER_CODNUM "
@@ -805,8 +816,8 @@ public class ModeloSolicitud {
 					MeritoSolicitud oldMS = getMeritoSolicitudByConvocatoriaAnterior(solicitud.getConvocatoria(), bolsa, merito);
 					boolean anteriorValidacion = oldMS != null;
 					
-					MeritoSolicitudTable row = new MeritoSolicitudTable(merito, ms, valoraciones, 
-							anteriorValidacion && oldMS.isExcluido());
+					MeritoSolicitudTable row = new MeritoSolicitudTable(merito, ms, valoraciones, anteriorValidacion && oldMS.isExcluido(), 
+							rs.getString("CODIGO"), rs.getString("NOMBRE"));
 					row.setAnteriorValidacion(anteriorValidacion);
 					meritos.add(row);
 				}
@@ -1004,8 +1015,17 @@ public class ModeloSolicitud {
 				// insertamos el mérito en la solicitud bolsa
 				String consulta = ""
 					+ "INSERT INTO TBEP_SOL_BOL_MERITOS ("
-						+ "BEPSBO_CODNUM, BEPMER_CODNUM, FLGEXCLUIDO, FLGVALIDADO, OBSERVACION_CANDIDATO, VALOR, BEPITE_CODNUM, UID_USUARIO"
-					+ ") VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+						+ "BEPSBO_CODNUM, "
+						+ "BEPMER_CODNUM, "
+						+ "FLGEXCLUIDO, "
+						+ "FLGVALIDADO, "
+						+ "OBSERVACION_CANDIDATO, "
+						+ "VALOR, "
+						+ "BEPITE_CODNUM, "
+						+ "UID_USUARIO, "
+						+ "CODIGO, "
+						+ "NOMBRE"
+					+ ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 				
 				int codNumSBM;
 				
@@ -1031,6 +1051,10 @@ public class ModeloSolicitud {
 						stmt.setInt(indexParam++, meritoSolicitud.getMerito().getItemBaremacion().getCodNum());
 					}
 					stmt.setString(indexParam++, usuarioUpdate.getCodCuenta());
+					stmt.setString(indexParam++, meritoSolicitud.getItem().getBloqueBaremacion().getApartadoBaremacion().getCodigo() 
+						+ "." + meritoSolicitud.getItem().getBloqueBaremacion().getCodigo() 
+						+ "." + meritoSolicitud.getItem().getCodigo());
+					stmt.setString(indexParam++, meritoSolicitud.getItem().getNombre());
 					stmt.executeUpdate();
 					
 					ResultSet rs = stmt.getGeneratedKeys();
@@ -1127,17 +1151,23 @@ public class ModeloSolicitud {
 		}
 		
 		// insertamos el mérito en la solicitud bolsa
-		String consulta = "INSERT INTO TBEP_SOL_BOL_MERITOS (BEPSBO_CODNUM, BEPMER_CODNUM, BEPITE_CODNUM, UID_USUARIO)"
-				+ " SELECT bepsbo.CODNUM AS BEPSBO_CODNUM, bepmer.CODNUM AS BEPMER_CODNUM, bepmer.BEPITE_CODNUM AS BEPITE_CODNUM, ? AS UID_USUARIO"
-				+ " FROM TBEP_SOLICITUD_BOLSAS bepsbo, TBEP_MERITOS bepmer"
-				+ " WHERE bepsbo.BEPSOL_CODNUM = ? AND bepsbo.BEPBOL_CODNUM = ? AND bepmer.CODNUM = ? ";
-
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+		String consulta = "INSERT INTO TBEP_SOL_BOL_MERITOS "
+			+ " (BEPSBO_CODNUM, BEPMER_CODNUM, BEPITE_CODNUM, CODIGO, NOMBRE, UID_USUARIO) VALUES "
+			+ " (?, ?, ?, ?, ?, ?) ";
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {			
+			Integer idSolicitudBolsa = this.getIdSolicitudBolsa(solicitud, bolsa, conexion);
+			String codigo = merito.getItemBaremacion().getBloqueBaremacion().getApartadoBaremacion().getCodigo() + "."
+					+ merito.getItemBaremacion().getBloqueBaremacion().getCodigo() + "." 
+					+ merito.getItemBaremacion().getCodigo();
+			
 			int indexParam = 1;
-			stmt.setString(indexParam++, usuarioUpdate.getCodCuenta());
-			stmt.setInt(indexParam++, solicitud.getCodNum());
-			stmt.setInt(indexParam++, bolsa.getCodNum());
+			stmt.setInt(indexParam++, idSolicitudBolsa);
 			stmt.setInt(indexParam++, merito.getCodNum());
+			stmt.setInt(indexParam++, merito.getItemBaremacion().getCodNum());
+			stmt.setString(indexParam++, codigo);
+			stmt.setString(indexParam++, merito.getItemBaremacion().getNombre());
+			stmt.setString(indexParam++, usuarioUpdate.getCodCuenta());
 			stmt.executeUpdate();
 		}
 	}
@@ -1204,7 +1234,7 @@ public class ModeloSolicitud {
 				conexion.rollback();
 				throw e;
 			} finally {
-				conexion.setAutoCommit(true);				
+				conexion.setAutoCommit(true);
 			}
 		}
 	}
@@ -1502,7 +1532,8 @@ public class ModeloSolicitud {
 	 */
 	public Integer obtenerTotalMeritosSolicitud(Solicitud solicitud) throws SQLException {
 		Integer total = 0;
-		String consulta = "SELECT COUNT(*) AS total FROM TBEP_SOL_BOL_MERITOS bepsbm"
+		String consulta = "SELECT COUNT(*) AS total "
+				+ " FROM TBEP_SOL_BOL_MERITOS bepsbm"
 				+ "	INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbm.BEPSBO_CODNUM = bepsbo.CODNUM"
 				+ "	WHERE bepsbo.BEPSOL_CODNUM = ? ";
 		
@@ -1663,7 +1694,10 @@ public class ModeloSolicitud {
 					+ "	LEFT JOIN TBEP_SOL_BOL_MER_VALORACION bepsbv ON bepsbv.BEPSBM_CODNUM  = bepsbm.CODNUM"
 					+ "	INNER JOIN TBEP_MERITOS bepmer ON bepmer.CODNUM  = bepsbm.BEPMER_CODNUM"
 					+ "	INNER JOIN TBEP_ITEMSBAREMACION bepite ON bepite.CODNUM = bepmer.BEPITE_CODNUM"
-					+ "	WHERE bepsbo.BEPSOL_CODNUM = ? AND bepite.AFINIDAD IS NOT NULL AND bepsbv.CODNUM IS NULL AND bepite.INDIVIDUALIZADO = 'S'";
+					+ "	WHERE bepsbo.BEPSOL_CODNUM = ? "
+					+ "		AND bepite.AFINIDAD IS NOT NULL "
+					+ "		AND bepsbv.CODNUM IS NULL "
+					+ "		AND bepite.INDIVIDUALIZADO = 'S'";
 			
 			try (PreparedStatement stmt = conexion.prepareStatement(consultaIndividualizados)) {
 				int parameterIndex = 1;
@@ -1712,7 +1746,7 @@ public class ModeloSolicitud {
 		boolean evaluado = false;
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia()) {
-			// si el mérito está asociado a una solicitud, no se puede borrar		
+			// si el mérito está asociado a una solicitud, no se puede borrar
 			String consultaSolicitud = "SELECT besbm.* FROM TBEP_SOL_BOL_MERITOS besbm WHERE besbm.BEPMER_CODNUM = ?";
 			
 			try (PreparedStatement stmt = conexion.prepareStatement(consultaSolicitud)) {
@@ -1720,7 +1754,7 @@ public class ModeloSolicitud {
 				stmt.setInt(parameterIndex++, merito.getCodNum());
 				
 				try (ResultSet rs = stmt.executeQuery()) {
-					asociadoASolicitud = rs.next();				
+					asociadoASolicitud = rs.next();
 				}
 			}
 			
@@ -1732,7 +1766,7 @@ public class ModeloSolicitud {
 				stmt.setInt(parameterIndex++, merito.getCodNum());
 				
 				try (ResultSet rs = stmt.executeQuery()) {
-					evaluado = rs.next();				
+					evaluado = rs.next();
 				}
 			}
 		}
@@ -2089,7 +2123,7 @@ public class ModeloSolicitud {
 				+ "		WHERE bepsbm.BEPMER_CODNUM = ? AND bepsbm.BEPSBO_CODNUM IN ( "
 				+ "			SELECT bepsbo.CODNUM "
 				+ "			FROM TBEP_SOLICITUD_BOLSAS bepsbo "
-				+ "			WHERE bepsbo.BEPSOL_CODNUM = ? AND bepsbo.BEPBOL_CODNUM = ? "						
+				+ "			WHERE bepsbo.BEPSOL_CODNUM = ? AND bepsbo.BEPBOL_CODNUM = ? "
 				+ "		)"
 				+ ")";
 		
@@ -2110,7 +2144,7 @@ public class ModeloSolicitud {
 				+ "		WHERE bepsbm.BEPMER_CODNUM = ? AND bepsbm.BEPSBO_CODNUM IN ( "
 				+ "			SELECT bepsbo.CODNUM "
 				+ "			FROM TBEP_SOLICITUD_BOLSAS bepsbo "
-				+ "			WHERE bepsbo.BEPSOL_CODNUM = ? AND bepsbo.BEPBOL_CODNUM = ? "						
+				+ "			WHERE bepsbo.BEPSOL_CODNUM = ? AND bepsbo.BEPBOL_CODNUM = ? "
 				+ "		)"
 				+ ")";
 		

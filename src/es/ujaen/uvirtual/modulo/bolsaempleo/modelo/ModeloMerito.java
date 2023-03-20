@@ -314,9 +314,9 @@ public class ModeloMerito {
 		String consulta = ""
 				+ " SELECT bepmer.*, bepblo.BEPAPA_CODNUM "
 				+ " FROM TBEP_MERITOS bepmer "
-				+ " INNER JOIN TBEP_ITEMSBAREMACION bepite ON bepite.CODNUM = bepmer.BEPITE_CODNUM "
-				+ " INNER JOIN TBEP_BLOQUESBAREMACION bepblo ON bepblo.CODNUM = bepite.BEPBLO_CODNUM "
-				+ " INNER JOIN TBEP_APARTADOSBAREMACION bepapa ON bepapa.CODNUM  = bepblo.BEPAPA_CODNUM "
+				+ " INNER JOIN TBEP_ITEMSBAREMACION bepite ON (bepite.CODNUM = bepmer.BEPITE_CODNUM AND bepite.FLGACTIVO = 'S') "
+				+ " INNER JOIN TBEP_BLOQUESBAREMACION bepblo ON (bepblo.CODNUM = bepite.BEPBLO_CODNUM AND bepblo.FLGACTIVO = 'S') "
+				+ " INNER JOIN TBEP_APARTADOSBAREMACION bepapa ON (bepapa.CODNUM  = bepblo.BEPAPA_CODNUM AND bepapa.FLGACTIVO = 'S') "
 				+ " WHERE bepmer.BEPUSU_CODNUM = ? ";
 		
 		String whereCodigo = String.format("(%s || '.' || %s || '.' || %s)", "bepapa.CODIGO", "bepblo.CODIGO", "bepite.CODIGO");

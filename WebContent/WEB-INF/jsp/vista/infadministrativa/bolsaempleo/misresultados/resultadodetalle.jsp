@@ -57,20 +57,17 @@ String titulaciones = BolsaEmpleoUtils.clobToString(bolsaResultado.getTitulacion
 			<tr>
 				<th scope="col"	style="width:50px">Id. Mérito</th>
 				<th scope="col"	style="width:60px">Cod. Mérito</th>
-				<th scope="col"	style="width:60%">Tipo de Mérito</th>	
+				<th scope="col"	style="width:60%">Tipo de Mérito</th>
 				<th scope="col"	style="width:100px" title="Valor * Afinidad * Peso Categoría * Peso Bloque">Desglose</th>
 				<th scope="col" style="width:60px" title="Resultado de cada mérito para el área">Resultado</th>
 				<th scope="col" style="width:40%">Observación</th>
 			</tr>
 			<tbody>
-			<%	for (MeritoResultado merito: bolsaResultado.getListaMeritos()) {
-				ItemBaremacion itemBaremacion = merito.getItemMeritoSolicitud();
-			%>
+			<%	for (MeritoResultado merito: bolsaResultado.getListaMeritos()) { %>
 					<tr>
 						<td><%= merito.getCodNum() %></td>
-						<td><%= EscapaHTML.escapa(itemBaremacion.getBloqueBaremacion().getApartadoBaremacion().getCodigo() + "." 
-						+ itemBaremacion.getBloqueBaremacion().getCodigo() + "." + itemBaremacion.getCodigo()) %></td>
-						<td><%= EscapaHTML.escapa(itemBaremacion.getNombre()) %></td>
+						<td><%= EscapaHTML.escapa(merito.getCodigoMerito()) %></td>
+						<td><%= EscapaHTML.escapa(merito.getNombreMerito()) %></td>
 						<td><%= EscapaHTML.escapa(merito.getDesglose()) %></td>
 						<td><%= merito.getResultado() %></td>
 						<td><%= EscapaHTML.escapa(merito.getObservacionCandidato()) %></td>
@@ -120,9 +117,8 @@ String titulaciones = BolsaEmpleoUtils.clobToString(bolsaResultado.getTitulacion
 			<%	for (MeritoResultado merito: bolsaResultado.getListaMeritosExcluidos()) { %>
 					<tr>
 						<td><%= merito.getCodNum() %></td>
-						<td><%= EscapaHTML.escapa(merito.getItemBaremacion().getBloqueBaremacion().getApartadoBaremacion().getCodigo() + "." 
-						+ merito.getItemBaremacion().getBloqueBaremacion().getCodigo() + "." + merito.getItemBaremacion().getCodigo()) %></td>
-						<td><%= EscapaHTML.escapa(merito.getItemBaremacion().getNombre()) %></td>
+						<td><%= EscapaHTML.escapa(merito.getCodigoMerito()) %></td>
+						<td><%= EscapaHTML.escapa(merito.getNombreMerito()) %></td>
 						<td><%= merito.getValorMeritoSolicitud() != null && merito.getValorMeritoSolicitud() > 0 ? merito.getValorMeritoSolicitud() : merito.getValor() %></td>
 						<td><%= EscapaHTML.escapa(merito.getObservacionCandidato()) %></td>
 					</tr>
@@ -148,9 +144,8 @@ String titulaciones = BolsaEmpleoUtils.clobToString(bolsaResultado.getTitulacion
 			<%	for (MeritoResultado merito: bolsaResultado.getListaMeritosNoEvaluados()) { %>
 					<tr>
 						<td><%= merito.getCodNum() %></td>
-						<td><%= EscapaHTML.escapa(merito.getItemBaremacion().getBloqueBaremacion().getApartadoBaremacion().getCodigo() + "." 
-						+ merito.getItemBaremacion().getBloqueBaremacion().getCodigo() + "." + merito.getItemBaremacion().getCodigo()) %></td>
-						<td><%= EscapaHTML.escapa(merito.getItemBaremacion().getNombre()) %></td>
+						<td><%= EscapaHTML.escapa(merito.getCodigoMerito()) %></td>
+						<td><%= EscapaHTML.escapa(merito.getNombreMerito()) %></td>
 						<td><%= merito.getValorMeritoSolicitud() != null && merito.getValorMeritoSolicitud() > 0 ? merito.getValorMeritoSolicitud() : merito.getValor() %></td>
 						<td><%= EscapaHTML.escapa(merito.getObservacionCandidato()) %></td>
 					</tr>

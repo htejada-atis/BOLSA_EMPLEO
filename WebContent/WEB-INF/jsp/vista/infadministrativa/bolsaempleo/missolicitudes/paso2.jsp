@@ -149,7 +149,7 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 					texto += '<b title="' + valoracion.afinidad.descripcion + '">' + valoracion.valor + ' - ' + valoracion.afinidad.codigo + " " + valoracion.afinidad.modulacion * 100 + ' %</strong><br/>';
 				}
 			} else {
-				texto += 'Selecciona afinidad<br/>';
+				texto += '<strong style="color:red;">Selecciona afinidad</strong><br/>';
 			}
 
 			texto += '<button class="pointer" title="Seleccionar afinidad" ' + (row.anteriorValidacion ? "disabled" : "") + '>Afinidad</button></span>';
