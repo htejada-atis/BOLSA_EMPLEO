@@ -18,6 +18,7 @@ public class VistaConvocatorias extends Vista implements Serializable {
 	private Convocatoria convocatoria;
 	private String vista;
 	private UsuarioBolsaEmpleo usuarioLogeado;
+	private boolean hayMeritosSinValidar;
 
 	public BolsaEmpleoDataTable<Convocatoria> getDatatableConvocatorias() {
 		return dataTable;
@@ -49,5 +50,13 @@ public class VistaConvocatorias extends Vista implements Serializable {
 	
 	public void setUsuarioLogeado(UsuarioBolsaEmpleo usuario) {
 		this.usuarioLogeado = usuario;
+	}
+	
+	public boolean isHayMeritosSinValidar() {
+		return this.hayMeritosSinValidar;
+	}
+	
+	public void setHayMeritosSinValidar(boolean phayMeritosSinValidar) {
+		this.hayMeritosSinValidar = phayMeritosSinValidar;
 	}
 }
