@@ -54,6 +54,7 @@ public class ControladorConvocatorias extends HttpServlet {
 	public static final String PARAM_CONVOCATORIA_NUMEROBOLSASMAXIMO = "numBolsasMaximo";
 	public static final String PARAM_CONVOCATORIA_NUMEROMERITOSPORBLOQUE = "numMeritosPorBloque";
 	public static final String PARAM_CONVOCATORIA_CURSO = "curso";
+	public static final String PARAM_CONVOCATORIA_CHECKFORCEEND = "forzarFinalizar";
 	
 	// acciones
 	public static final String ACCION_ABRIR_CONVOCATORIA = "abrirConvocatoria";
@@ -268,6 +269,9 @@ public class ControladorConvocatorias extends HttpServlet {
 			throw new UVException(MENSAJE_ERROR_MODIFICAR_CONVOCATORIA_FINALIZADA);
 		}
 		
+		// conteo de méritos sin validar
+		bean.setHayMeritosSinValidar(modelo.contieneMeritosSinValidar(convocatoria));
+		
 		switch (nombreAccion) {
 			case ACCION_ABRIR_CONVOCATORIA:
 				abrirConvocatoria(bean, datos, request, response);
@@ -386,9 +390,12 @@ public class ControladorConvocatorias extends HttpServlet {
 			throws UVException, SQLException, IOException {
 		ModeloConvocatoria modelo = ModeloConvocatoria.obtenerInstancia();
 		
+		boolean forceEnd = request.getParameter(PARAM_CONVOCATORIA_CHECKFORCEEND).equals("true");
+		
+		
 		if (!bean.getConvocatoria().getEstado().contains(ModeloConvocatoria.CONVOCATORIA_ESTADO_CERRADA)) {
 			BolsaEmpleoUtils.addMensajeDeError(MENSAJE_ERROR_ESTADO_CERRADA_REQUERIDO, bean, request);
-		} else if (modelo.contieneMeritosSinValidar(bean.getConvocatoria())) {
+		} else if (modelo.contieneMeritosSinValidar(bean.getConvocatoria()) && !forceEnd) {
 			BolsaEmpleoUtils.addMensajeDeError(MENSAJE_ERROR_MERITOS_SIN_VALIDAR, bean, request);
 		} else {
 			Convocatoria convocatoria = bean.getConvocatoria();

@@ -17,6 +17,7 @@ Convocatoria convocatoria = bean.getConvocatoria();
 boolean estadoAbierta = false;
 boolean estadoCerrada = false;
 boolean estadoFinalizada = false;
+boolean meritosSinValidar = bean.isHayMeritosSinValidar();
 
 if (convocatoria != null) {
 	estadoAbierta = convocatoria.getEstado().equals(ModeloConvocatoria.CONVOCATORIA_ESTADO_ABIERTA);
@@ -106,6 +107,10 @@ if (convocatoria != null) {
 			</div>
 		</div>
 		
+	<% if (meritosSinValidar) { %>
+		<div class="form-group-container col1 warning">Hay méritos sin validar en la convocatoria</div>
+	<% } %>
+		
 	<%	if (!estadoFinalizada) { %>
 			<div class="form-group-container col2">
 				<div class="form-group">
@@ -185,12 +190,21 @@ if (convocatoria != null) {
 		<%	} else { %>
 				document.getElementById("convocatoria_estado_finalizada").addEventListener("click", function(e) {
 					e.preventDefault();
-					Atis.confirmDialog("Cambiar estado de la convocatoria", "La convocatoria pasará a estado finalizada. Una vez finalizada ya no se podrá alterar.", {
-						'Si': function() {
+					var htmlDialogo = "La convocatoria pasará a estado finalizada. Una vez finalizada ya no se podrá alterar.";
+					
+					if ('<%= meritosSinValidar %>' == 'true') {
+						htmlDialogo += '<br><br>¡¡¡ HAY MÉRITOS SIN VALIDAR EN LA CONVOCATORIA !!!<br><br>' 
+							+ '<label for="forzeEndConvocatoria" style="width: 100%;float:none;"><input class="params" id="forzeEndConvocatoria" type="checkbox"/>Forzar cierre convocatoria</label>';
+					}
+					
+					Atis.confirmDialog("Cambiar estado de la convocatoria", htmlDialogo, {
+						'Finalizar Convocatoria': function() {
 							var params = {
 									"<%= ControladorConvocatorias.PARAM_ACCION %>": "<%=ControladorConvocatorias.ACCION_FINALIZAR_CONVOCATORIA %>",
-									"<%= ControladorConvocatorias.PARAM_CONVOCATORIA_ID %>": <%= bean.getConvocatoria().getCodNum() %>
+									"<%= ControladorConvocatorias.PARAM_CONVOCATORIA_ID %>": <%= bean.getConvocatoria().getCodNum() %>,
+									"<%= ControladorConvocatorias.PARAM_CONVOCATORIA_CHECKFORCEEND %>": $('#forzeEndConvocatoria').prop('checked')
 							};
+							console.log(params)
 							Atis.sendForm("<%= request.getRequestURI() %>", params);
 							$(this).dialog("close");
 						},
