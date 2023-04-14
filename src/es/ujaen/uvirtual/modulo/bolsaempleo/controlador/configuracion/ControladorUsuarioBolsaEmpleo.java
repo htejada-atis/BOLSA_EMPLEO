@@ -124,9 +124,9 @@ public class ControladorUsuarioBolsaEmpleo extends HttpServlet {
 		UVDatos datos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
 		datos.setDocType("<!DOCTYPE html>");
 		datos.setContentType("text/html");
-		
-		VistaUsuarioBolsaEmpleo bean = new VistaUsuarioBolsaEmpleo();		
-		
+
+		VistaUsuarioBolsaEmpleo bean = new VistaUsuarioBolsaEmpleo();
+
 		String nombreAccion = EscapaHTML.ajustaCodificacion(BolsaEmpleoUtils.getParamRequestOrSession(request, PARAM_ACCION));
 		if (nombreAccion == null) {
 			nombreAccion = ACCION_INDEX;

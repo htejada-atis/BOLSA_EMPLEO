@@ -23,6 +23,7 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 		String nombre = "";
 		String apellidos = "";
 		String email = "";
+		String emailUja = "";
 		String tipo_documento = "";
 		String n_documento = "";
 		String razon_excluido = "";
@@ -36,7 +37,8 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 			usuario = bean.getUsuarioArcos().getUid();
 			nombre = bean.getUsuarioArcos().getNombre();
 			apellidos = bean.getUsuarioArcos().getApellido1() + " " + bean.getUsuarioArcos().getApellido2();
-			email = bean.getUsuarioArcos().getEmailCalculado();
+			emailUja = bean.getUsuarioArcos().getEmailCalculado();
+			email = bean.getUsuario().getEmail();
 			tipo_documento = bean.getUsuarioArcos().getDocumentoTipo();
 			n_documento = bean.getUsuarioArcos().getDocumentoNumero();
 			
@@ -98,7 +100,7 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
     			<input class="form-input-custom" id="apellidos" type="text" name="apellidos" value="<%= apellidos %>" disabled/>
     		</div>
     		<div class="form-group">
-    			<label for="email">Email: </label>
+    			<label for="email">Email: <small>(<%= emailUja %>)</small></label>
     			<input class="form-input-custom" id="email" type="text" name="email" value="<%= email %>" disabled/>
     		</div>
     	</div>
