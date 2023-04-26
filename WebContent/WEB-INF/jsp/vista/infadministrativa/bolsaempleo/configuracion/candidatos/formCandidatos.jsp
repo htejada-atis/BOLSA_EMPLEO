@@ -206,9 +206,11 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 			<div class="form-group">
 				<%	if (candidato != null && candidato.getBorrado()) { %>
 					<input id="usuario_restaurar" type="button" value="Restaurar" style="float:right;"/>
-				<%	} %>
+				<%	} else { %>
+					<input id="usuario_actualizar_datos" type="button" value="Actualizar datos personales" style="float:left;"/>
+				<%  } %>
 			</div>
-			<div class="form-group">
+			<div class="form-group">				
 				<input id="usuario_guardar" type="submit" name="<%= ControladorUsuarioCandidato.PARAM_GUARDAR %>" value="Guardar candidato" style="float:right; margin-left: 10px;"/>
 			<%	if (candidato != null && !candidato.getBorrado()) { %>
 					<input id="usuario_borrar" type="button" value="Dar de baja candidato" style="float:right;"/>
@@ -846,6 +848,31 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 							inputRazon.setCustomValidity("La razón de borrado no puede estar vacía");
 							inputRazon.reportValidity();
 						}
+					},
+					No: function() {
+						$(this).dialog("close");
+					}
+				});
+			});
+			document.getElementById("usuario_actualizar_datos").addEventListener("click", function(event) {
+				event.preventDefault();
+				
+				var message = "<h3>¿Desea actualizar los datos del candidato?</h3><br/>" +
+						"<p>Se actualizarán los datos del candidato (<strong><%= usuario %></strong>)</p><br/>" +
+						"<ul>" +
+						"<li>- Tipo de documento de indentificación: <strong><%= bean.getUsuarioArcos().getDocumentoTipo() %></strong></li>" +
+						"<li>- Documento de identificación: <strong><%= bean.getUsuarioArcos().getDocumentoNumero() %></strong></li>" +
+						"<li>- Nombre y apellidos: <strong><%= bean.getUsuarioArcos().getNombre() %>, <%= bean.getUsuarioArcos().getApellido1() %>&nbsp;<%= bean.getUsuarioArcos().getApellido2() %></strong></li>" +
+						"</ul>" +
+						"</div>";
+				
+				Atis.confirmDialog("Actualizar datos candidato", message, {
+					Si: function() {
+						Atis.sendForm("<%= request.getRequestURI() %>", {
+							'<%=ControladorUsuarioCandidato.PARAM_ACCION%>': '<%=ControladorUsuarioCandidato.ACCION_ACTUALIZAR_DATOS_PERSONALES%>',
+							'<%=ControladorUsuarioCandidato.PARAM_CANDIDATO%>': '<%=candidato.getCodNum()%>'
+						});
+						$(this).dialog("close");
 					},
 					No: function() {
 						$(this).dialog("close");

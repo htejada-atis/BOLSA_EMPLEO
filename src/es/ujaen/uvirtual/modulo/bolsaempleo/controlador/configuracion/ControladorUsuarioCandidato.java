@@ -124,6 +124,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 	public static final String ACCION_EXPORTAR = "exportarcandidatos";
 	public static final String ACCION_DAR_BAJA_CANDIDATOS = "darbajacandidatos";
 	public static final String ACCION_CAMBIAR_LOGIN_CANDIDATO = "cambiarlogincandidato";
+	public static final String ACCION_ACTUALIZAR_DATOS_PERSONALES = "actualizardatospersonales";
 
 	// mensajes
 	public static final String MENSAJE_ERROR_ACCION_NO_CONTEMPLADA = "Acción no contemplada";
@@ -139,6 +140,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 	public static final String MENSAJE_ERROR_RAZON_EXCLUSION_REQUERIDA = "La razón de exclusión es requerida";
 	public static final String MENSAJE_ERROR_RAZON_EXCLUSION_LARGA = "La razón de exclusión es demasiado larga. Máximo %d carácteres";
 	public static final String MENSAJE_ERROR_SIN_PERMISO_PERSONAL = "No tienes permiso de personal";
+	public static final String MENSAJE_ERROR_USUARIO_UJA_NO_ENCONTRADO = "No se ha encontrado el usuario UJA";
 
 	public static final String MENSAJE_EXITO_AGREGAR = "Usuario creado correctamente";
 	public static final String MENSAJE_EXITO_AREAS_EXCLUIDAS = "Áreas excluidas correctamente para el candidato: %s";
@@ -238,6 +240,9 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 				case ACCION_DAR_BAJA_CANDIDATOS:
 					darBajaCandidatosSinSolicitudes(bean, datos, request, response);
 					break;
+				case ACCION_ACTUALIZAR_DATOS_PERSONALES:
+					actualizarDatosCandidato(bean, datos, request, response);
+					break;
 				default:
 					errorFatal(bean, MENSAJE_ERROR_ACCION_NO_CONTEMPLADA);
 			}
@@ -309,6 +314,12 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 		Integer idCandidato = Formateador.leeParametroInteger(BolsaEmpleoUtils.getParamRequestOrSession(request, PARAM_CANDIDATO));
 		UsuarioBolsaEmpleo candidato = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioById(idCandidato);
 		bean.setCandidato(candidato);
+		
+		Usuario usuArcos = CrearUsuario.usuario(candidato.getCodCuenta());
+		if (usuArcos == null) {
+			throw new UVException(MENSAJE_ERROR_USUARIO_UJA_NO_ENCONTRADO);
+		}
+		bean.setUsuarioArcos(usuArcos);
 		
 		switch (nombreAccion) {
 			case ACCION_ACREDITACIONES_CANDIDATO:
@@ -1006,6 +1017,34 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 		Map<String, String> params = new HashMap<>();
 		params.put(PARAM_ACCION, ACCION_INDEX);
 		BolsaEmpleoUtils.redirectWithParams(datos, request, response, params);
+	}
+	
+	private void actualizarDatosCandidato(VistaCandidatos bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) 
+			throws SQLException, UVException, IOException {		
+		// leemos usuario bolsa
+		Integer idCandidato = Formateador.leeParametroInteger(BolsaEmpleoUtils.getParamRequestOrSession(request, PARAM_CANDIDATO));
+		UsuarioBolsaEmpleo candidato = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioById(idCandidato);
+		bean.setCandidato(candidato);
+		
+		// leemos usuario uja
+		Usuario usuArcos = CrearUsuario.usuario(candidato.getCodCuenta());
+		if (usuArcos == null) {
+			throw new UVException(MENSAJE_ERROR_USUARIO_UJA_NO_ENCONTRADO);
+		}
+		bean.setUsuarioArcos(usuArcos);
+		
+		// comprobamos si esta borrado
+		if (bean.getCandidato().getBorrado()) {
+			throw new UVException("El usuario está dado de baja.");
+		}
+		
+		// actualizamos sus datos
+		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
+		modelo.actualizarDatosPersonalesCandidato(bean.getCandidato(), bean.getUsuarioArcos(), bean.getUsuarioLogeado());
+		
+		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_EDITAR, bean, request);
+		datos.setRespuestaEnviada(true);
+		response.sendRedirect(request.getServletPath());
 	}
 	
 	private void cambiarLoginCandidato(VistaCandidatos bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) 

@@ -1015,6 +1015,49 @@ public class ModeloUsuarioBolsaEmpleo {
 	}
 	
 	/**
+	 * Actualiza tipo de documento, documento, nombre y apellidos a partir del usuario uja.
+	 * @param candidato .
+	 * @param usuArcos .
+	 * @param usuarioQueActualiza .
+	 * @throws SQLException .
+	 * @throws UVException .
+	 */
+	public void actualizarDatosPersonalesCandidato(UsuarioBolsaEmpleo candidato, Usuario usuArcos, UsuarioBolsaEmpleo usuarioQueActualiza)
+			throws SQLException, UVException {
+
+		String query = ""
+			+ "UPDATE TBEP_USUARIOS SET "
+			+ "		UID_USUARIO=?, "
+			+ " 	VUAJA_STRTIPODOCUMENTO=?, "
+			+ " 	VUAJA_IDNIF=?, "
+			+ " 	VUAJA_LETRANIF=?, "
+			+ " 	VUAJA_PRSNIF=?, "
+			+ " 	VUAJA_STRNOMBRE=?, "
+			+ " 	VUAJA_STRAPELLIDO1=?, "
+			+ " 	VUAJA_STRAPELLIDO2=? "
+			+ " WHERE CODNUM=?";
+				
+		// comprobamos que no existe un usuario con el mismo dni y que no sea el mismo
+		if (existeUsuarioBolsaEmpleoByNif(usuArcos.getDocumentoNumero(), candidato.getCodNum())) {
+			throw new UVException(String.format(MENSAJE_ERROR_USUARIO_NIF_YA_EXISTE, usuArcos.getDocumentoNumero()));
+		}
+		
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(query)) {
+			int indexParam = 1;
+			stmt.setString(indexParam++, usuarioQueActualiza.getCodCuenta());
+			stmt.setString(indexParam++, usuArcos.getDocumentoTipo());
+			stmt.setString(indexParam++, AdaptadorDocumentoIdentidad.numeroDocumento(AdaptadorDocumentoIdentidad.UXXIAC, usuArcos));
+			stmt.setString(indexParam++, AdaptadorDocumentoIdentidad.letraNIF(usuArcos.getDocumentoTipo(), usuArcos.getDocumentoNumero()));
+			stmt.setString(indexParam++, usuArcos.getDocumentoNumero());
+			stmt.setString(indexParam++, usuArcos.getNombre());
+			stmt.setString(indexParam++, usuArcos.getApellido1());
+			stmt.setString(indexParam++, usuArcos.getApellido2());
+			stmt.setInt(indexParam++, candidato.getCodNum());
+			stmt.executeUpdate();
+		}
+	}
+	
+	/**
 	 * Dar de baja a todos los usuarios que no tengan solicitudes.
 	 * @param usuarioQueBorra .
 	 * @throws UVException .
@@ -1150,39 +1193,5 @@ public class ModeloUsuarioBolsaEmpleo {
 		return rows;
 	}
 	
-	/**
-	 * Devuelve un resultset con los datos del usuario de la vista VUJA_NET_BEP_AR_PERSONA.
-	 * Buscando por PRSNIF.
-	 * @param documento .
-	 * @return .
-	 * @throws SQLException .
-	 * @throws UVException .
-	 */
 	
-//	public UsuarioBolsaEmpleoVuja getResultSetPersonaArcosByPrsnif(String documento) throws SQLException, UVException {
-//		String consultaArcos = "SELECT * FROM arcos.VUJA_NET_BEP_AR_PERSONA WHERE PRSNIF = ?";
-//
-//		try (Connection conexionArcos = ConexionArcos.obtenerInstancia(); PreparedStatement stmtArcos = conexionArcos.prepareStatement(consultaArcos)) {
-//			stmtArcos.setString(1, documento);
-//
-//			try (ResultSet rsArcos = stmtArcos.executeQuery()) {
-//				if (!rsArcos.next()) {
-//					LOGGER.log(Level.SEVERE, String.format("No existe el usuario en VUJA_NET_BEP_AR_PERSONA [%s]", documento));
-//					throw new UVException(String.format(MENSAJE_ERROR_USUARIO_UJA_CON_DOCUMENTO_NO_EXISTE, documento));
-//				}
-//				
-//				return new UsuarioBolsaEmpleoVuja(
-//					rsArcos.getInt("CODINT"),
-//					rsArcos.getString("STRTIPODOCUMENTO"),
-//					rsArcos.getString("IDNIF"),
-//					rsArcos.getString("LETRANIF"),
-//					rsArcos.getString("PRSNIF"),
-//					rsArcos.getString("STRNOMBRE"),
-//					rsArcos.getString("STRAPELLIDO1"),
-//					rsArcos.getString("STRAPELLIDO2"),
-//					rsArcos.getString("EMAIL_ALTA")					
-//				);
-//			}
-//		}
-//	}
 }

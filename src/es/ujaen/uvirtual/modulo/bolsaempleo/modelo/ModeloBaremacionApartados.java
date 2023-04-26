@@ -522,6 +522,7 @@ public class ModeloBaremacionApartados {
 	 * @return .
 	 * @throws SQLException .
 	 */
+	/*
 	private boolean chequearUsandose(ApartadoBaremacion apartado) throws SQLException {
 		String sql = ""
 			+ " SELECT COUNT(*) AS TOTAL "
@@ -543,5 +544,5 @@ public class ModeloBaremacionApartados {
 		}
 		
 		return false;
-	}
+	}*/
 }
