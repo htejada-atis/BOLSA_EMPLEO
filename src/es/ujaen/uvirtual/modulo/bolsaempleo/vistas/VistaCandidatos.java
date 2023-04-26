@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.beans.vistas.Vista;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ApartadoBaremacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Area;
@@ -26,6 +27,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 public class VistaCandidatos extends Vista implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private Solicitud solicitud;
+	private Usuario usuarioArcos;
 	private UsuarioBolsaEmpleo candidato;
 	private List<Area> listaAreas = new ArrayList<>();
 	private List<ApartadoBaremacion> apartados = new ArrayList<>();
@@ -70,6 +72,14 @@ public class VistaCandidatos extends Vista implements Serializable {
 
 	public void setCandidato(UsuarioBolsaEmpleo usuario) {
 		this.candidato = usuario;
+	}
+	
+	public Usuario getUsuarioArcos() {
+		return usuarioArcos;
+	}
+
+	public void setUsuarioArcos(Usuario pusuario) {
+		this.usuarioArcos = pusuario;
 	}
 
 	public BolsaEmpleoDataTable<UsuarioBolsaEmpleo> getDatatableCandidatos() {
