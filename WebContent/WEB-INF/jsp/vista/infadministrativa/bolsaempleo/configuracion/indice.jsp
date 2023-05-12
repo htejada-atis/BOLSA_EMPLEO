@@ -33,7 +33,7 @@ VistaConfiguracion bean = (VistaConfiguracion) uvdatos.getVistas().get(VistaConf
    	<%	} %>
    	</div>
 	
-	<p class="ta-right">Versión: <%= bean.getVersion() %></p>
+	<p class="ta-right"><%= bean.getVersion() %></p>
 </div>
 
 <script>
