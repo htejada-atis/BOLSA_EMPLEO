@@ -136,7 +136,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 				"selectable": {'all': false},
 				"filterable": true,
 				"stateSave": true,
-				"title": 'TITULACIONES: <%=candidato.getNombre() + " " + candidato.getPrimerApellido() + " " + candidato.getSegundoApellido()%>',
+				"title": "TITULACIONES: <%=candidato.getNombre() + " " + candidato.getPrimerApellido() + " " + candidato.getSegundoApellido()%>",
 				"pageSize": 10,
 				"action": "<%=ControladorFiltrarTitulacion.ACCION_DATATABLE_TITULACIONES_CANDIDATO%>",
 				"params": {"<%=ControladorFiltrarTitulacion.PARAM_CANDIDATO%>": <%=candidato.getCodNum()%>},
