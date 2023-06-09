@@ -239,14 +239,21 @@ public class ControladorMisMeritos extends HttpServlet {
 		ModeloBaremacionApartados modelo = ModeloBaremacionApartados.obtenerInstancia();
 		bean.setApartados(modelo.getApartadosActivos());
 		
+		// maximo filesize request
+		ModeloParametrosConfiguracion modeloParam = ModeloParametrosConfiguracion.obtenerInstancia();
+		Integer maxSize = Formateador.leeParametroInteger(modeloParam.getParametroByNombre("bolsaempleo.maxEspacioArchivo").getValor());
+		
 		// leemos los parametros del form, chequeando el fichero
-		List<FileItem> items = new ServletFileUpload(new DiskFileItemFactory()).parseRequest(request);
-		HashMap<String, Object> parametros = new HashMap<>();		
+		ServletFileUpload upload = new ServletFileUpload(new DiskFileItemFactory());
+		upload.setSizeMax(maxSize);
+		
+		List<FileItem> items = upload.parseRequest(request);
+		HashMap<String, Object> parametros = new HashMap<>();
 		for (FileItem item : items) {
 			if (item.isFormField()) {
 				parametros.put(item.getFieldName(), item.getString());
 			} else {
-				if (item.getSize() > 0 && item.getName().toLowerCase().endsWith(".pdf")) {									
+				if (item.getSize() > 0 && item.getName().toLowerCase().endsWith(".pdf")) {
 					try (InputStream contenidoDelFichero = item.getInputStream(); ByteArrayOutputStream salida = new ByteArrayOutputStream()) {
 						parametros.put(PARAM_ARCHIVO, BolsaEmpleoUtils.checkFileSize(contenidoDelFichero));
 					}
