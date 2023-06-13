@@ -134,10 +134,6 @@ public class ControladorMisMeritos extends HttpServlet {
 			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
 			LOGGER.log(Level.SEVERE, e.toString());
 			bean.getMensajesDeError().add("Error al acceder a la base de datos");
-		} catch (FileUploadException e) {
-			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
-			LOGGER.log(Level.SEVERE, e.toString());
-			bean.getMensajesDeError().add("Error al subir fichero");
 		} finally {
 			datos.getVistas().put(bean.getClass().getName(), bean);
 			datos.getFicherosJSP().add(bean.getVista());
@@ -189,7 +185,7 @@ public class ControladorMisMeritos extends HttpServlet {
 	}
 	
 	private void accionesMeritos(VistaMeritos bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, String nombreAccion) 
-			throws SQLException, IOException, UVException, FileUploadException {
+			throws SQLException, IOException, UVException {
 		
 		switch (nombreAccion) {
 			case ACCION_INDEX:
@@ -233,7 +229,7 @@ public class ControladorMisMeritos extends HttpServlet {
 	}
 	
 	private void agregarMerito(VistaMeritos bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
-			throws SQLException, UVException, IOException, FileUploadException {
+			throws SQLException, UVException, IOException {
 		bean.setVista(JSP_FORM);
 		
 		ModeloBaremacionApartados modelo = ModeloBaremacionApartados.obtenerInstancia();
@@ -241,13 +237,19 @@ public class ControladorMisMeritos extends HttpServlet {
 		
 		// maximo filesize request
 		ModeloParametrosConfiguracion modeloParam = ModeloParametrosConfiguracion.obtenerInstancia();
-		Integer maxSize = Formateador.leeParametroInteger(modeloParam.getParametroByNombre("bolsaempleo.maxEspacioArchivo").getValor());
+		Integer maxSize = Formateador.leeParametroInteger(modeloParam.getParametroByNombre("bolsaempleo.maxEspacioArchivo").getValor());		
+		List<FileItem> items;
+		try {
+			ServletFileUpload upload = new ServletFileUpload(new DiskFileItemFactory());
+			upload.setSizeMax(maxSize);
+			items = upload.parseRequest(request);
+		} catch (FileUploadException e) {
+			String maxSizeHuman = ModeloParametrosConfiguracion.obtenerInstancia().getMaxEspacioArchivoHuman();
+			
+			LOGGER.log(Level.SEVERE, String.format("Error subiendo fichero [%s]", e));
+			throw new UVException("Error subiendo fichero. Recuerde tamaño máximo de fichero: " + maxSizeHuman);
+		}
 		
-		// leemos los parametros del form, chequeando el fichero
-		ServletFileUpload upload = new ServletFileUpload(new DiskFileItemFactory());
-		upload.setSizeMax(maxSize);
-		
-		List<FileItem> items = upload.parseRequest(request);
 		HashMap<String, Object> parametros = new HashMap<>();
 		for (FileItem item : items) {
 			if (item.isFormField()) {
@@ -271,7 +273,7 @@ public class ControladorMisMeritos extends HttpServlet {
 				Merito merito = this.validarMerito(parametros);
 				
 				ModeloMerito.obtenerInstancia().insertaMerito(merito, bean.getUsuarioLogeado());
-							
+				
 				BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_AGREGAR, bean, request);
 				datos.setRespuestaEnviada(true);
 				response.sendRedirect(request.getServletPath());
