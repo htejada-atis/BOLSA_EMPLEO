@@ -6,14 +6,20 @@ import java.util.List;
 
 import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.beans.vistas.Vista;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Afinidad;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ApartadoBaremacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Area;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaSolicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.CandidatoEstado;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.HistorialTableMerito;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.HistorialTableSolicitudBolsaMerito;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.HistorialTableSolicitudBolsaMeritoValoracion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Merito;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoPreferenteUsuario;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitud;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitudTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Solicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.TitulacionUsuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
@@ -29,10 +35,12 @@ public class VistaCandidatos extends Vista implements Serializable {
 	private Solicitud solicitud;
 	private Usuario usuarioArcos;
 	private UsuarioBolsaEmpleo candidato;
+	private MeritoSolicitud meritoSolicitud;
 	private List<Area> listaAreas = new ArrayList<>();
 	private List<ApartadoBaremacion> apartados = new ArrayList<>();
-	private List<BolsaSolicitud> listaBolsasSolicitud;	
+	private List<BolsaSolicitud> listaBolsasSolicitud;
 	private List<Convocatoria> listaConvocatorias = new ArrayList<>();
+	private List<Afinidad> listaAfinidades;
 	private transient BolsaEmpleoDataTable<UsuarioBolsaEmpleo> dataTableCandidatos;
 	private transient BolsaEmpleoDataTable<Bolsa> dataTableAreas;
 	private transient BolsaEmpleoDataTable<MeritoPreferenteUsuario> dataTableAcreditaciones;
@@ -40,6 +48,9 @@ public class VistaCandidatos extends Vista implements Serializable {
 	private transient BolsaEmpleoDataTable<Solicitud> dataTableSolicitudes;
 	private transient BolsaEmpleoDataTable<TitulacionUsuario> dataTableTitulaciones;
 	private transient BolsaEmpleoDataTable<CandidatoEstado> dataTableEstadosCandidato;
+	private transient BolsaEmpleoDataTable<HistorialTableMerito> dataTableHistorialMerito;
+	private transient BolsaEmpleoDataTable<HistorialTableSolicitudBolsaMerito> dataTableHistorialSolicitudBolsaMerito;
+	private transient BolsaEmpleoDataTable<HistorialTableSolicitudBolsaMeritoValoracion> dataTableHistorialSolicitudBolsaMeritoValoracion;
 	private Boolean apartadoAcreditaciones;
 	private Boolean apartadoAreasExcluidas;
 	private Boolean apartadoContrataciones;
@@ -49,7 +60,7 @@ public class VistaCandidatos extends Vista implements Serializable {
 	private String codigoPadreMeritoPreferente;
 	private String vista;
 	private UsuarioBolsaEmpleo usuarioLogeado;
-	
+
 	public String getVista() {
 		return vista;
 	}
@@ -57,11 +68,11 @@ public class VistaCandidatos extends Vista implements Serializable {
 	public void setVista(String vista) {
 		this.vista = vista;
 	}
-	
+
 	public UsuarioBolsaEmpleo getUsuarioLogeado() {
 		return this.usuarioLogeado;
 	}
-	
+
 	public void setUsuarioLogeado(UsuarioBolsaEmpleo pusuario) {
 		this.usuarioLogeado = pusuario;
 	}
@@ -73,7 +84,7 @@ public class VistaCandidatos extends Vista implements Serializable {
 	public void setCandidato(UsuarioBolsaEmpleo usuario) {
 		this.candidato = usuario;
 	}
-	
+
 	public Usuario getUsuarioArcos() {
 		return usuarioArcos;
 	}
@@ -113,7 +124,7 @@ public class VistaCandidatos extends Vista implements Serializable {
 	public Boolean getApartadoSolicitudes() {
 		return apartadoSolicitudes;
 	}
-	
+
 	public void setApartadoMeritos(Boolean apartadoMeritos) {
 		this.apartadoMeritos = apartadoMeritos;
 	}
@@ -201,7 +212,7 @@ public class VistaCandidatos extends Vista implements Serializable {
 	public void setDataTableMeritos(BolsaEmpleoDataTable<Merito> dataTableMeritos) {
 		this.dataTableMeritos = dataTableMeritos;
 	}
-	
+
 	public List<ApartadoBaremacion> getApartados() {
 		return apartados;
 	}
@@ -225,12 +236,53 @@ public class VistaCandidatos extends Vista implements Serializable {
 	public void setDataTableEstadosCandidato(BolsaEmpleoDataTable<CandidatoEstado> dataTableEstadosCandidato) {
 		this.dataTableEstadosCandidato = dataTableEstadosCandidato;
 	}
+
+	public BolsaEmpleoDataTable<HistorialTableMerito> getDataTableHistorialMerito() {
+		return dataTableHistorialMerito;
+	}
+
+	public void setDataTableHistorialMerito(BolsaEmpleoDataTable<HistorialTableMerito> pdataTable) {
+		this.dataTableHistorialMerito = pdataTable;
+	}
 	
+	public BolsaEmpleoDataTable<HistorialTableSolicitudBolsaMerito> getDataTableHistorialSolicitudBolsaMerito() {
+		return dataTableHistorialSolicitudBolsaMerito;
+	}
+
+	public void setDataTableHistorialSolicitudBolsaMerito(BolsaEmpleoDataTable<HistorialTableSolicitudBolsaMerito> pdataTable) {
+		this.dataTableHistorialSolicitudBolsaMerito = pdataTable;
+	}
+
 	public List<Convocatoria> getListaConvocatorias() {
 		return this.listaConvocatorias;
 	}
-	
+
 	public void setListaConvocatorias(List<Convocatoria> listaConvocatorias) {
 		this.listaConvocatorias = listaConvocatorias;
+	}
+
+	public void setMeritoSolicitud(MeritoSolicitud pmerito) {
+		this.meritoSolicitud = pmerito;
+	}
+
+	public MeritoSolicitud getMeritoSolicitud() {
+		return this.meritoSolicitud;
+	}
+
+	public BolsaEmpleoDataTable<HistorialTableSolicitudBolsaMeritoValoracion> getDataTableHistorialSolicitudBolsaMeritoValoracion() {
+		return dataTableHistorialSolicitudBolsaMeritoValoracion;
+	}
+
+	public void setDataTableHistorialSolicitudBolsaMeritoValoracion(
+			BolsaEmpleoDataTable<HistorialTableSolicitudBolsaMeritoValoracion> dataTableHistorialSolicitudBolsaMeritoValoracion) {
+		this.dataTableHistorialSolicitudBolsaMeritoValoracion = dataTableHistorialSolicitudBolsaMeritoValoracion;
+	}
+
+	public List<Afinidad> getListaAfinidades() {
+		return listaAfinidades;
+	}
+
+	public void setListaAfinidades(List<Afinidad> listaAfinidades) {
+		this.listaAfinidades = listaAfinidades;
 	}
 }

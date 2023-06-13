@@ -91,6 +91,10 @@
 	background-image: url(../img/md/file_download.svg);
 }
 
+.bolsa-empleo .icon-search:before {
+	background-image: url(../img/md/search.svg);
+}
+
 #merito_preferente_form p.helper {
 	margin-top: 0;
 }

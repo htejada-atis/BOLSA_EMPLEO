@@ -81,7 +81,7 @@ public class ModeloSolicitud {
 	public static final String OBSERVACION_CANDIDATO = "OBSERVACION_CANDIDATO";
 	public static final String S = "S";
 	public static final int RAZON_EXCLUSION_SOLICITUD_MAXLENGTH = 500;
-		
+	
 	protected static ModeloSolicitud eInstancia;
 	
 	/** Crea una instancia del objeto.
@@ -529,8 +529,8 @@ public class ModeloSolicitud {
 						? ModeloBaremacionItems.obtenerInstancia().getItemBaremacionById(rs.getInt(BEPITE_CODNUM)) : null;
 				
 				MeritoSolicitud meritoSolicitud = new MeritoSolicitud(
-						rs.getInt(CODNUM), 
-						meritoRead, 
+						rs.getInt(CODNUM),
+						meritoRead,
 						rs.getString(FLGEXCLUIDO).equals(S)
 				);
 				meritoSolicitud.setItem(itemBaremacion);
@@ -687,9 +687,11 @@ public class ModeloSolicitud {
 	public List<MeritoSolicitudValoracion> getValoracionesMeritoSolicitud(int idMeritoSolicitud, boolean loadMeritoSolicitud) throws SQLException, UVException {
 		List<MeritoSolicitudValoracion> valoraciones = new ArrayList<>();
 		
-		String consulta = "SELECT bepsbv.* FROM TBEP_SOL_BOL_MER_VALORACION bepsbv"
-				+ "	INNER JOIN TBEP_AFINIDADES bepafi ON bepafi.CODNUM = bepsbv.BEPAFI_CODNUM"
-				+ "	WHERE bepsbv.BEPSBM_CODNUM = ? ORDER BY bepafi.MODULACION DESC";
+		String consulta = "SELECT bepsbv.* "
+				+ " FROM TBEP_SOL_BOL_MER_VALORACION bepsbv "
+				+ "	INNER JOIN TBEP_AFINIDADES bepafi ON bepafi.CODNUM = bepsbv.BEPAFI_CODNUM "
+				+ "	WHERE bepsbv.BEPSBM_CODNUM = ? "
+				+ " ORDER BY bepafi.MODULACION DESC";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int indexParam = 1;
