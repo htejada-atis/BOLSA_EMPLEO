@@ -154,10 +154,6 @@ public class ControladorMisTitulaciones extends HttpServlet {
 			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
 			LOGGER.log(Level.SEVERE, e.toString());
 			bean.getMensajesDeError().add("Error al acceder a la base de datos");
-		} catch (FileUploadException e) {
-			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
-			LOGGER.log(Level.SEVERE, e.toString());
-			bean.getMensajesDeError().add("Error al subir fichero");
 		} finally {
 			datos.getVistas().put(bean.getClass().getName(), bean);
 			datos.getFicherosJSP().add(bean.getVista());
@@ -286,7 +282,7 @@ public class ControladorMisTitulaciones extends HttpServlet {
 	}
 	
 	private void agregarTitulacion(UVDatos datos, HttpServletRequest request, HttpServletResponse response, VistaTitulaciones bean) 
-			throws SQLException, UVException, IOException, FileUploadException {		
+			throws SQLException, UVException, IOException {
 		agregarTitulacionFormulario(bean);
 		
 		// comprobamos si se puede añadir titulaciones.
@@ -294,14 +290,28 @@ public class ControladorMisTitulaciones extends HttpServlet {
 			throw new UVException("No se puede añadir, la convocatoria está cerrada o solicitud cerrada");
 		}
 		
+		// maximo filesize request
+		ModeloParametrosConfiguracion modeloParam = ModeloParametrosConfiguracion.obtenerInstancia();
+		Integer maxSize = Formateador.leeParametroInteger(modeloParam.getParametroByNombre("bolsaempleo.maxEspacioArchivo").getValor());
+		List<FileItem> items;
+		try {
+			ServletFileUpload upload = new ServletFileUpload(new DiskFileItemFactory());
+			upload.setSizeMax(maxSize);
+			items = upload.parseRequest(request);
+		} catch (FileUploadException e) {
+			String maxSizeHuman = ModeloParametrosConfiguracion.obtenerInstancia().getMaxEspacioArchivoHuman();
+			
+			LOGGER.log(Level.SEVERE, String.format("Error subiendo fichero [%s]", e));
+			throw new UVException("Error subiendo fichero. Recuerde tamaño máximo de fichero: " + maxSizeHuman);
+		}
+		
 		// leemos los parametros del form, chequeando el fichero
-		List<FileItem> items = new ServletFileUpload(new DiskFileItemFactory()).parseRequest(request);
-		HashMap<String, Object> parametros = new HashMap<>();		
+		HashMap<String, Object> parametros = new HashMap<>();
 		for (FileItem item : items) {
 			if (item.isFormField()) {
 				parametros.put(item.getFieldName(), item.getString());
 			} else {
-				if (item.getSize() > 0 && item.getName().toLowerCase().endsWith(".pdf")) {									
+				if (item.getSize() > 0 && item.getName().toLowerCase().endsWith(".pdf")) {
 					try (InputStream contenidoDelFichero = item.getInputStream(); ByteArrayOutputStream salida = new ByteArrayOutputStream()) {
 						parametros.put(PARAM_ARCHIVO, BolsaEmpleoUtils.checkFileSize(contenidoDelFichero));
 					}
