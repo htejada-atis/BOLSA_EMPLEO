@@ -9,35 +9,42 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import javax.servlet.ServletOutputStream;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import es.ujaen.uvirtual.adm.CrearUsuario;
 import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Afinidad;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Area;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaSolicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.CandidatoEstado;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.HistorialTableMerito;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.HistorialTableSolicitudBolsaMerito;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.HistorialTableSolicitudBolsaMeritoValoracion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Merito;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoPreferenteUsuario;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.ParametrosConfiguracion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Solicitud;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.TitulacionUsuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.informes.GenerarSolicitudPDF;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloAfinidad;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloArea;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacionApartados;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloConvocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloEstadoCandidato;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloHistorial;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMerito;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMeritosPreferentesCandidato;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMisTitulaciones;
@@ -59,10 +66,10 @@ import es.ujaen.uvirtual.utilidades.UVException;
 	name = "informacionadministrativa.bolsaempleo.configuracion.candidatos", 
 	description = "Gestión de usuarios candidatos", 
 	urlPatterns = {
-		"/srv/es/informacionadministrativa/bolsaempleo/configuracion/candidatos", 
+		"/srv/es/informacionadministrativa/bolsaempleo/configuracion/candidatos",
 		"/srv/en/informacionadministrativa/bolsaempleo/configuracion/candidatos",
 		"/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/candidatos",
-		"/srv/en/ajax/informacionadministrativa/bolsaempleo/configuracion/candidatos"
+		"/srv/en/ajax/informacionadministrativa/bolsaempleo/configuracion/candidatos" 
 	})
 public class ControladorUsuarioCandidato extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -82,6 +89,11 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 	public static final String PARAM_FECHA_EXCLUIDO_FIN = "fechaexcluidofin";
 	public static final String PARAM_GUARDAR = "guardar";
 	public static final String PARAM_LISTA = "lista";
+	public static final String PARAM_LOGINNUEVO = "nuevologin";
+	public static final String PARAM_MERITO = "merito";
+	public static final String PARAM_MERITO_SOLICITUD = "meritosolicitud";
+	public static final String PARAM_MERITO_SOLICITUD_VALORACION = "meritosolicitudvaloracion";
+	public static final String PARAM_MERITO_SOLICITUD_VALORACION_AFINIDAD = "meritosolicitudvaloracionafinidad";
 	public static final String PARAM_NOMBRE = "nombre";
 	public static final String PARAM_NOMBRE_USUARIO = "nombreusuario";
 	public static final String PARAM_RAZON_BORRADO = "razonborrado";
@@ -90,11 +102,12 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 	public static final String PARAM_RAZON_EXCLUSION_SOLICITUD = "razonexclusionsolicitud";
 	public static final String PARAM_CONVOCATORIA = "convocatoria";
 	public static final String PARAM_TIPOLOGIN = "tipologin";
-	public static final String PARAM_LOGINNUEVO = "nuevologin";
-	
+
 	// acciones
 	public static final String ACCION_ACREDITACIONES_CANDIDATO = "acreditacionescandidato";
+	public static final String ACCION_ACTUALIZAR_DATOS_PERSONALES = "actualizardatospersonales";
 	public static final String ACCION_AREAS_EXCLUIDAS_CANDIDATO = "areasexcluidascandidato";
+	public static final String ACCION_CAMBIAR_LOGIN_CANDIDATO = "cambiarlogincandidato";
 	public static final String ACCION_CAMBIAR_ESTADO_CANDIDATO = "cambiarestadocandidato";
 	public static final String ACCION_CONFIRMAR_SOLICITUD = "confirmarsolicitud";
 	public static final String ACCION_CONTRATACIONES_CANDIDATO = "contratacionescandidato";
@@ -106,11 +119,20 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 	public static final String ACCION_DATATABLE_SOLICITUDES = "datatablesolicitudes";
 	public static final String ACCION_DATATABLE_TITULACIONES_CANDIDATO = "datatabletitulacionescandidato";
 	public static final String ACCION_DATATABLE_USUARIOS_CANDIDATOS = "datatableusuarioscandidatos";
+	public static final String ACCION_DATATABLE_HISTORIAL_MERITO = "datatablehistorialmerito";
+	public static final String ACCION_DATATABLE_HISTORIAL_SOLICITUD_BOLSA_MERITO = "datatablehistorialsolicitudbolsamerito";
+	public static final String ACCION_DATATABLE_HISTORIAL_SOLICITUD_BOLSA_MERITO_VALORACION = "datatablehistorialsolicitudbolsameritovaloracion";
+	public static final String ACCION_DAR_BAJA_CANDIDATOS = "darbajacandidatos";
+	public static final String ACCION_DETALLE_MERITO = "detallemerito";
 	public static final String ACCION_EDITAR_CANDIDATO = "editarcandidato";
+	public static final String ACCION_EDITAR_AFINIDADES_MERITO = "editarafinidadesmerito";
 	public static final String ACCION_ELIMINAR_CANDIDATO = "eliminarcandidato";
 	public static final String ACCION_EXCLUIR_USUARIO_AREA = "excluirusuarioarea";
-	public static final String ACCION_INCLUIR_USUARIO_AREA = "incluirusuarioarea";
+	public static final String ACCION_EXCLUIR_SOLICITUD = "excluirsolicitudcandidato";
+	public static final String ACCION_EXPORTAR = "exportarcandidatos";
 	public static final String ACCION_INDEX = "index";
+	public static final String ACCION_INCLUIR_SOLICITUD = "incluirsolicitudcandidato";
+	public static final String ACCION_INCLUIR_USUARIO_AREA = "incluirusuarioarea";
 	public static final String ACCION_MERITOS_CANDIDATO = "meritoscandidato";
 	public static final String ACCION_REABRIR_SOLICITUD = "reabrirsolicitud";
 	public static final String ACCION_RECUPERAR_CANDIDATO = "recuperarusuario";
@@ -119,12 +141,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 	public static final String ACCION_SOLICITUDES_CANDIDATO = "solicitudescandidato";
 	public static final String ACCION_TITULACIONES_CANDIDATO = "titulacionescandidato";
 	public static final String ACCION_VOLVER_CANDIDATO = "volvercandidato";
-	public static final String ACCION_EXCLUIR_SOLICITUD = "excluirsolicitudcandidato";	
-	public static final String ACCION_INCLUIR_SOLICITUD = "incluirsolicitudcandidato";
-	public static final String ACCION_EXPORTAR = "exportarcandidatos";
-	public static final String ACCION_DAR_BAJA_CANDIDATOS = "darbajacandidatos";
-	public static final String ACCION_CAMBIAR_LOGIN_CANDIDATO = "cambiarlogincandidato";
-	public static final String ACCION_ACTUALIZAR_DATOS_PERSONALES = "actualizardatospersonales";
+	public static final String ACCION_VOLVER_SOLICITUD = "volversolicitud";
 
 	// mensajes
 	public static final String MENSAJE_ERROR_ACCION_NO_CONTEMPLADA = "Acción no contemplada";
@@ -157,7 +174,8 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 	public static final String MENSAJE_EXITO_EXCLUSION_SOLICITUD = "Solicitud excluida correctamente";
 	public static final String MENSAJE_EXITO_INCLUSION_SOLICITUD = "Solicitud incluida correctamente";
 	public static final String MENSAJE_EXITO_CANDIDATOS_SIN_SOLICITUDES_DADOS_DE_BAJA = "Candidatos sin solicitudes dados de baja";
-	
+	public static final String MENSAJE_EXITO_EDITAR_AFINIDAD = "Afinidad actualizada correctamente";
+
 	public static final String URL_PATTERN = "/srv/es/informacionadministrativa/bolsaempleo/configuracion/candidatos";
 
 	// ajax
@@ -166,7 +184,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 	public static final String RESPONSE_AJAX_ENCODING = "UTF-8";
 	public static final String RESPONSE_AJAX_ERROR = "error";
 	public static final int RESPONSE_AJAX_HTTP_CODE_ERROR = 400;
-	
+
 	// csv
 	public static final String RESPONSE_CSV_CONTENTTYPE = "text/csv";
 	public static final String RESPONSE_CSV_ENCODING = "UTF-8";
@@ -176,24 +194,28 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 	public static final String JSP_INDEX = RUTA_BEP_CONF_CAND + "candidatos.jsp";
 	public static final String JSP_FORM_CANDIDATO = RUTA_BEP_CONF_CAND + "formCandidatos.jsp";
 	public static final String JSP_RESUMEN_SOLICITUD = RUTA_BEP_CONF_CAND + "resumenSolicitud.jsp";
+	public static final String JSP_DETALLE_MERITO_SOLICITUD = RUTA_BEP_CONF_CAND + "resumenMerito.jsp";
 
-	/** Peticion GET.
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	/**
+	 * Peticion GET.
+	 * 
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
+	 *      response)
 	 */
 	@Override
-	@SuppressWarnings({"checkstyle:CyclomaticComplexity", "checkstyle:JavaNCSS"})
+	@SuppressWarnings({ "checkstyle:CyclomaticComplexity", "checkstyle:JavaNCSS" })
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		UVDatos datos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
 		datos.setDocType("<!DOCTYPE html>");
 		datos.setContentType("text/html");
-		
+
 		VistaCandidatos bean = new VistaCandidatos();
-		
+
 		String nombreAccion = EscapaHTML.ajustaCodificacion(BolsaEmpleoUtils.getParamRequestOrSession(request, PARAM_ACCION));
 		if (nombreAccion == null) {
 			nombreAccion = ACCION_INDEX;
 		}
-		
+
 		try {
 			if (!init(bean, datos, request, response)) {
 				return;
@@ -211,7 +233,11 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 				case ACCION_DATATABLE_MERITOS_CANDIDATO:
 				case ACCION_DATATABLE_SOLICITUDES:
 				case ACCION_DATATABLE_TITULACIONES_CANDIDATO:
+				case ACCION_DATATABLE_HISTORIAL_MERITO:
+				case ACCION_DATATABLE_HISTORIAL_SOLICITUD_BOLSA_MERITO:
+				case ACCION_DATATABLE_HISTORIAL_SOLICITUD_BOLSA_MERITO_VALORACION:
 				case ACCION_EDITAR_CANDIDATO:
+				case ACCION_EDITAR_AFINIDADES_MERITO:
 				case ACCION_ELIMINAR_CANDIDATO:
 				case ACCION_EXCLUIR_USUARIO_AREA:
 				case ACCION_INCLUIR_USUARIO_AREA:
@@ -223,9 +249,11 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 				case ACCION_SOLICITUDES_CANDIDATO:
 				case ACCION_TITULACIONES_CANDIDATO:
 				case ACCION_VOLVER_CANDIDATO:
+				case ACCION_VOLVER_SOLICITUD:
 				case ACCION_EXCLUIR_SOLICITUD:
 				case ACCION_INCLUIR_SOLICITUD:
 				case ACCION_CAMBIAR_LOGIN_CANDIDATO:
+				case ACCION_DETALLE_MERITO:
 					accionesCandidato(bean, datos, request, response, nombreAccion);
 					break;
 				case ACCION_INDEX:
@@ -265,16 +293,20 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 			datos.getFicherosCSS().add("/css/jqueryujaen/jquery-ui-1.8.16.custom.css");
 		}
 	}
-		
-	/** Redireccion de do post.
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+
+	/**
+	 * Redireccion de do post.
+	 * 
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
+	 *      response)
 	 */
 	@Override
 	public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		doGet(request, response);
 	}
-	
-	private boolean init(VistaCandidatos bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
+
+	private boolean init(VistaCandidatos bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
+			throws SQLException, UVException, IOException {
 		bean.setVista(JSP_INDEX);
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
 
@@ -294,33 +326,33 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 
 		return true;
 	}
-	
+
 	private void index(VistaCandidatos bean) throws SQLException {
-		ModeloConvocatoria modelo = ModeloConvocatoria.obtenerInstancia(); 
+		ModeloConvocatoria modelo = ModeloConvocatoria.obtenerInstancia();
 		bean.setListaConvocatorias(modelo.listaConvocatorias());
 		bean.setVista(JSP_INDEX);
 	}
-	
+
 	private void errorFatal(VistaCandidatos bean, String mensaje) {
 		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/error.jsp");
 		bean.getMensajesDeError().add(mensaje);
 	}
-	
-	@SuppressWarnings({"checkstyle:CyclomaticComplexity", "checkstyle:JavaNCSS"})
-	private void accionesCandidato(VistaCandidatos bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, String nombreAccion)
-			throws SQLException, UVException, IOException {
+
+	@SuppressWarnings({ "checkstyle:CyclomaticComplexity", "checkstyle:JavaNCSS" })
+	private void accionesCandidato(VistaCandidatos bean, UVDatos datos, HttpServletRequest request,
+			HttpServletResponse response, String nombreAccion) throws SQLException, UVException, IOException {
 		bean.setVista(JSP_FORM_CANDIDATO);
-		
+
 		Integer idCandidato = Formateador.leeParametroInteger(BolsaEmpleoUtils.getParamRequestOrSession(request, PARAM_CANDIDATO));
 		UsuarioBolsaEmpleo candidato = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioById(idCandidato);
 		bean.setCandidato(candidato);
-		
+
 		Usuario usuArcos = CrearUsuario.usuario(candidato.getCodCuenta());
 		if (usuArcos == null) {
 			throw new UVException(MENSAJE_ERROR_USUARIO_UJA_NO_ENCONTRADO);
 		}
 		bean.setUsuarioArcos(usuArcos);
-		
+
 		switch (nombreAccion) {
 			case ACCION_ACREDITACIONES_CANDIDATO:
 				obtenerCodigoPadreAcreditacion(bean);
@@ -375,6 +407,11 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 			case ACCION_SELECCIONAR_SOLICITUD:
 			case ACCION_EXCLUIR_SOLICITUD:
 			case ACCION_INCLUIR_SOLICITUD:
+			case ACCION_DETALLE_MERITO:
+			case ACCION_EDITAR_AFINIDADES_MERITO:
+			case ACCION_DATATABLE_HISTORIAL_MERITO:
+			case ACCION_DATATABLE_HISTORIAL_SOLICITUD_BOLSA_MERITO:
+			case ACCION_DATATABLE_HISTORIAL_SOLICITUD_BOLSA_MERITO_VALORACION:
 				accionesSolicitud(bean, datos, request, response, nombreAccion);
 				break;
 			case ACCION_RECUPERAR_CANDIDATO:
@@ -391,6 +428,12 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 			case ACCION_VOLVER_CANDIDATO:
 				redireccionConCandidatoSeleccionado(bean, datos, request, response, ACCION_SOLICITUDES_CANDIDATO);
 				break;
+			case ACCION_VOLVER_SOLICITUD:
+				Integer idSolicitud = Formateador.leeParametroInteger(BolsaEmpleoUtils.getParamRequestOrSession(request, PARAM_SOLICITUD));
+				Solicitud solicitud = ModeloSolicitud.obtenerInstancia().getSolicitudById(idSolicitud);
+				bean.setSolicitud(solicitud);
+				redireccionConSolicitudSeleccionada(bean, datos, request, response, ACCION_SELECCIONAR_SOLICITUD);
+				break;
 			case ACCION_CAMBIAR_LOGIN_CANDIDATO:
 				cambiarLoginCandidato(bean, datos, request, response);
 				break;
@@ -398,13 +441,14 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 				errorFatal(bean, MENSAJE_ERROR_ACCION_NO_CONTEMPLADA);
 		}
 	}
-	
-	private void accionesSolicitud(VistaCandidatos bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, String nombreAccion)
-			throws SQLException, UVException, IOException {
+
+	@SuppressWarnings({ "checkstyle:CyclomaticComplexity" })
+	private void accionesSolicitud(VistaCandidatos bean, UVDatos datos, HttpServletRequest request,
+			HttpServletResponse response, String nombreAccion) throws SQLException, UVException, IOException {
 		Integer idSolicitud = Formateador.leeParametroInteger(BolsaEmpleoUtils.getParamRequestOrSession(request, PARAM_SOLICITUD));
 		Solicitud solicitud = ModeloSolicitud.obtenerInstancia().getSolicitudById(idSolicitud);
 		bean.setSolicitud(solicitud);
-		
+
 		switch (nombreAccion) {
 			case ACCION_CONFIRMAR_SOLICITUD:
 				confirmarSolicitudCandidato(bean, datos, request, response);
@@ -421,117 +465,307 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 			case ACCION_INCLUIR_SOLICITUD:
 				incluirSolicitudCandidato(bean, datos, request, response);
 				break;
+			case ACCION_DATATABLE_HISTORIAL_MERITO:
+				listadoHistorialMerito(bean, datos, request, response);
+				break;
+			case ACCION_DATATABLE_HISTORIAL_SOLICITUD_BOLSA_MERITO:
+				listadoHistorialSolicitudBolsaMerito(bean, datos, request, response);
+				break;
+			case ACCION_DATATABLE_HISTORIAL_SOLICITUD_BOLSA_MERITO_VALORACION:
+				listadoHistorialSolicitudBolsaMeritoValoracion(bean, datos, request, response);
+				break;
+			case ACCION_DETALLE_MERITO:
+				detalleMeritoSolicitud(bean, datos, request, response);
+				break;
+			case ACCION_EDITAR_AFINIDADES_MERITO:
+				editarAfinidadesMerito(bean, datos, request, response);
+				break;
 			default:
 				errorFatal(bean, MENSAJE_ERROR_ACCION_NO_CONTEMPLADA);
 		}
 	}
-	
-	private void excluirSolicitudCandidato(VistaCandidatos bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
-			throws UVException, SQLException, IOException {
+
+	private void excluirSolicitudCandidato(VistaCandidatos bean, UVDatos datos, HttpServletRequest request,
+			HttpServletResponse response) throws UVException, SQLException, IOException {
 		Solicitud solicitud = bean.getSolicitud();
-		
-		solicitud.setRazonExclusion(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_RAZON_EXCLUSION_SOLICITUD)));
+
+		solicitud.setRazonExclusion(
+				EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_RAZON_EXCLUSION_SOLICITUD)));
 		if (solicitud.getRazonExclusion() == null || solicitud.getRazonExclusion().isEmpty()) {
 			throw new UVException(MENSAJE_ERROR_RAZON_EXCLUSION_REQUERIDA);
 		}
 		if (solicitud.getRazonExclusion().length() > ModeloSolicitud.RAZON_EXCLUSION_SOLICITUD_MAXLENGTH) {
-			throw new UVException(String.format(MENSAJE_ERROR_RAZON_EXCLUSION_LARGA, ModeloSolicitud.RAZON_EXCLUSION_SOLICITUD_MAXLENGTH));
+			throw new UVException(String.format(MENSAJE_ERROR_RAZON_EXCLUSION_LARGA,
+					ModeloSolicitud.RAZON_EXCLUSION_SOLICITUD_MAXLENGTH));
 		}
-			
+
 		ModeloSolicitud.obtenerInstancia().excluirIncluirSolicitud(solicitud, true, bean.getUsuarioLogeado());
-		
+
 		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_EXCLUSION_SOLICITUD, bean, request);
 		redireccionConSolicitudSeleccionada(bean, datos, request, response, ACCION_SELECCIONAR_SOLICITUD);
 	}
-	
-	private void incluirSolicitudCandidato(VistaCandidatos bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
-			throws UVException, SQLException, IOException {
+
+	private void incluirSolicitudCandidato(VistaCandidatos bean, UVDatos datos, HttpServletRequest request,
+			HttpServletResponse response) throws UVException, SQLException, IOException {
 		Solicitud solicitud = bean.getSolicitud();
 		ModeloSolicitud.obtenerInstancia().excluirIncluirSolicitud(solicitud, false, bean.getUsuarioLogeado());
-		
+
 		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_INCLUSION_SOLICITUD, bean, request);
 		redireccionConSolicitudSeleccionada(bean, datos, request, response, ACCION_SELECCIONAR_SOLICITUD);
 	}
-	
-	/** Confirmar la solicitud del candidato .
-	 * @param bean .
-	 * @param datos .
-	 * @param request .
+
+	/**
+	 * Confirmar la solicitud del candidato .
+	 * 
+	 * @param bean     .
+	 * @param datos    .
+	 * @param request  .
 	 * @param response .
-	 * @throws IOException .
-	 * @throws IOException .
+	 * @throws IOException  .
+	 * @throws IOException  .
 	 * @throws SQLException .
-	 * @throws UVException .
+	 * @throws UVException  .
 	 */
-	private void confirmarSolicitudCandidato(VistaCandidatos bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
-			throws SQLException, UVException, IOException {
+	private void confirmarSolicitudCandidato(VistaCandidatos bean, UVDatos datos, HttpServletRequest request,
+			HttpServletResponse response) throws SQLException, UVException, IOException {
 		bean.setVista(JSP_RESUMEN_SOLICITUD);
-		
+
 		ModeloSolicitud modeloSolicitud = ModeloSolicitud.obtenerInstancia();
-		
+
 		List<BolsaSolicitud> listaBolsas = modeloSolicitud.getBolsasSolicitudMeritos(bean.getSolicitud());
 		bean.setListaBolsasSolicitud(listaBolsas);
-		
+
 		modeloSolicitud.comprobarSolicitudCorrecta(bean.getSolicitud(), true);
-		
+
 		bean.getSolicitud().setEstado(ModeloSolicitud.SOLICITUD_ESTADO_CERRADA);
 		bean.getSolicitud().setFechaConfirmacion(BolsaEmpleoUtils.getCurrentDateTime());
-		
+
 		try (InputStream archivo = GenerarSolicitudPDF.generarPDF(bean.getSolicitud(), listaBolsas)) {
 			bean.getSolicitud().setArchivo(archivo);
 		}
-		
+
 		modeloSolicitud.confirmacionSolicitud(bean.getSolicitud(), bean.getCandidato());
-		
+
 		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_SOLICITUD_CONFIRMADA, bean, request);
 		redireccionConSolicitudSeleccionada(bean, datos, request, response, ACCION_SELECCIONAR_SOLICITUD);
 	}
-	
-	private void cambiarEstadoCandidato(VistaCandidatos bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
-			throws SQLException, UVException, IOException {
+
+	private void detalleMeritoSolicitud(VistaCandidatos bean, UVDatos datos, HttpServletRequest request,
+			HttpServletResponse response) throws SQLException, UVException, IOException {
+		Integer idMeritoSolicitud = Formateador.leeParametroInteger(BolsaEmpleoUtils.getParamRequestOrSession(request, PARAM_MERITO_SOLICITUD));
+		ModeloSolicitud modeloSolicitud = ModeloSolicitud.obtenerInstancia();
+
+		MeritoSolicitud meritoSolicitud = modeloSolicitud.getMeritoSolicitudById(idMeritoSolicitud);
+		meritoSolicitud.setValoraciones(modeloSolicitud.getValoracionesMeritoSolicitud(meritoSolicitud.getCodNum(), false));
+
+		bean.setVista(JSP_DETALLE_MERITO_SOLICITUD);
+		bean.setMeritoSolicitud(meritoSolicitud);
+		bean.setListaAfinidades(ModeloAfinidad.obtenerInstancia().listaAfinidades());
+	}
+
+	private void listadoHistorialMerito(VistaCandidatos bean, UVDatos datos, HttpServletRequest request,
+			HttpServletResponse response) throws IOException, SQLException, UVException {
+		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
+		datos.setRespuestaEnviada(true);
+		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
+		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
+
+		Integer idMerito = Formateador.leeParametroInteger(BolsaEmpleoUtils.getParamRequestOrSession(request, PARAM_MERITO));
+		Merito merito = ModeloMerito.obtenerInstancia().listaMerito(idMerito);
+
+		try (PrintWriter writer = response.getWriter()) {
+			try {
+				BolsaEmpleoDataTable<HistorialTableMerito> dataTable = ModeloHistorial.obtenerInstancia().listaTablaMeritos(request.getParameterMap(), merito);
+				bean.setDataTableHistorialMerito(dataTable);
+				writer.write(dataTable.toJson("dd/M/yyyy HH:mm:ss"));
+			} catch (UVException | SQLException e) {
+				if (e instanceof SQLException) {
+					LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
+					LOGGER.log(Level.SEVERE, e.toString());
+				} else {
+					LOGGER.log(Level.WARNING, e.toString());
+				}
+				bean.getMensajesDeError().add(e.getMessage());
+				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, e.getMessage());
+				writer.write(new Gson().toJson(mensaje));
+				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
+			}
+		}
+	}
+
+	private void listadoHistorialSolicitudBolsaMerito(VistaCandidatos bean, UVDatos datos, HttpServletRequest request,
+			HttpServletResponse response) throws IOException, SQLException, UVException {
+		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
+		datos.setRespuestaEnviada(true);
+		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
+		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
+
+		Integer idMeritoSolicitud = Formateador.leeParametroInteger(BolsaEmpleoUtils.getParamRequestOrSession(request, PARAM_MERITO_SOLICITUD));
+		MeritoSolicitud meritoSolicitud = ModeloSolicitud.obtenerInstancia().getMeritoSolicitudById(idMeritoSolicitud);
+
+		try (PrintWriter writer = response.getWriter()) {
+			try {
+				BolsaEmpleoDataTable<HistorialTableSolicitudBolsaMerito> dataTable = ModeloHistorial.obtenerInstancia().
+						listaTablaSolicitudBolsaMerito(request.getParameterMap(), meritoSolicitud);
+				bean.setDataTableHistorialSolicitudBolsaMerito(dataTable);
+				writer.write(dataTable.toJson("dd/M/yyyy HH:mm:ss"));
+			} catch (UVException | SQLException e) {
+				if (e instanceof SQLException) {
+					LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
+					LOGGER.log(Level.SEVERE, e.toString());
+				} else {
+					LOGGER.log(Level.WARNING, e.toString());
+				}
+				bean.getMensajesDeError().add(e.getMessage());
+				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, e.getMessage());
+				writer.write(new Gson().toJson(mensaje));
+				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
+			}
+		}
+	}
+
+	private void listadoHistorialSolicitudBolsaMeritoValoracion(VistaCandidatos bean, UVDatos datos,
+			HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException, UVException {
+		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
+		datos.setRespuestaEnviada(true);
+		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
+		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
+
+		Integer idMeritoSolicitud = Formateador.leeParametroInteger(BolsaEmpleoUtils.getParamRequestOrSession(request, PARAM_MERITO_SOLICITUD));
+		MeritoSolicitud meritoSolicitud = ModeloSolicitud.obtenerInstancia().getMeritoSolicitudById(idMeritoSolicitud);
+
+		try (PrintWriter writer = response.getWriter()) {
+			try {
+				BolsaEmpleoDataTable<HistorialTableSolicitudBolsaMeritoValoracion> dataTable = ModeloHistorial.obtenerInstancia().
+						listaTablaSolicitudBolsaMeritoValoracion(request.getParameterMap(), meritoSolicitud);
+				bean.setDataTableHistorialSolicitudBolsaMeritoValoracion(dataTable);
+				writer.write(dataTable.toJson("dd/M/yyyy HH:mm:ss"));
+			} catch (UVException | SQLException e) {
+				if (e instanceof SQLException) {
+					LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
+					LOGGER.log(Level.SEVERE, e.toString());
+				} else {
+					LOGGER.log(Level.WARNING, e.toString());
+				}
+				bean.getMensajesDeError().add(e.getMessage());
+				CodigoDescripcion mensaje = new CodigoDescripcion(RESPONSE_AJAX_ERROR, e.getMessage());
+				writer.write(new Gson().toJson(mensaje));
+				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
+			}
+		}
+	}
+
+	private void editarAfinidadesMerito(VistaCandidatos bean, UVDatos datos, HttpServletRequest request,
+			HttpServletResponse response) throws SQLException, UVException, IOException {
+		Integer idMeritoSolicitud = Formateador.leeParametroInteger(BolsaEmpleoUtils.getParamRequestOrSession(request, PARAM_MERITO_SOLICITUD));
+		ModeloSolicitud modeloSolicitud = ModeloSolicitud.obtenerInstancia();
+
+		MeritoSolicitud meritoSolicitud = modeloSolicitud.getMeritoSolicitudById(idMeritoSolicitud);
+		meritoSolicitud.setValoraciones(modeloSolicitud.getValoracionesMeritoSolicitud(meritoSolicitud.getCodNum(), false));
+
+		bean.setVista(JSP_DETALLE_MERITO_SOLICITUD);
+		bean.setMeritoSolicitud(meritoSolicitud);
+		bean.setListaAfinidades(ModeloAfinidad.obtenerInstancia().listaAfinidades());
+
+		if (bean.getMeritoSolicitud().getMerito().getItemBaremacion().getAfinidad() == null) {
+			throw new UVException("El item del mérito no tiene afinidad");
+		}
+
+		if (bean.getMeritoSolicitud().getValoraciones().size() == 0) {
+			throw new UVException("El item no tiene valoraciones");
+		}
+
+		if (bean.getMeritoSolicitud().getMerito().getItemBaremacion().getIndividualizado()) {
+			Afinidad afinidad = ModeloAfinidad.obtenerInstancia().getAfinidadById(Formateador.leeParametroInteger(
+					BolsaEmpleoUtils.getParamRequestOrSession(request, PARAM_MERITO_SOLICITUD_VALORACION_AFINIDAD)));
+			Integer codNumSolicitudBolsaMeritoValoracion = Formateador.leeParametroInteger(
+					BolsaEmpleoUtils.getParamRequestOrSession(request, PARAM_MERITO_SOLICITUD_VALORACION));
+
+			ModeloSolicitud.obtenerInstancia().actualizarAfinidadesMeritoIndividualizado(meritoSolicitud, afinidad,
+					codNumSolicitudBolsaMeritoValoracion, bean.getUsuarioLogeado());
+		} else {
+			Gson gson = new GsonBuilder().create();
+			HashMap<String, Double> afinidadesRaw;
+
+			try {
+				afinidadesRaw = gson.fromJson(request.getParameter(PARAM_MERITO_SOLICITUD_VALORACION_AFINIDAD),
+						new TypeToken<HashMap<String, Double>>() { }.getType());
+			} catch (Exception e) {
+				throw new UVException("Afinidades incorrectas");
+			}
+
+			Double total = 0.0;
+			HashMap<Afinidad, Double> afinidades = new HashMap<>();
+			for (Map.Entry<String, Double> entry : afinidadesRaw.entrySet()) {
+				Afinidad a = ModeloAfinidad.obtenerInstancia().getAfinidadById(Formateador.leeParametroInteger(entry.getKey()));
+				afinidades.put(a, entry.getValue());
+				total += entry.getValue();
+			}
+
+			Double valor = meritoSolicitud.getValor() != null && meritoSolicitud.getValor() != 0
+					? meritoSolicitud.getValor()
+					: meritoSolicitud.getMerito().getValor();
+			Double totalRounder = BolsaEmpleoUtils.redondeo(total);
+			if (!totalRounder.equals(valor)) {
+				throw new UVException("El total de afinidades tiene que ser igual al valor del mérito");
+			}
+
+			modeloSolicitud.actualizarAfinidadesMeritoNoIndividualizado(meritoSolicitud, afinidades,
+					bean.getUsuarioLogeado());
+		}
+
+		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_EDITAR_AFINIDAD, bean, request);
+		redireccionConMeritoSeleccionado(bean, datos, request, response, ACCION_DETALLE_MERITO);
+	}
+
+	private void cambiarEstadoCandidato(VistaCandidatos bean, UVDatos datos, HttpServletRequest request,
+			HttpServletResponse response) throws SQLException, UVException, IOException {
 		String selectedJson = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_BOLSAS));
 		String estado = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ESTADO));
-		
+
 		int[] selected;
 		List<Bolsa> bolsas;
-		
+
 		try {
 			selected = (new Gson()).fromJson(selectedJson, new TypeToken<int[]>() { }.getType());
 			bolsas = ModeloBolsa.obtenerInstancia().getBolsasByIds(selected);
 		} catch (Exception ex) {
 			throw new UVException(MENSAJE_ERROR_BOLSAS_SELECCIONADAS_INCORRECTAS);
 		}
-		
+
 		CandidatoEstado candidato = new CandidatoEstado(bean.getCandidato());
-		ModeloEstadoCandidato.obtenerInstancia().cambiarEstadosCandidato(candidato, estado, bolsas, bean.getUsuarioLogeado());
+		ModeloEstadoCandidato.obtenerInstancia().cambiarEstadosCandidato(candidato, estado, bolsas,
+				bean.getUsuarioLogeado());
 		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_ESTADO_CAMBIADO, bean, request);
-		
+
 		Map<String, String> params = new HashMap<>();
 		params.put(PARAM_ACCION, ACCION_CONTRATACIONES_CANDIDATO);
 		params.put(PARAM_CANDIDATO, bean.getCandidato().getCodNum().toString());
 		BolsaEmpleoUtils.redirectWithParams(datos, request, response, params);
 	}
-	
-	/** edita un candidato .
-	 * @param datos .
-	 * @param request .
+
+	/**
+	 * edita un candidato .
+	 * 
+	 * @param datos    .
+	 * @param request  .
 	 * @param response .
-	 * @param bean bean de la vista a la que poner los valores .
+	 * @param bean     bean de la vista a la que poner los valores .
 	 * @throws SQLException excepcion de bbdd .
-	 * @throws UVException en caso de error en bd .
-	 * @throws IOException en caso error de input u output .
+	 * @throws UVException  en caso de error en bd .
+	 * @throws IOException  en caso error de input u output .
 	 */
-	private void editarCandidato(VistaCandidatos bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) 
-			throws SQLException, UVException, IOException {
-		
+	private void editarCandidato(VistaCandidatos bean, UVDatos datos, HttpServletRequest request,
+			HttpServletResponse response) throws SQLException, UVException, IOException {
+
 		if (request.getParameter(PARAM_GUARDAR) != null) {
 			Usuario usuArcos = CrearUsuario.usuario(bean.getCandidato().getCodCuenta());
 			if (usuArcos == null) {
 				throw new UVException(MENSAJE_ERROR_USUARIO_NO_EXISTE);
 			}
-			
+
 			UsuarioBolsaEmpleo usuarioForm = this.getValidatorUsuarios(request);
-			
+
 			usuarioForm.setUsuarioArcos(usuArcos);
 			usuarioForm.setCodCuenta(bean.getCandidato().getCodCuenta());
 			usuarioForm.setCodNum(Formateador.leeParametroInteger(request.getParameter(PARAM_CANDIDATO)));
@@ -542,31 +776,34 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 			usuarioForm.setNacionalidad(bean.getCandidato().getNacionalidad());
 			usuarioForm.setTelefono(bean.getCandidato().getTelefono());
 			usuarioForm.setEmail(bean.getCandidato().getEmail());
-			
+
 			ModeloUsuarioBolsaEmpleo.obtenerInstancia().actualizaUsuario(usuarioForm, bean.getUsuarioLogeado());
 			BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_EDITAR, bean, request);
 			datos.setRespuestaEnviada(true);
 			response.sendRedirect(request.getServletPath());
 		}
 	}
-	
-	private void excluirUsuarioArea(VistaCandidatos bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, boolean excluir)
-			throws SQLException, UVException, IOException {
+
+	private void excluirUsuarioArea(VistaCandidatos bean, UVDatos datos, HttpServletRequest request,
+			HttpServletResponse response, boolean excluir) throws SQLException, UVException, IOException {
 		ModeloUsuarioBolsaEmpleo modeloUsuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
+		
 		int[] idsAreas = (new Gson()).fromJson(request.getParameter(PARAM_AREAS_SELECCIONADAS), new TypeToken<int[]>() { }.getType());
 		List<Area> areas = ModeloArea.obtenerInstancia().getAreasByIds(idsAreas);
 		bean.setListaAreas(areas);
-		
+
 		try {
 			if (areas.size() > 0) {
 				if (excluir) {
 					modeloUsuario.excluirUsuarioArea(bean.getCandidato(), areas, bean.getUsuarioLogeado());
-					String mensaje = String.format(areas.size() > 1 ? MENSAJE_EXITO_AREAS_EXCLUIDAS : MENSAJE_EXITO_AREA_EXCLUIDA,
+					String mensaje = String.format(
+							areas.size() > 1 ? MENSAJE_EXITO_AREAS_EXCLUIDAS : MENSAJE_EXITO_AREA_EXCLUIDA,
 							bean.getCandidato().getCodCuenta());
 					BolsaEmpleoUtils.addMensajeDeExito(mensaje, bean, request);
 				} else {
 					modeloUsuario.incluirUsuarioArea(bean.getCandidato(), areas);
-					String mensaje = String.format(areas.size() > 1 ? MENSAJE_EXITO_AREAS_INCLUIDAS : MENSAJE_EXITO_AREA_INCLUIDA,
+					String mensaje = String.format(
+							areas.size() > 1 ? MENSAJE_EXITO_AREAS_INCLUIDAS : MENSAJE_EXITO_AREA_INCLUIDA,
 							bean.getCandidato().getCodCuenta());
 					BolsaEmpleoUtils.addMensajeDeExito(mensaje, bean, request);
 				}
@@ -574,94 +811,109 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 		} catch (Exception ex) {
 			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(ex));
 			LOGGER.log(Level.SEVERE, ex.toString());
-			
-			BolsaEmpleoUtils.addMensajeDeError(excluir ? MENSAJE_ERROR_EXCLUIR_AREAS : MENSAJE_ERROR_INCLUIR_AREAS, bean, request);
+
+			BolsaEmpleoUtils.addMensajeDeError(excluir ? MENSAJE_ERROR_EXCLUIR_AREAS : MENSAJE_ERROR_INCLUIR_AREAS,
+					bean, request);
 		}
-		
+
 		redireccionConCandidatoSeleccionado(bean, datos, request, response, ACCION_AREAS_EXCLUIDAS_CANDIDATO);
 	}
-	
+
 	private void meritosCandidato(VistaCandidatos bean) throws SQLException {
 		bean.setApartadoMeritos(true);
 		ModeloBaremacionApartados modeloBaremacion = ModeloBaremacionApartados.obtenerInstancia();
 		bean.setApartados(modeloBaremacion.getApartadosActivos());
 	}
-	
+
 	private void obtenerCodigoPadreAcreditacion(VistaCandidatos bean) throws SQLException, UVException {
 		ParametrosConfiguracion config = ModeloParametrosConfiguracion.obtenerInstancia().getParametroByNombre("bolsaempleo.local.codMeritoPreferente");
 		bean.setCodigoPadreMeritoPreferente(config.getValor());
 		bean.setApartadoAcreditaciones(true);
 	}
-	
-	private void reabrirSolicitudCandidato(VistaCandidatos bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) 
-			throws IOException, SQLException, UVException {
+
+	private void reabrirSolicitudCandidato(VistaCandidatos bean, UVDatos datos, HttpServletRequest request,
+			HttpServletResponse response) throws IOException, SQLException, UVException {
 		ModeloSolicitud modeloSolicitud = ModeloSolicitud.obtenerInstancia();
 		Solicitud solicitud = bean.getSolicitud();
 		solicitud.setEstado(ModeloSolicitud.SOLICITUD_ESTADO_ABIERTA);
 		modeloSolicitud.reabrirSolicitud(solicitud, bean.getUsuarioLogeado());
-		
+
 		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_REABRIR_SOLICITUD, bean, request);
 		redireccionConSolicitudSeleccionada(bean, datos, request, response, ACCION_SELECCIONAR_SOLICITUD);
 	}
-	
-	private void redireccionConCandidatoSeleccionado(VistaCandidatos bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, String accion)
-			throws IOException {
+
+	private void redireccionConCandidatoSeleccionado(VistaCandidatos bean, UVDatos datos, HttpServletRequest request,
+			HttpServletResponse response, String accion) throws IOException {
 		Map<String, String> params = new HashMap<>();
 		params.put(PARAM_ACCION, accion);
 		params.put(PARAM_CANDIDATO, bean.getCandidato().getCodNum().toString());
 		BolsaEmpleoUtils.redirectWithParams(datos, request, response, params);
 	}
-	
-	private void redireccionConSolicitudSeleccionada(VistaCandidatos bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response, String accion)
-			throws IOException {
+
+	private void redireccionConSolicitudSeleccionada(VistaCandidatos bean, UVDatos datos, HttpServletRequest request,
+			HttpServletResponse response, String accion) throws IOException {
 		Map<String, String> params = new HashMap<>();
 		params.put(PARAM_ACCION, accion);
 		params.put(PARAM_CANDIDATO, bean.getCandidato().getCodNum().toString());
 		params.put(PARAM_SOLICITUD, bean.getSolicitud().getCodNum().toString());
 		BolsaEmpleoUtils.redirectWithParams(datos, request, response, params);
 	}
-	
-	private void eliminarCandidato(VistaCandidatos bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
-			throws SQLException, UVException, IOException {
+
+	private void redireccionConMeritoSeleccionado(VistaCandidatos bean, UVDatos datos, HttpServletRequest request,
+			HttpServletResponse response, String accion) throws IOException {
+		Map<String, String> params = new HashMap<>();
+		params.put(PARAM_ACCION, accion);
+		params.put(PARAM_CANDIDATO, bean.getCandidato().getCodNum().toString());
+		params.put(PARAM_SOLICITUD, bean.getSolicitud().getCodNum().toString());
+		params.put(PARAM_MERITO_SOLICITUD, bean.getMeritoSolicitud().getCodNum().toString());
+
+		BolsaEmpleoUtils.redirectWithParams(datos, request, response, params);
+	}
+
+	private void eliminarCandidato(VistaCandidatos bean, UVDatos datos, HttpServletRequest request,
+			HttpServletResponse response) throws SQLException, UVException, IOException {
 		String razonBorrado = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_RAZON_BORRADO));
 		bean.getCandidato().setRazonBorrado(razonBorrado);
-		ModeloUsuarioBolsaEmpleo.obtenerInstancia().ponerUsuarioComoBorrado(bean.getCandidato(), bean.getUsuarioLogeado());	
+		ModeloUsuarioBolsaEmpleo.obtenerInstancia().ponerUsuarioComoBorrado(bean.getCandidato(),
+				bean.getUsuarioLogeado());
 		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_ELIMINAR, bean, request);
 		datos.setRespuestaEnviada(true);
 		response.sendRedirect(request.getServletPath());
 	}
-	
-	private void recuperarCantidato(VistaCandidatos bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) 
-			throws SQLException, UVException, IOException {
-		ModeloUsuarioBolsaEmpleo.obtenerInstancia().ponerUsuarioComoNoBorrado(bean.getCandidato(), bean.getUsuarioLogeado());
+
+	private void recuperarCantidato(VistaCandidatos bean, UVDatos datos, HttpServletRequest request,
+			HttpServletResponse response) throws SQLException, UVException, IOException {
+		ModeloUsuarioBolsaEmpleo.obtenerInstancia().ponerUsuarioComoNoBorrado(bean.getCandidato(),
+				bean.getUsuarioLogeado());
 		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_RESTAURAR, bean, request);
 		datos.setRespuestaEnviada(true);
 		response.sendRedirect(request.getServletPath());
 	}
-	
-	private void resumenSolicitudCandidato(VistaCandidatos bean)
-			throws SQLException, UVException {
+
+	private void resumenSolicitudCandidato(VistaCandidatos bean) throws SQLException, UVException {
 		List<BolsaSolicitud> listaBolsas = ModeloSolicitud.obtenerInstancia().getBolsasSolicitudMeritos(bean.getSolicitud());
 		bean.setListaBolsasSolicitud(listaBolsas);
 		bean.setVista(JSP_RESUMEN_SOLICITUD);
 	}
-	
+
 	/**
 	 * Lista de acreditaciones .
-	 * @param bean .
-	 * @param datos .
-	 * @param request .
+	 * 
+	 * @param bean     .
+	 * @param datos    .
+	 * @param request  .
 	 * @param response .
-	 * @throws UVException .
-	 * @throws IOException .
+	 * @throws UVException  .
+	 * @throws IOException  .
 	 * @throws SQLException .
 	 */
-	private void listadoAcreditacionesCandidato(VistaCandidatos bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException {
+	private void listadoAcreditacionesCandidato(VistaCandidatos bean, UVDatos datos, HttpServletRequest request,
+			HttpServletResponse response) throws IOException {
 		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		datos.setRespuestaEnviada(true);
 		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
-		
+
 		try (PrintWriter writer = response.getWriter()) {
 			try {
 				BolsaEmpleoDataTable<MeritoPreferenteUsuario> dataTable = ModeloMeritosPreferentesCandidato.obtenerInstancia().
@@ -682,23 +934,25 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 			}
 		}
 	}
-	
+
 	/**
 	 * AJAX para devolver listado de usuarios con rol CANDIDATO.
-	 * @param bean .
-	 * @param datos .
-	 * @param request .
+	 * 
+	 * @param bean     .
+	 * @param datos    .
+	 * @param request  .
 	 * @param response .
-	 * @throws IOException . 
+	 * @throws IOException  .
 	 * @throws SQLException .
 	 */
-	private void listadoCandidatos(VistaCandidatos bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException {
+	private void listadoCandidatos(VistaCandidatos bean, UVDatos datos, HttpServletRequest request,
+			HttpServletResponse response) throws IOException {
 		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		datos.setRespuestaEnviada(true);
 		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
-		
+
 		try (PrintWriter writer = response.getWriter()) {
 			try {
 				BolsaEmpleoDataTable<UsuarioBolsaEmpleo> dataTable = modelo.listaUsuarioCandidatosBolsaEmpleoDatatable(request.getParameterMap());
@@ -718,24 +972,25 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 			}
 		}
 	}
-	
+
 	/**
 	 * AJAX para devolver listado de areas excluidas de un usuario.
-	 * @param bean .
-	 * @param datos .
-	 * @param request .
+	 * 
+	 * @param bean     .
+	 * @param datos    .
+	 * @param request  .
 	 * @param response .
-	 * @throws UVException .
+	 * @throws UVException  .
 	 * @throws SQLException .
-	 * @throws IOException .
+	 * @throws IOException  .
 	 */
-	private void listadoAreasExcluidasCandidato(VistaCandidatos bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) 
-			throws IOException {
+	private void listadoAreasExcluidasCandidato(VistaCandidatos bean, UVDatos datos, HttpServletRequest request,
+			HttpServletResponse response) throws IOException {
 		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		datos.setRespuestaEnviada(true);
 		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
-		
+
 		try (PrintWriter writer = response.getWriter()) {
 			try {
 				BolsaEmpleoDataTable<Bolsa> dataTable = ModeloArea.obtenerInstancia().
@@ -756,27 +1011,28 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 			}
 		}
 	}
-	
+
 	/**
 	 * AJAX para devolver listado de areas no excluidas de un usuario(bolsas).
-	 * @param bean .
-	 * @param datos .
-	 * @param request .
+	 * 
+	 * @param bean     .
+	 * @param datos    .
+	 * @param request  .
 	 * @param response .
-	 * @throws IOException .
+	 * @throws IOException  .
 	 * @throws SQLException .
 	 */
-	private void listadoAreasNoExcluidasCandidato(VistaCandidatos bean, UVDatos datos, 
-			HttpServletRequest request, HttpServletResponse response) throws IOException {
+	private void listadoAreasNoExcluidasCandidato(VistaCandidatos bean, UVDatos datos, HttpServletRequest request,
+			HttpServletResponse response) throws IOException {
 		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		datos.setRespuestaEnviada(true);
 		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
-		
+
 		try (PrintWriter writer = response.getWriter()) {
 			try {
-				BolsaEmpleoDataTable<Bolsa> dataTable = ModeloArea.obtenerInstancia().
-						listaAreaExcluidasUsuarioDatatable(request.getParameterMap(), bean.getCandidato().getCodNum());
+				BolsaEmpleoDataTable<Bolsa> dataTable = ModeloArea.obtenerInstancia().listaAreaExcluidasUsuarioDatatable(
+						request.getParameterMap(), bean.getCandidato().getCodNum());
 				bean.setDatatableAreas(dataTable);
 				writer.write(dataTable.toJson());
 			} catch (UVException | SQLException e) {
@@ -793,24 +1049,25 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 			}
 		}
 	}
-	
+
 	/**
 	 * Lista de méritos del candidato .
-	 * @param bean .
-	 * @param datos .
-	 * @param request .
+	 * 
+	 * @param bean     .
+	 * @param datos    .
+	 * @param request  .
 	 * @param response .
-	 * @throws UVException .
-	 * @throws IOException .
+	 * @throws UVException  .
+	 * @throws IOException  .
 	 * @throws SQLException .
 	 */
-	private void listadoMeritosCandidato(VistaCandidatos bean, UVDatos datos,
-			HttpServletRequest request, HttpServletResponse response) throws IOException {
+	private void listadoMeritosCandidato(VistaCandidatos bean, UVDatos datos, HttpServletRequest request,
+			HttpServletResponse response) throws IOException {
 		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		datos.setRespuestaEnviada(true);
 		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
-		
+
 		try (PrintWriter writer = response.getWriter()) {
 			try {
 				BolsaEmpleoDataTable<Merito> dataTable = ModeloMerito.obtenerInstancia().listaMeritosCandidatoDatatable(
@@ -831,24 +1088,25 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 			}
 		}
 	}
-	
+
 	/**
 	 * Lista de solicitudes .
-	 * @param bean .
-	 * @param datos .
-	 * @param request .
+	 * 
+	 * @param bean     .
+	 * @param datos    .
+	 * @param request  .
 	 * @param response .
-	 * @throws UVException .
-	 * @throws IOException .
+	 * @throws UVException  .
+	 * @throws IOException  .
 	 * @throws SQLException .
 	 */
-	private void listadoSolicitudes(VistaCandidatos bean, UVDatos datos,
-			HttpServletRequest request, HttpServletResponse response) throws IOException {
+	private void listadoSolicitudes(VistaCandidatos bean, UVDatos datos, HttpServletRequest request,
+			HttpServletResponse response) throws IOException {
 		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		datos.setRespuestaEnviada(true);
 		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
-		
+
 		try (PrintWriter writer = response.getWriter()) {
 			try {
 				BolsaEmpleoDataTable<Solicitud> dataTable = ModeloSolicitud.obtenerInstancia().listaSolicitudesCandidatoDatatable(
@@ -869,28 +1127,29 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 			}
 		}
 	}
-	
+
 	/**
 	 * Lista de titulaciones .
-	 * @param bean .
-	 * @param datos .
-	 * @param request .
+	 * 
+	 * @param bean     .
+	 * @param datos    .
+	 * @param request  .
 	 * @param response .
-	 * @throws UVException .
-	 * @throws IOException .
+	 * @throws UVException  .
+	 * @throws IOException  .
 	 * @throws SQLException .
 	 */
-	private void listadoTitulacionesCandidato(VistaCandidatos bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
-			throws IOException {
+	private void listadoTitulacionesCandidato(VistaCandidatos bean, UVDatos datos, HttpServletRequest request,
+			HttpServletResponse response) throws IOException {
 		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		datos.setRespuestaEnviada(true);
 		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
-		
+
 		try (PrintWriter writer = response.getWriter()) {
 			try {
-				BolsaEmpleoDataTable<TitulacionUsuario> dataTable = ModeloMisTitulaciones.obtenerInstancia().
-						listaTitulacionesCandidatoDatatable(request.getParameterMap(), bean.getCandidato());
+				BolsaEmpleoDataTable<TitulacionUsuario> dataTable = ModeloMisTitulaciones.obtenerInstancia().listaTitulacionesCandidatoDatatable(
+						request.getParameterMap(), bean.getCandidato());
 				bean.setDataTableTitulaciones(dataTable);
 				writer.write(dataTable.toJson());
 			} catch (UVException | SQLException e) {
@@ -907,18 +1166,18 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 			}
 		}
 	}
-	
-	private void listadoEstadosCandidato(VistaCandidatos bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
-			throws IOException {
+
+	private void listadoEstadosCandidato(VistaCandidatos bean, UVDatos datos, HttpServletRequest request,
+			HttpServletResponse response) throws IOException {
 		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		datos.setRespuestaEnviada(true);
 		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
-		
+
 		try (PrintWriter writer = response.getWriter()) {
 			try {
-				BolsaEmpleoDataTable<CandidatoEstado> dataTable = ModeloEstadoCandidato.obtenerInstancia().
-						listaEstadosCandidato(request.getParameterMap(), bean.getCandidato());
+				BolsaEmpleoDataTable<CandidatoEstado> dataTable = ModeloEstadoCandidato.obtenerInstancia().listaEstadosCandidato(
+						request.getParameterMap(), bean.getCandidato());
 				bean.setDataTableEstadosCandidato(dataTable);
 				writer.write(dataTable.toJson());
 			} catch (UVException | SQLException e) {
@@ -935,10 +1194,10 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 			}
 		}
 	}
-	
+
 	private UsuarioBolsaEmpleo getValidatorUsuarios(HttpServletRequest request) throws UVException, SQLException {
 		UsuarioBolsaEmpleo u = new UsuarioBolsaEmpleo();
-		
+
 		String excluido = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_EXCLUIDO));
 		u.setExcluido("true".equals(excluido));
 		if (excluido != null) {
@@ -947,52 +1206,55 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 				throw new UVException(MENSAJE_ERROR_RAZON_EXCLUSION_VACIO);
 			}
 			if (u.getRazonExcluido().length() > ModeloUsuarioBolsaEmpleo.COLUMN_RAZON_EXCLUSION_MAXLENGTH) {
-				throw new UVException(String.format(MENSAJE_ERROR_RAZON_EXCLUSION_LARGO, ModeloUsuarioBolsaEmpleo.COLUMN_RAZON_EXCLUSION_MAXLENGTH));
+				throw new UVException(String.format(MENSAJE_ERROR_RAZON_EXCLUSION_LARGO,
+						ModeloUsuarioBolsaEmpleo.COLUMN_RAZON_EXCLUSION_MAXLENGTH));
 			}
 			u.setExcluidoTipo(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_EXCLUIDO_TIPO)));
-			
+
 			if (u.getExcluidoTipo() == null) {
 				throw new UVException(MENSAJE_ERROR_EXCLUIDO_TIPO_VACIO);
 			}
-			
+
 			if ("T".equals(u.getExcluidoTipo())) {
-				
-				u.setFechaExclusionInicio(Formateador.leeParametroFecha(request.getParameter(PARAM_FECHA_EXCLUIDO_INICIO), 
+
+				u.setFechaExclusionInicio(Formateador.leeParametroFecha(
+						request.getParameter(PARAM_FECHA_EXCLUIDO_INICIO), Formateador.FORMATO_FECHA_DDMMYYYY, "/"));
+				u.setFechaExclusionFin(Formateador.leeParametroFecha(request.getParameter(PARAM_FECHA_EXCLUIDO_FIN),
 						Formateador.FORMATO_FECHA_DDMMYYYY, "/"));
-				u.setFechaExclusionFin(Formateador.leeParametroFecha(request.getParameter(PARAM_FECHA_EXCLUIDO_FIN), 
-						Formateador.FORMATO_FECHA_DDMMYYYY, "/"));
-				
+
 				if (u.getFechaExclusionInicio() == null) {
 					throw new UVException(MENSAJE_ERROR_FECHA_EXCLUIDO_INICIO_REQUERIDA);
 				}
-				
+
 				if (u.getFechaExclusionFin() == null) {
 					throw new UVException(MENSAJE_ERROR_FECHA_EXCLUIDO_FIN_REQUERIDA);
 				}
 			}
 			u.setFechaExclusion(BolsaEmpleoUtils.getCurrentDateTime());
 		}
-		
+
 		u.setRol(ModeloRol.obtenerInstancia().getRoleById(ModeloRol.ID_ROL_CANDIDATO));
 		u.setListaDist("true".equals(EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_LISTA))));
 		return u;
 	}
-	
-	private void exportarCandidatos(VistaCandidatos bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException {
+
+	private void exportarCandidatos(VistaCandidatos bean, UVDatos datos, HttpServletRequest request,
+			HttpServletResponse response) throws SQLException, UVException {
 		Integer idConvocatoria = Formateador.leeParametroInteger(BolsaEmpleoUtils.getParamRequestOrSession(request, PARAM_CONVOCATORIA));
 		Convocatoria c = ModeloConvocatoria.obtenerInstancia().getConvocatoriaById(idConvocatoria);
-		
+
 		datos.setRespuestaEnviada(true);
 		datos.setContentType(RESPONSE_CSV_CONTENTTYPE);
 		response.setContentType(RESPONSE_CSV_CONTENTTYPE);
-		response.setCharacterEncoding(RESPONSE_CSV_ENCODING);		
-		response.setHeader("Content-Disposition", "attachment; filename=\"candidatos-convocatoria-" + c.getCodNum().toString() + ".csv\"");
-		
+		response.setCharacterEncoding(RESPONSE_CSV_ENCODING);
+		response.setHeader("Content-Disposition",
+				"attachment; filename=\"candidatos-convocatoria-" + c.getCodNum().toString() + ".csv\"");
+
 		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
-		
+
 		String separator = ";";
-		List<String[]> rows = modelo.listadoCandidatosPorConvocatoriaCsv(c, separator); 
-				
+		List<String[]> rows = modelo.listadoCandidatosPorConvocatoriaCsv(c, separator);
+
 		try (ServletOutputStream stream = response.getOutputStream()) {
 			try (PrintWriter printer = new PrintWriter(stream)) {
 				for (String[] row : rows) {
@@ -1006,86 +1268,91 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 			throw new UVException(ex.getMessage());
 		}
 	}
-	
-	private void darBajaCandidatosSinSolicitudes(VistaCandidatos bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) 
-			throws SQLException, UVException, IOException {
+
+	private void darBajaCandidatosSinSolicitudes(VistaCandidatos bean, UVDatos datos, HttpServletRequest request,
+			HttpServletResponse response) throws SQLException, UVException, IOException {
 		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
-		
+
 		modelo.darBajaCandidatosSinSolicitudes(bean.getUsuarioLogeado());
-		
+
 		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_CANDIDATOS_SIN_SOLICITUDES_DADOS_DE_BAJA, bean, request);
 		Map<String, String> params = new HashMap<>();
 		params.put(PARAM_ACCION, ACCION_INDEX);
 		BolsaEmpleoUtils.redirectWithParams(datos, request, response, params);
 	}
-	
-	private void actualizarDatosCandidato(VistaCandidatos bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) 
-			throws SQLException, UVException, IOException {		
+
+	private void actualizarDatosCandidato(VistaCandidatos bean, UVDatos datos, HttpServletRequest request,
+			HttpServletResponse response) throws SQLException, UVException, IOException {
 		// leemos usuario bolsa
 		Integer idCandidato = Formateador.leeParametroInteger(BolsaEmpleoUtils.getParamRequestOrSession(request, PARAM_CANDIDATO));
 		UsuarioBolsaEmpleo candidato = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioById(idCandidato);
 		bean.setCandidato(candidato);
-		
+
 		// leemos usuario uja
 		Usuario usuArcos = CrearUsuario.usuario(candidato.getCodCuenta());
 		if (usuArcos == null) {
 			throw new UVException(MENSAJE_ERROR_USUARIO_UJA_NO_ENCONTRADO);
 		}
 		bean.setUsuarioArcos(usuArcos);
-		
+
 		// comprobamos si esta borrado
 		if (bean.getCandidato().getBorrado()) {
 			throw new UVException("El usuario está dado de baja.");
 		}
-		
+
 		// actualizamos sus datos
 		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
-		modelo.actualizarDatosPersonalesCandidato(bean.getCandidato(), bean.getUsuarioArcos(), bean.getUsuarioLogeado());
-		
+		modelo.actualizarDatosPersonalesCandidato(bean.getCandidato(), bean.getUsuarioArcos(),
+				bean.getUsuarioLogeado());
+
 		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_EDITAR, bean, request);
 		datos.setRespuestaEnviada(true);
 		response.sendRedirect(request.getServletPath());
 	}
-	
-	private void cambiarLoginCandidato(VistaCandidatos bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) 
-			throws UVException, IOException, SQLException {
+
+	private void cambiarLoginCandidato(VistaCandidatos bean, UVDatos datos, HttpServletRequest request,
+			HttpServletResponse response) throws UVException, IOException, SQLException {
 		if (bean.getCandidato().getBorrado()) {
 			throw new UVException("El usuario está dado de baja.");
 		}
-		
+
 		String tipoLogin = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_TIPOLOGIN));
 		if (!"externo".equals(tipoLogin) && !"tic".equals(tipoLogin)) {
 			throw new UVException("Indique si el nuevo login es para usuario externo o para usuario con cuenta tic");
 		}
-		
+
 		String nuevoLogin = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_LOGINNUEVO)).trim();
 		if (nuevoLogin.length() == 0) {
 			throw new UVException("Introduzca un nuevo login");
 		}
-		
+
 		if ("externo".equals(tipoLogin) && !BolsaEmpleoUtils.isCorreo(nuevoLogin)) {
 			throw new UVException("Para una cuenta externa, debe ser un email.");
 		}
-		
+
 		if ("tic".equals(tipoLogin) && BolsaEmpleoUtils.isCorreo(nuevoLogin)) {
 			throw new UVException("Para una cuenta tic, no debe ser un email.");
 		}
-		
+
 		ModeloUsuarioBolsaEmpleo modelo = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
 		modelo.cambiarLoginCandidato(bean.getCandidato(), nuevoLogin, bean.getUsuarioLogeado());
-		
-		BolsaEmpleoUtils.addMensajeDeExito(String.format("Usuario actualizado correctamente. Recuerde indicarle a informática el cambio: %s => %s", 
-				bean.getCandidato().getCodCuenta(), nuevoLogin), bean, request);
+
+		BolsaEmpleoUtils.addMensajeDeExito(
+				String.format("Usuario actualizado correctamente. Recuerde indicarle a informática el cambio: %s => %s",
+						bean.getCandidato().getCodCuenta(), nuevoLogin),
+				bean, request);
 		datos.setRespuestaEnviada(true);
 		response.sendRedirect(request.getServletPath());
 	}
-	
+
 	/**
 	 * Devuelve una url de. detalle de un candidato.
+	 * 
 	 * @param codnum .
 	 * @return .
 	 */
 	public static String getUrlCandidato(String codnum) {
-		return String.format("%s?%s=%s&%s=%s", URL_PATTERN, PARAM_ACCION, ACCION_SELECCIONAR_CANDIDATO, PARAM_CANDIDATO, codnum);
+		return String.format("%s?%s=%s&%s=%s", URL_PATTERN, PARAM_ACCION, ACCION_SELECCIONAR_CANDIDATO, PARAM_CANDIDATO,
+				codnum);
 	}
 }

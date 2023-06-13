@@ -73,9 +73,9 @@ VistaCandidatos bean = (VistaCandidatos) uvdatos.getVistas().get(VistaCandidatos
 			<tr>
 				<th scope="col" style="width:8%">Id</th>
 				<th scope="col"	style="width:15%">Cod. mérito</th>
-				<th scope="col"	style="width:30%">Mérito</th>
+				<th scope="col"	style="width:30">Mérito</th>
 				<th scope="col"	style="width:10%">Valor</th>
-				<th scope="col"	style="width:30%">Descripción</th>
+				<th scope="col"	style="width:12%">Descripción</th>
 				<th scope="col" style="width:15%">Afinidad</th>
 				<th scope="col" style="width:10%"></th>
 			</tr>
@@ -105,6 +105,11 @@ VistaCandidatos bean = (VistaCandidatos) uvdatos.getVistas().get(VistaCandidatos
 						<%	} %>
 							</td>
 							<td>
+								<button class="btn only-icon icon-search detalle-merito"
+										title="Detalle mérito"
+										type="button"
+										data-merito="<%= merito.getMeritoSolicitud().getCodNum() %>"></button>
+										
 								<button class="btn only-icon icon-download fichero-merito"
 										title="Descargar fichero del mérito"
 										type="button"
@@ -128,7 +133,18 @@ VistaCandidatos bean = (VistaCandidatos) uvdatos.getVistas().get(VistaCandidatos
 		$('.table-solicitud').on('click', '.fichero-merito', function() {
 			var idMerito = $(this).data('merito');
 			window.open("<%= ControladorDescargaFicheros.URL_DESCARGA_FICHEROS %>"
-		        	+ "?a=<%= ControladorDescargaFicheros.ACCION_DESCARGAR_MERITO_PERSONAL %>&<%= ControladorDescargaFicheros.PARAM_MERITO %>=" + idMerito);
+				+ "?a=<%= ControladorDescargaFicheros.ACCION_DESCARGAR_MERITO_PERSONAL %>&<%= ControladorDescargaFicheros.PARAM_MERITO %>=" + idMerito);
+		});
+		
+		$('.table-solicitud').on('click', '.detalle-merito', function() {
+			var idMerito = $(this).data('merito');
+			var params = {
+    			'<%= ControladorUsuarioCandidato.PARAM_ACCION %>': '<%= ControladorUsuarioCandidato.ACCION_DETALLE_MERITO %>',
+    			'<%= ControladorUsuarioCandidato.PARAM_SOLICITUD %>': '<%= bean.getSolicitud().getCodNum() %>',
+    			'<%= ControladorUsuarioCandidato.PARAM_CANDIDATO %>': '<%= bean.getCandidato().getCodNum() %>',
+    			'<%= ControladorUsuarioCandidato.PARAM_MERITO_SOLICITUD %>': idMerito
+   			};
+    		Atis.sendForm("<%= request.getRequestURI() %>", params);
 		});
 		
 	<%	if (bean.getSolicitud().getEstado().equals(ModeloSolicitud.SOLICITUD_ESTADO_CERRADA)) { %>
@@ -140,7 +156,7 @@ VistaCandidatos bean = (VistaCandidatos) uvdatos.getVistas().get(VistaCandidatos
 		
 	<%	} else { %>
 			document.getElementById("cerrar_solicitud").addEventListener("click", function() {
-				Atis.confirmDialog("Confirmar solicitud", "¿Desea confirmar la solicitud del candidato?", {
+				Atis.confirmDialog("Confirmar solicitud", "¿Desea confirmar la solicitud del candidato?<br/>(Se generará de nuevo el pdf con el resumen de la solicitud)", {
 			    	Si: function() {
 			    		var params = {
 	            				'<%= ControladorUsuarioCandidato.PARAM_ACCION %>': '<%= ControladorUsuarioCandidato.ACCION_CONFIRMAR_SOLICITUD %>',
