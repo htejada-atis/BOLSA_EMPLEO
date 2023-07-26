@@ -907,8 +907,16 @@ public class ModeloMensajes {
 		
 		dest.setCodNum(rs.getInt(CODNUM));
 		dest.setMensaje(this.getMensajeById(rs.getInt(BEPMEN_CODNUM), false));
-		dest.setUsuario(rs.getInt(BEPUSU_CODNUM) != 0 ? ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioById(rs.getInt(BEPUSU_CODNUM)) : null);
-		dest.setEmail(rs.getString(EMAIL));
+		
+		UsuarioBolsaEmpleo usuario = rs.getInt(BEPUSU_CODNUM) != 0 ? ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioById(rs.getInt(BEPUSU_CODNUM)) : null;
+		dest.setUsuario(usuario);
+		
+		String email = rs.getString(EMAIL);
+		if (email == null && usuario != null) {
+			email = usuario.getEmail();
+		}
+		
+		dest.setEmail(email);
 		dest.setEstado(rs.getString(ESTADO));
 		
 		return dest;
