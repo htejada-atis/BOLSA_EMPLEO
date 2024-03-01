@@ -421,13 +421,13 @@ public class ModeloEvaluador {
 				+ " FROM TBEP_EVALUADORES bepeva"
 				+ " LEFT JOIN TBEP_USUARIOS bepusu ON bepusu.CODNUM = bepeva.BEPUSU_CODNUM"
 				+ "	LEFT JOIN TBEP_AREAS bepare ON bepare.CODNUM = bepeva.BEPARE_CODNUM"
-				+ " WHERE bepeva.FLGACTIVO = 'S'";
+				+ " WHERE bepeva.FLGACTIVO = 'S' AND bepusu.FLGBORRADO = 'N'";
 		
 		List<String[]> rows = new ArrayList<>();
 		
 		rows.add(new String[] {"NIF", "USUARIO", "NOMBRE", "EMAIL", "COD.AREA", "AREA"});
 		
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {			
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
 					UsuarioBolsaEmpleo usuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia().getUsuarioById(rs.getInt("BEPUSU_CODNUM"));
