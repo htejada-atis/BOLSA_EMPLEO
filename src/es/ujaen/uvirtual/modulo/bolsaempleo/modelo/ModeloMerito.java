@@ -195,28 +195,42 @@ public class ModeloMerito {
 			throw new UVException("No se puede insertar un mérito sin usuario");
 		}
 		
+		/* jalucena 19/10/2023: Extraer campos LOB a sistema de archivos
 		String consulta = "INSERT INTO tbep_meritos " 
 				+ " (BEPITE_CODNUM,BEPUSU_CODNUM,VALOR,DESCRIPCION,OBSERVACION,ARCHIVO,UID_USUARIO) "
 				+ "VALUES (?,?,?,?,?,?,?)";
+		*/
+		
+		String consulta = "INSERT INTO tbep_meritos " 
+				+ " (BEPITE_CODNUM,BEPUSU_CODNUM,VALOR,DESCRIPCION,OBSERVACION,UID_USUARIO) "
+				+ "VALUES (?,?,?,?,?,?)";
+
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-			 PreparedStatement stmt = conexion.prepareStatement(consulta, new String[]{"CODNUM"})) {
+			 PreparedStatement stmt = conexion.prepareStatement(consulta, new String[]{ID_TBEP_MERITOS})) {
 			int parameterIndex = 1;
 			stmt.setInt(parameterIndex++, merito.getItemBaremacion().getCodNum());
 			stmt.setInt(parameterIndex++, usuarioUpdate.getCodNum());
 			stmt.setDouble(parameterIndex++, merito.getValor());
 			stmt.setString(parameterIndex++, merito.getDescripcion());
 			stmt.setString(parameterIndex++, merito.getObservacion());
-			stmt.setBinaryStream(parameterIndex++, merito.getArchivo());
+			
+			//stmt.setBinaryStream(parameterIndex++, merito.getArchivo());
+						
 			stmt.setString(parameterIndex++, usuarioUpdate.getCodCuenta());
 			stmt.executeUpdate();
 			
 			ResultSet rs = stmt.getGeneratedKeys();
 			rs.next();
+			int codnum = rs.getInt(1);
 			
-			return rs.getInt(1);
+			try {
+				  boolean procesada = FileSystemUtils.grabarFichero(Long.valueOf(codnum), ESQUEMA_TBEP_MERITOS, TABLA_TBEP_MERITOS, COLUMNA_TBEP_MERITOS, FileSystemUtils.fromInputStreamToByteArray(merito.getArchivo()));
+			} catch (IOException e) {}
+			
+			// return rs.getInt(1);
+			return codnum;
 		}
-	}
-	
+	}	
 	/**
 	 * Comprueba si se puede actualizar un mérito.
 	 * @param merito .
@@ -540,7 +554,17 @@ public class ModeloMerito {
 		}
 		
 		if (Boolean.TRUE.equals(withFile)) {
-			mer.setArchivo(rs.getBlob("ARCHIVO").getBinaryStream());
+			/*
+			 * mer.setArchivo(rs.getBlob("ARCHIVO").getBinaryStream());
+			 */
+			byte[] bytes = FileSystemUtils.obtenerFichero(Long.valueOf(rs.getInt("CODNUM")),"G_INTRANET","TBEP_MERITOS","ARCHIVO");
+			if (bytes == null) {
+				mer.setArchivo(rs.getBlob("ARCHIVO").getBinaryStream());
+			} else {
+				InputStream archivo = new ByteArrayInputStream(bytes);
+				mer.setArchivo(archivo);
+			}
+				
 		}
 		
 		return mer;
