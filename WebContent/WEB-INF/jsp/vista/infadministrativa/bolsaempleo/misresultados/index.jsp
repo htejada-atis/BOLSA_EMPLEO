@@ -26,7 +26,7 @@ VistaMisResultados bean = (VistaMisResultados)uvdatos.getVistas().get(VistaMisRe
 		</select>
 	</div>
 	
-	<p>Resultados de la convocatoria seleccionada. Al pulsar sobre un area, listado del candidato con su puntuanción y el detalle del cálculo.</p>
+	<p>Resultados de la convocatoria seleccionada. Al pulsar sobre un area, listado del candidato con su puntuación y el detalle del cálculo.</p>
 	
 	<table class="bluetable bolsaempleo" id="tableAreasMRE">
 		<tr>

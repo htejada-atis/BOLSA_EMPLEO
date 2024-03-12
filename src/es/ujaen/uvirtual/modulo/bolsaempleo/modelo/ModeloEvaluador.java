@@ -163,7 +163,7 @@ public class ModeloEvaluador {
 		
 		String consulta = "SELECT * FROM TBEP_USUARIOS bepusu"
 				+ " INNER JOIN TBEP_EVALUADORES bepeva ON bepusu.CODNUM = bepeva.BEPUSU_CODNUM"
-				+ " WHERE FLGBORRADO!='S' AND FLGEXCLUIDO!='S' AND bepeva.BEPARE_CODNUM = ? ";
+				+ " WHERE FLGBORRADO != 'S' AND FLGEXCLUIDO!='S' AND bepeva.BEPARE_CODNUM = ? ";
 		
 		String whereNombre = String.format("(%s || ' ' || %s || ' ' || %s)", "bepusu.VUAJA_STRNOMBRE", "bepusu.VUAJA_STRAPELLIDO1", "bepusu.VUAJA_STRAPELLIDO2");
 		
