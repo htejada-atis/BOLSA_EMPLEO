@@ -575,7 +575,7 @@ public class ModeloMerito {
 			/*
 			 * mer.setArchivo(rs.getBlob("ARCHIVO").getBinaryStream());
 			 */
-			byte[] bytes = FileSystemUtils.obtenerFichero(Long.valueOf(rs.getInt("CODNUM")),"G_INTRANET","TBEP_MERITOS","ARCHIVO");
+			byte[] bytes = FileSystemUtils.obtenerFichero(Long.valueOf((long) rs.getInt("CODNUM")), ESQUEMA_TBEP_MERITOS, TABLA_TBEP_MERITOS, COLUMNA_TBEP_MERITOS);
 			if (bytes == null) {
 				mer.setArchivo(rs.getBlob("ARCHIVO").getBinaryStream());
 			} else {
