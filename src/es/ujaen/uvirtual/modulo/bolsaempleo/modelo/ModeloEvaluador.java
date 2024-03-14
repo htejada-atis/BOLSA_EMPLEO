@@ -12,6 +12,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Area;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.AreaEvaluadoresTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Departamento;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Evaluador;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.EvaluadorCandidato;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
@@ -29,6 +30,10 @@ public class ModeloEvaluador {
 	public static final int ORDER_COLUMN_INDEX_NUMDOCUMENTO_EVALUADORES = 0;
 	public static final int ORDER_COLUMN_INDEX_NOMBRE_Y_APELLIDOS_EVALUADORES = 1;
 	public static final int ORDER_COLUMN_INDEX_ACTIVO_EVALUADORES = 2;
+	
+	public static final int ORDER_COLUMN_INDEX_NOMBRE_MIEMBROS_COMISION = 0;
+	public static final int ORDER_COLUMN_INDEX_APELLIDO1_MIEMBROS_COMISION = 1;
+	public static final int ORDER_COLUMN_INDEX_APELLIDO2_MIEMBROS_COMISION = 2;
 	
 	public static final int ORDER_COLUMN_INDEX_ID = 1;
 	public static final int ORDER_COLUMN_INDEX_CODIGO = 2;
@@ -153,7 +158,6 @@ public class ModeloEvaluador {
 	 * @throws UVException error si no existe la area .
 	 */
 	public BolsaEmpleoDataTable<Evaluador> listaEvaluadoresDatatable(Map<String, String[]> params, Integer area) throws SQLException, UVException {
-		
 		if (area == null) {
 			throw new UVException("No se pueden listar evaluadores sin area");
 		}
@@ -163,7 +167,7 @@ public class ModeloEvaluador {
 		
 		String consulta = "SELECT * FROM TBEP_USUARIOS bepusu"
 				+ " INNER JOIN TBEP_EVALUADORES bepeva ON bepusu.CODNUM = bepeva.BEPUSU_CODNUM"
-				+ " WHERE FLGBORRADO != 'S' AND FLGEXCLUIDO!='S' AND bepeva.BEPARE_CODNUM = ? ";
+				+ " WHERE FLGBORRADO != 'S' AND FLGEXCLUIDO != 'S' AND bepeva.BEPARE_CODNUM = ? ";
 		
 		String whereNombre = String.format("(%s || ' ' || %s || ' ' || %s)", "bepusu.VUAJA_STRNOMBRE", "bepusu.VUAJA_STRAPELLIDO1", "bepusu.VUAJA_STRAPELLIDO2");
 		
@@ -195,6 +199,54 @@ public class ModeloEvaluador {
 			dataTable.setData(usuarios);
 		}
 		
+		return dataTable;
+	}
+	
+	/**
+	 * Listado de evaluadores para mostrarlos en la zona de candidatos .
+	 * 
+	 * @param params para leer los parametros de paginación, ordenacion, etc .
+	 * @param area   .
+	 * @return listado de evaluadores .
+	 * @throws SQLException .
+	 * @throws UVException  .
+	 */
+	public BolsaEmpleoDataTable<EvaluadorCandidato> listaEvaluadoresCandidatosDatatable(Map<String, String[]> params,
+			Integer area) throws SQLException, UVException {
+		List<EvaluadorCandidato> usuarios = new ArrayList<>();
+		BolsaEmpleoDataTable<EvaluadorCandidato> dataTable = new BolsaEmpleoDataTable<>(params);
+
+		String consulta = "SELECT * FROM TBEP_USUARIOS bepusu"
+				+ " INNER JOIN TBEP_EVALUADORES bepeva ON bepusu.CODNUM = bepeva.BEPUSU_CODNUM"
+				+ " WHERE FLGBORRADO != 'S' AND FLGEXCLUIDO != 'S' AND bepeva.BEPARE_CODNUM = ? ";
+
+		dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE_MIEMBROS_COMISION, "bepusu.VUAJA_STRNOMBRE");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_APELLIDO1_MIEMBROS_COMISION, "bepusu.VUAJA_STRAPELLIDO1");
+		dataTable.setColumn(ORDER_COLUMN_INDEX_APELLIDO2_MIEMBROS_COMISION, "bepusu.VUAJA_STRAPELLIDO2");
+
+		dataTable.setQuery(consulta);
+
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
+				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery())) {
+			int indexParam = 1;
+			stmt.setInt(indexParam, area);
+			stmtCount.setInt(indexParam++, area);
+			dataTable.setFiltersParams(stmt, stmtCount, indexParam);
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					Integer codNum = rs.getInt("BEPUSU_CODNUM");
+					String nombre = rs.getString("VUAJA_STRNOMBRE");
+					String apellido1 = rs.getString("VUAJA_STRAPELLIDO1");
+					String apellido2 = rs.getString("VUAJA_STRAPELLIDO2");
+					usuarios.add(new EvaluadorCandidato(codNum, nombre, apellido1, apellido2));
+				}
+			}
+
+			dataTable.setRecordsTotalFromQuery(stmtCount);
+			dataTable.setData(usuarios);
+		}
+
 		return dataTable;
 	}
 	

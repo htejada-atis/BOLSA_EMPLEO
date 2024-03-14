@@ -21,6 +21,7 @@ import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Area;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Departamento;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Evaluador;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.EvaluadorCandidato;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloArea;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloDepartamento;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloEvaluador;
@@ -38,15 +39,14 @@ import es.ujaen.uvirtual.utilidades.UVException;
 /**
  * Listado de bolsas y su estado.
  */
-@WebServlet(
-	name = "informacionadministrativa.bolsaempleo.miembroscomision", 
+@WebServlet(name = "informacionadministrativa.bolsaempleo.miembroscomision", 
 	description = "Quien ha baremabo cada area", 
 	urlPatterns = {
 		"/srv/es/informacionadministrativa/bolsaempleo/miembroscomision",
 		"/srv/en/informacionadministrativa/bolsaempleo/miembroscomision",
 		"/srv/es/ajax/informacionadministrativa/bolsaempleo/miembroscomision",
-		"/srv/en/ajax/informacionadministrativa/bolsaempleo/miembroscomision"
-	})
+		"/srv/en/ajax/informacionadministrativa/bolsaempleo/miembroscomision" 
+})
 public class ControladorMiembrosComision extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static final String NOMBREDEESTACLASE = ControladorMiembrosComision.class.getName();
@@ -67,8 +67,8 @@ public class ControladorMiembrosComision extends HttpServlet {
 	// ruta vistas
 	public static final String RUTA_BEP_CONF = "/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/miembroscomision/";
 	public static final String JSP_INDEX = RUTA_BEP_CONF + "index.jsp";
-	
-	// ajax	
+
+	// ajax
 	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/miembroscomision";
 	public static final String RESPONSE_AJAX_CONTENTTYPE = "application/json";
 	public static final String RESPONSE_AJAX_ENCODING = "UTF-8";
@@ -142,7 +142,7 @@ public class ControladorMiembrosComision extends HttpServlet {
 		try {
 			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getAndRefreshUsuario(datos));
 
-			if (!bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRol.ID_ROL_SERVICIO_PERSONAL) 
+			if (!bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRol.ID_ROL_SERVICIO_PERSONAL)
 					&& !bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRol.ID_ROL_CANDIDATO)) {
 				throw new UVException("No tienes permiso");
 			}
@@ -184,24 +184,26 @@ public class ControladorMiembrosComision extends HttpServlet {
 		bean.setAreas(getAreas());
 	}
 
-	private void seleccionarArea(VistaMiembrosComision bean, HttpServletRequest request) throws SQLException, UVException {
+	private void seleccionarArea(VistaMiembrosComision bean, HttpServletRequest request)
+			throws SQLException, UVException {
 		bean.setVista(JSP_INDEX);
 		bean.setAreas(getAreas());
 		bean.setArea(getAreaSeleccionada(request));
 	}
 
-	private void listadoEvaluadores(VistaMiembrosComision bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) 
-			throws IOException, SQLException, UVException {
+	private void listadoEvaluadores(VistaMiembrosComision bean, UVDatos datos, HttpServletRequest request,
+			HttpServletResponse response) throws IOException, SQLException, UVException {
 		bean.setArea(getAreaSeleccionada(request));
-		
+
 		ModeloEvaluador modeloEvaluador = ModeloEvaluador.obtenerInstancia();
 		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
-		
+
 		try (PrintWriter writer = response.getWriter()) {
 			try {
-				BolsaEmpleoDataTable<Evaluador> dataTable = modeloEvaluador.listaEvaluadoresDatatable(request.getParameterMap(), bean.getArea().getCodNum());
+				BolsaEmpleoDataTable<EvaluadorCandidato> dataTable = modeloEvaluador.listaEvaluadoresCandidatosDatatable(
+						request.getParameterMap(), bean.getArea().getCodNum());
 				bean.setDatatableEvaluadores(dataTable);
 				writer.write(dataTable.toJson());
 			} catch (UVException | SQLException e) {
@@ -217,7 +219,7 @@ public class ControladorMiembrosComision extends HttpServlet {
 				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
 			}
 		}
-		
+
 		datos.setRespuestaEnviada(true);
 	}
 

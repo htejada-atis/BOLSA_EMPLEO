@@ -29,7 +29,6 @@ Area areaSeleccionada = bean.getArea();
 	
 	<table class="bluetable bolsaempleo" id="tableEvaluadores" style="<%= areaSeleccionada == null ? "visibility: hidden" : "" %>">
 		<tr>
-			<th scope="col" class="dni" style="width:25%">D.N.I</th>
 			<th scope="col">Nombre</th>
 			<th scope="col">Apellido (primer)</th>
 			<th scope="col">Apellido (segundo)</th>
@@ -37,7 +36,7 @@ Area areaSeleccionada = bean.getArea();
 		<tbody></tbody>
 		<tfoot>
 			<tr>
-				<th colspan="4" style="width:100%"></th>
+				<th colspan="3" style="width:100%"></th>
 			</tr>
 		</tfoot>
 	</table>
@@ -65,7 +64,6 @@ Area areaSeleccionada = bean.getArea();
 				"params": {"<%= ControladorMiembrosComision.PARAM_AREA %>": '<%= areaSeleccionada.getCodNum() %>'},
 				"title": "EVALUADORES DEL AREA: <%= areaSeleccionada.getDescripcion() %>",				
 				"columns": [
-					{'data': 'prsnif', 'filter': true},
 					{'data': 'nombre', 'filter': true},
 					{'data': 'apellido1', 'filter': true},
 					{'data': 'apellido2', 'filter': true}
