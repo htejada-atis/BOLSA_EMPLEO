@@ -1,5 +1,8 @@
 package es.ujaen.uvirtual.modulo.bolsaempleo.modelo;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -7,6 +10,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
@@ -17,12 +22,16 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable.Data
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.utilidades.Formateador;
 import es.ujaen.uvirtual.utilidades.UVException;
+import es.ujaen.uvirtual.utilidades.ficheros.FileSystemUtils;
 
 /**
  * Clase de modelo para la gestión de meritos. 
  * @author ATISoluciones 2021
  */
 public class ModeloMerito {
+	
+	private static final Logger ELOGGER = Logger.getLogger(ModeloMerito.class.getName());
+	
 	public static final int ORDER_COLUMN_INDEX_ID = 1;
 	public static final int ORDER_COLUMN_INDEX_BLOQUE = 2;
 	public static final int ORDER_COLUMN_INDEX_ITEM = 3;
@@ -48,6 +57,11 @@ public class ModeloMerito {
 	public static final String MENSAJE_ERROR_VALOR_MAXIMO_PERMITIDO = "El valor máximo permitido es %s para %s";
 	public static final String MENSAJE_ERROR_VALOR_MINIMO_PERMITIDO = "El valor mínimo permitido es %s para %s";
 	
+	// paso a ficheros
+	public static final String ESQUEMA_TBEP_MERITOS = "UVIRTUAL";
+	public static final String TABLA_TBEP_MERITOS = "TBEP_MERITOS";
+	public static final String COLUMNA_TBEP_MERITOS = "ARCHIVO";
+	public static final String ID_TBEP_MERITOS = "CODNUM";	
 
 	protected static ModeloMerito eInstancia;
 
@@ -195,18 +209,17 @@ public class ModeloMerito {
 			throw new UVException("No se puede insertar un mérito sin usuario");
 		}
 		
-		/* jalucena 19/10/2023: Extraer campos LOB a sistema de archivos
 		String consulta = "INSERT INTO tbep_meritos " 
 				+ " (BEPITE_CODNUM,BEPUSU_CODNUM,VALOR,DESCRIPCION,OBSERVACION,ARCHIVO,UID_USUARIO) "
 				+ "VALUES (?,?,?,?,?,?,?)";
-		*/
-		
-		String consulta = "INSERT INTO tbep_meritos " 
-				+ " (BEPITE_CODNUM,BEPUSU_CODNUM,VALOR,DESCRIPCION,OBSERVACION,UID_USUARIO) "
-				+ "VALUES (?,?,?,?,?,?)";
 
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-			 PreparedStatement stmt = conexion.prepareStatement(consulta, new String[]{ID_TBEP_MERITOS})) {
+		Connection conexion = null;
+		PreparedStatement stmt = null;
+		try {
+			conexion = ConexionUvirtual.obtenerInstancia();
+			conexion.setAutoCommit(false);
+			stmt = conexion.prepareStatement(consulta, new String[]{ID_TBEP_MERITOS});
+			
 			int parameterIndex = 1;
 			stmt.setInt(parameterIndex++, merito.getItemBaremacion().getCodNum());
 			stmt.setInt(parameterIndex++, usuarioUpdate.getCodNum());
@@ -214,7 +227,7 @@ public class ModeloMerito {
 			stmt.setString(parameterIndex++, merito.getDescripcion());
 			stmt.setString(parameterIndex++, merito.getObservacion());
 			
-			//stmt.setBinaryStream(parameterIndex++, merito.getArchivo());
+			stmt.setBinaryStream(parameterIndex++, new ByteArrayInputStream("En fichero".getBytes())); // El campo ARCHIVO no puede ser nulo
 						
 			stmt.setString(parameterIndex++, usuarioUpdate.getCodCuenta());
 			stmt.executeUpdate();
@@ -223,14 +236,19 @@ public class ModeloMerito {
 			rs.next();
 			int codnum = rs.getInt(1);
 			
-			try {
-				  boolean procesada = FileSystemUtils.grabarFichero(Long.valueOf(codnum), ESQUEMA_TBEP_MERITOS, TABLA_TBEP_MERITOS, COLUMNA_TBEP_MERITOS, FileSystemUtils.fromInputStreamToByteArray(merito.getArchivo()));
-			} catch (IOException e) {}
+			FileSystemUtils.grabarFichero(Long.valueOf((long) codnum), ESQUEMA_TBEP_MERITOS, TABLA_TBEP_MERITOS, COLUMNA_TBEP_MERITOS, FileSystemUtils.fromInputStreamToByteArray(merito.getArchivo()));
+			conexion.commit();
 			
-			// return rs.getInt(1);
 			return codnum;
+		} catch(IOException e) {
+			ELOGGER.log(Level.SEVERE , "insertaTitulacionUsuario - Error al grabar archivos: " + e.getMessage());
+			throw new UVException("Error al grabar el fichero.");
+		} finally {
+			if (stmt != null) try { stmt.close(); } catch (Exception e2) {};
+			if (conexion != null) try {conexion.rollback(); conexion.setAutoCommit(true); conexion.close(); } catch(Exception e2) {};
 		}
-	}	
+	}
+	
 	/**
 	 * Comprueba si se puede actualizar un mérito.
 	 * @param merito .
