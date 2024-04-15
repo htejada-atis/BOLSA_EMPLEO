@@ -218,7 +218,10 @@ public class ModeloEvaluador {
 
 		String consulta = "SELECT * FROM TBEP_USUARIOS bepusu"
 				+ " INNER JOIN TBEP_EVALUADORES bepeva ON bepusu.CODNUM = bepeva.BEPUSU_CODNUM"
-				+ " WHERE FLGBORRADO != 'S' AND FLGEXCLUIDO != 'S' AND bepeva.BEPARE_CODNUM = ? ";
+				+ " WHERE bepusu.FLGBORRADO != 'S' "
+				+ "     AND bepusu.FLGEXCLUIDO != 'S' "
+				+ "     AND bepeva.FLGACTIVO = 'S' " 
+				+ "     AND bepeva.BEPARE_CODNUM = ? ";
 
 		dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE_MIEMBROS_COMISION, "bepusu.VUAJA_STRNOMBRE");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_APELLIDO1_MIEMBROS_COMISION, "bepusu.VUAJA_STRAPELLIDO1");
