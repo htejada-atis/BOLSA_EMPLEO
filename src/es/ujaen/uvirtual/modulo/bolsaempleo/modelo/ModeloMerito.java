@@ -61,7 +61,7 @@ public class ModeloMerito {
 	public static final String ESQUEMA_TBEP_MERITOS = "G_INTRANET";
 	public static final String TABLA_TBEP_MERITOS = "TBEP_MERITOS";
 	public static final String COLUMNA_TBEP_MERITOS = "ARCHIVO";
-	public static final String ID_TBEP_MERITOS = "CODNUM";	
+	public static final String ID_TBEP_MERITOS = "CODNUM";
 
 	protected static ModeloMerito eInstancia;
 
