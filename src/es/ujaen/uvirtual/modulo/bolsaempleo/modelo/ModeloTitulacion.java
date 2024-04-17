@@ -176,6 +176,7 @@ public class ModeloTitulacion {
 				+ "	WHERE 	beptus.BEPTUS_USU_CODNUM = ?"
 				+ "		AND beptpa.BEPARE_CODNUM = ?"
 				+ "		AND beptus.FLGVALIDADA = 'S'"
+				+ "     AND beptpa.FLGBORRADO = 'N'"
 				+ "		AND beptus.FLGBORRADO = 'N'";
 		
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
@@ -454,10 +455,13 @@ public class ModeloTitulacion {
 		List<TitulacionArea> titulaciones = new ArrayList<>();
 		BolsaEmpleoDataTable<TitulacionArea> dataTable = new BolsaEmpleoDataTable<>(params);
 		
-		String consulta = "SELECT beptit.* FROM tbep_titulaciones beptit "
-				+ "INNER JOIN TBEP_TIT_PREFERENTES_AREA beptpa ON beptit.codnum = beptpa.beptit_codnum "
-				+ "INNER JOIN TBEP_AREAS bepare ON bepare.codnum = beptpa.bepare_codnum "
-				+ "WHERE bepare.CODNUM = ? ";
+		String consulta = "SELECT beptit.* "
+				+ " FROM TBEP_TITULACIONES beptit "
+				+ " INNER JOIN TBEP_TIT_PREFERENTES_AREA beptpa ON beptit.codnum = beptpa.beptit_codnum "
+				+ " INNER JOIN TBEP_AREAS bepare ON bepare.codnum = beptpa.bepare_codnum "
+				+ " WHERE bepare.CODNUM = ? "
+				+ "     AND beptit.FLGBORRADO = 'N' "
+				+ "     AND beptpa.FLGBORRADO = 'N' ";
 		
 		dataTable.setColumn(ORDER_COLUMN_INDEX_NOMBRE_CANDIDATO, "beptit.NOMBRE");
 		dataTable.setQuery(consulta);
@@ -513,7 +517,7 @@ public class ModeloTitulacion {
 	}
 	
 	/**
-	 * Devuelve si el usuario está excluido de la area.
+	 * Devuelve si la titulación está asiganada a algún área.
 	 * @param tit .
 	 * @return true o false si está excluido o no
 	 * @throws SQLException .
