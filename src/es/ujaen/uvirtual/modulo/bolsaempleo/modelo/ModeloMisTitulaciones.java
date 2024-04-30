@@ -1,5 +1,8 @@
 package es.ujaen.uvirtual.modulo.bolsaempleo.modelo;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -8,6 +11,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Titulacion;
@@ -18,12 +23,16 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoUtils;
 import es.ujaen.uvirtual.modulo.bolsaempleo.utilidades.BolsaEmpleoDataTable.DataTableColumn;
 import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.UVException;
+import es.ujaen.uvirtual.utilidades.ficheros.FileSystemUtils;
 
 /**
  * Clase de modelo para la gestión de titulaciones de usuarios . 
  * @author ATISoluciones
  */
 public class ModeloMisTitulaciones {
+	
+	private static final Logger ELOGGER = Logger.getLogger(ModeloMisTitulaciones.class.getName());
+	
 	public static final int ORDER_COLUMN_INDEX_NOMBRE = 0;
 	public static final int ORDER_COLUMN_INDEX_NOMBRE_USUARIO = 1;
 	public static final int ORDER_COLUMN_INDEX_DESCRIPCION = 2;
@@ -50,6 +59,12 @@ public class ModeloMisTitulaciones {
 	
 	public static final int COLUMN_DESCRIPCION_MAXLENGTH = 250;
 	public static final int COLUMN_OTRATITULACION_MAXLENGTH = 100;
+	
+	// paso a ficheros
+	public static final String ESQUEMA_TBEP_TITULACIONES_USUARIO = "G_INTRANET";
+	public static final String TABLA_TBEP_TITULACIONES_USUARIO = "TBEP_TITULACIONES_USUARIO";
+	public static final String COLUMNA_TBEP_TITULACIONES_USUARIO = "ARCHIVO";
+	public static final String ID_TBEP_TITULACIONES_USUARIO = "CODNUM";	
 
 	protected static ModeloMisTitulaciones eInstancia;
 
@@ -300,34 +315,57 @@ public class ModeloMisTitulaciones {
 			String consulta = "INSERT INTO tbep_titulaciones_usuario " 
 					+ " (BEPTUS_TIT_CODNUM,BEPTUS_USU_CODNUM,DESCRIPCION,ARCHIVO,UID_USUARIO) "
 					+ "VALUES (?,?,?,?,?)";
+			
+			Connection conexion = null; 
+			PreparedStatement stmt = null;
+			try {
+				conexion = ConexionUvirtual.obtenerInstancia();
+				conexion.setAutoCommit(false);
+				stmt = conexion.prepareStatement(consulta, new String[]{CODNUM}); 
 	
-			try (Connection conexion = ConexionUvirtual.obtenerInstancia(); 
-					PreparedStatement stmt = conexion.prepareStatement(consulta, new String[]{CODNUM})) {
 				int parameterIndex = 1;
 				stmt.setInt(parameterIndex++, titulacion.getTitulacion().getCodNum());
 				stmt.setInt(parameterIndex++, titulacion.getUsuario().getCodNum());
 				stmt.setString(parameterIndex++, titulacion.getDescripcion());
-				stmt.setBinaryStream(parameterIndex++, titulacion.getArchivo());
+				//stmt.setBinaryStream(parameterIndex++, titulacion.getArchivo());
+				stmt.setBinaryStream(parameterIndex++, new ByteArrayInputStream("En fichero".getBytes())); // El campo ARCHIVO no puede ser nulo
 				stmt.setString(parameterIndex++, usuarioInsert.getCodCuenta());
 				stmt.executeUpdate();
 				
 				ResultSet rs = stmt.getGeneratedKeys();
 				rs.next();
 				
-				return rs.getInt(1);
-			}
+				int codnum = rs.getInt(1);
+				
+				FileSystemUtils.grabarFichero(Long.valueOf((long) codnum), ESQUEMA_TBEP_TITULACIONES_USUARIO, TABLA_TBEP_TITULACIONES_USUARIO, COLUMNA_TBEP_TITULACIONES_USUARIO, FileSystemUtils.fromInputStreamToByteArray(titulacion.getArchivo()));
+				conexion.commit();
+				
+				return codnum;
+				
+				} catch(IOException e) {
+					ELOGGER.log(Level.SEVERE , "insertaTitulacionUsuario - Error al grabar archivo: " + e.getMessage());
+					throw new UVException("Error grabando fichero.");
+				} finally {
+					if (stmt != null) try { stmt.close(); } catch (Exception e2) {};
+					if (conexion != null) try {conexion.rollback(); conexion.setAutoCommit(true); conexion.close(); } catch(Exception e2) {};
+				}
 		}
 		
 		String consulta = "INSERT INTO tbep_titulaciones_usuario " 
 				+ " (BEPTUS_USU_CODNUM,DESCRIPCION,ARCHIVO,OTRATITULACION,UID_USUARIO) "
 				+ "VALUES (?,?,?,?,?)";
 
-		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
-				PreparedStatement stmt = conexion.prepareStatement(consulta, new String[]{CODNUM})) {
+		Connection conexion = null;
+		PreparedStatement stmt = null;
+		try {
+			conexion = ConexionUvirtual.obtenerInstancia();
+			conexion.setAutoCommit(false);
+			stmt = conexion.prepareStatement(consulta, new String[]{CODNUM});
 			int parameterIndex = 1;
 			stmt.setInt(parameterIndex++, titulacion.getUsuario().getCodNum());
 			stmt.setString(parameterIndex++, titulacion.getDescripcion());
-			stmt.setBinaryStream(parameterIndex++, titulacion.getArchivo());
+			//stmt.setBinaryStream(parameterIndex++, titulacion.getArchivo());
+			stmt.setBinaryStream(parameterIndex++, new ByteArrayInputStream("En fichero".getBytes())); // El campo ARCHIVO no puede ser nulo
 			stmt.setString(parameterIndex++, titulacion.getOtraTitulacion());
 			stmt.setString(parameterIndex++, usuarioInsert.getCodCuenta());
 			stmt.executeUpdate();
@@ -335,7 +373,19 @@ public class ModeloMisTitulaciones {
 			ResultSet rs = stmt.getGeneratedKeys();
 			rs.next();
 			
-			return rs.getInt(1);
+			int codnum = rs.getInt(1);
+			
+			FileSystemUtils.grabarFichero(Long.valueOf((long) codnum), ESQUEMA_TBEP_TITULACIONES_USUARIO, TABLA_TBEP_TITULACIONES_USUARIO, COLUMNA_TBEP_TITULACIONES_USUARIO, FileSystemUtils.fromInputStreamToByteArray(titulacion.getArchivo()));
+			conexion.commit();
+			
+			return codnum;
+			
+		} catch(IOException e) {
+			ELOGGER.log(Level.SEVERE , "insertaTitulacionUsuario - Error al grabar archivo: " + e.getMessage());
+			throw new UVException("Error grabando fichero.");
+		} finally {
+			if (stmt != null) try { stmt.close(); } catch (Exception e2) {};
+			if (conexion != null) try {conexion.rollback(); conexion.setAutoCommit(true); conexion.close(); } catch(Exception e2) {};
 		}
 	}
 	
@@ -510,7 +560,15 @@ public class ModeloMisTitulaciones {
 		}
 
 		if (Boolean.TRUE.equals(archivo)) {
-			tit.setArchivo(rs.getBlob("ARCHIVO").getBinaryStream());
+			//tit.setArchivo(rs.getBlob("ARCHIVO").getBinaryStream());
+			
+			byte[] bytes = FileSystemUtils.obtenerFichero(Long.valueOf((long) rs.getInt("CODNUM")), ESQUEMA_TBEP_TITULACIONES_USUARIO, TABLA_TBEP_TITULACIONES_USUARIO, COLUMNA_TBEP_TITULACIONES_USUARIO);
+			if (bytes == null) {
+				tit.setArchivo(rs.getBlob("ARCHIVO").getBinaryStream());
+			} else {
+				InputStream fichero = new ByteArrayInputStream(bytes);
+				tit.setArchivo(fichero);
+			}
 		}
 
 		tit.setBorrado("S".equals(rs.getString("FLGBORRADO")));
