@@ -225,7 +225,7 @@ public class ControladorFiltrarTitulacion extends HttpServlet {
 		try (PrintWriter writer = response.getWriter()) {
 			try {
 				TitulacionUsuario titulacion = modeloTitulacion.getTitulacionUsuarioById(
-						Formateador.leeParametroInteger(request.getParameter(PARAM_TITULACION_USUARIO)));
+						Formateador.leeParametroInteger(request.getParameter(PARAM_TITULACION_USUARIO)), false);
 
 				bean.setTitulacion(titulacion);
 				UsuarioBolsaEmpleo candidato = modeloUsuario.getUsuarioById(Formateador.leeParametroInteger(request.getParameter(PARAM_CANDIDATO)));
@@ -327,7 +327,7 @@ public class ControladorFiltrarTitulacion extends HttpServlet {
 				}
 				
 				TitulacionUsuario titulacionUsuario = ModeloMisTitulaciones.obtenerInstancia().getTitulacionUsuarioById(
-						Formateador.leeParametroInteger(request.getParameter(PARAM_TITULACION_USUARIO)));
+						Formateador.leeParametroInteger(request.getParameter(PARAM_TITULACION_USUARIO)), false);
 				if (titulacionUsuario == null) {
 					throw new UVException("Titulación usuario requerida");
 				}

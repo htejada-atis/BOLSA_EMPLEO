@@ -58,10 +58,10 @@ public class ModeloMerito {
 	public static final String MENSAJE_ERROR_VALOR_MINIMO_PERMITIDO = "El valor mínimo permitido es %s para %s";
 	
 	// paso a ficheros
-	public static final String ESQUEMA_TBEP_MERITOS = "UVIRTUAL";
+	public static final String ESQUEMA_TBEP_MERITOS = "G_INTRANET";
 	public static final String TABLA_TBEP_MERITOS = "TBEP_MERITOS";
 	public static final String COLUMNA_TBEP_MERITOS = "ARCHIVO";
-	public static final String ID_TBEP_MERITOS = "CODNUM";	
+	public static final String ID_TBEP_MERITOS = "CODNUM";
 
 	protected static ModeloMerito eInstancia;
 
@@ -575,7 +575,7 @@ public class ModeloMerito {
 			/*
 			 * mer.setArchivo(rs.getBlob("ARCHIVO").getBinaryStream());
 			 */
-			byte[] bytes = FileSystemUtils.obtenerFichero(Long.valueOf(rs.getInt("CODNUM")),"G_INTRANET","TBEP_MERITOS","ARCHIVO");
+			byte[] bytes = FileSystemUtils.obtenerFichero(Long.valueOf((long) rs.getInt("CODNUM")), ESQUEMA_TBEP_MERITOS, TABLA_TBEP_MERITOS, COLUMNA_TBEP_MERITOS);
 			if (bytes == null) {
 				mer.setArchivo(rs.getBlob("ARCHIVO").getBinaryStream());
 			} else {
