@@ -75,8 +75,8 @@ public class TestBEPModeloMisTitulaciones {
 	@Test
 	public void testA01getTitulacionById() {
 		try {
-			TitulacionUsuario item = ModeloMisTitulaciones.obtenerInstancia().getTitulacionUsuarioById(CODNUM);
-			assertEquals(item.getCodNum(), CODNUM);			
+			TitulacionUsuario item = ModeloMisTitulaciones.obtenerInstancia().getTitulacionUsuarioById(CODNUM, false);
+			assertEquals(item.getCodNum(), CODNUM);
 		} catch (SQLException | UVException ex) {
 			fail(String.format(MENSAJE_ERROR_HAY_EXCEPCION, ex.toString()));
 		}
@@ -208,7 +208,7 @@ public class TestBEPModeloMisTitulaciones {
 			
 			Date now = BolsaEmpleoUtils.getCurrentDateTime();
 			ModeloMisTitulaciones.obtenerInstancia().validaTitulacion(tu, tu.getUsuario(), now, UtilsTestBolsaEmpleo.getUsuario("personal1"));
-			TitulacionUsuario tuValidado = ModeloMisTitulaciones.obtenerInstancia().getTitulacionUsuarioById(tu.getCodNum());			
+			TitulacionUsuario tuValidado = ModeloMisTitulaciones.obtenerInstancia().getTitulacionUsuarioById(tu.getCodNum(), false);
 			assertEquals(tuValidado.getCodNum(), tu.getCodNum());
 			assertTrue(tuValidado.getValidada());
 			assertEquals(Formateador.formatoFecha(tuValidado.getFechaValidada(), Formateador.FORMATO_FECHA_DDMMYYYY_HHMMSS), 
@@ -230,7 +230,7 @@ public class TestBEPModeloMisTitulaciones {
 			TitulacionUsuario tu = insertarTitulacion(t);
 			
 			ModeloMisTitulaciones.obtenerInstancia().desvalidaTitulacion(tu, tu.getUsuario(), UtilsTestBolsaEmpleo.getUsuario("personal1"));
-			TitulacionUsuario tuNew = ModeloMisTitulaciones.obtenerInstancia().getTitulacionUsuarioById(tu.getCodNum());			
+			TitulacionUsuario tuNew = ModeloMisTitulaciones.obtenerInstancia().getTitulacionUsuarioById(tu.getCodNum(), false);
 			assertEquals(tuNew.getCodNum(), tu.getCodNum());
 			assertFalse(tuNew.getValidada());
 			assertNull(tuNew.getFechaValidada());
@@ -249,7 +249,7 @@ public class TestBEPModeloMisTitulaciones {
 	@Test
 	public void testE01getTitulacionById() {
 		Throwable throwable = assertThrows(Throwable.class,
-				() -> ModeloMisTitulaciones.obtenerInstancia().getTitulacionUsuarioById(CODNUM_NOEXISTE));
+				() -> ModeloMisTitulaciones.obtenerInstancia().getTitulacionUsuarioById(CODNUM_NOEXISTE, false));
 		
 		assertEquals(UVException.class, throwable.getClass());
 		assertEquals(ModeloMisTitulaciones.ERROR_NO_EXISTE_TITULACION, throwable.getMessage());
@@ -383,7 +383,7 @@ public class TestBEPModeloMisTitulaciones {
 		tusuario.setUsuario(usuario);
 		
 		Integer codNum = ModeloMisTitulaciones.obtenerInstancia().insertaTitulacionUsuario(tusuario, UtilsTestBolsaEmpleo.getUsuario("personal1"));
-		TitulacionUsuario tusuarioNew = ModeloMisTitulaciones.obtenerInstancia().getTitulacionUsuarioById(codNum);
+		TitulacionUsuario tusuarioNew = ModeloMisTitulaciones.obtenerInstancia().getTitulacionUsuarioById(codNum, false);
 		
 		assertEquals(BolsaEmpleoUtils.inputStreamToString(tusuario.getArchivo()), BolsaEmpleoUtils.inputStreamToString(archivo));
 		assertEquals(tusuarioNew.getBorrado(), false);
@@ -404,7 +404,7 @@ public class TestBEPModeloMisTitulaciones {
 		ArrayList<TitulacionUsuario> titulacionesABorrar = new ArrayList<>();
 		titulacionesABorrar.add(tu);
 		ModeloMisTitulaciones.obtenerInstancia().borraTitulacionUsuario(titulacionesABorrar, UtilsTestBolsaEmpleo.getUsuario("personal1"));
-		TitulacionUsuario tusuarioDel = ModeloMisTitulaciones.obtenerInstancia().getTitulacionUsuarioById(tu.getCodNum());
+		TitulacionUsuario tusuarioDel = ModeloMisTitulaciones.obtenerInstancia().getTitulacionUsuarioById(tu.getCodNum(), false);
 		assertTrue(tusuarioDel.getBorrado());
 		assertNotNull(tusuarioDel.getFechaBorrado());
 	}

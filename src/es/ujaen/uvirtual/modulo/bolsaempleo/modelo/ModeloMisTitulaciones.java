@@ -91,12 +91,13 @@ public class ModeloMisTitulaciones {
 	
 	/** obtiene una titulación a partir de su id.
 	 * @param id codigo de la titulación
+	 * @param archivo indica si cargar el archivo de disco
 	 * @return titulación con el id especificado
 	 * @throws SQLException en caso de error en la BD
 	 */
-	public TitulacionUsuario getTitulacionUsuarioById(int id) throws SQLException, UVException {
+	public TitulacionUsuario getTitulacionUsuarioById(int id, Boolean archivo) throws SQLException, UVException {
 		String clausulaWhere = "WHERE codnum = " + id;
-		List<TitulacionUsuario> titulaciones = listaTitulacionesUsuarios(clausulaWhere);
+		List<TitulacionUsuario> titulaciones = listaTitulacionesUsuarios(clausulaWhere, archivo);
 		if (titulaciones.isEmpty()) {
 			throw new UVException(ERROR_NO_EXISTE_TITULACION);
 		}
@@ -105,11 +106,12 @@ public class ModeloMisTitulaciones {
 	
 	/** Consulta titulaciones en BBDD y las devuelve.
 	 * @param clausula para filtrar las titulaciones de la bd
+	 * @param archivo indica si cargar el archivo de disco
 	 * @return todas las titulaciones de la base de datos
 	 * @throws SQLException en caso de error de base de datos
 	 * @throws UVException .
 	 */
-	public List<TitulacionUsuario> listaTitulacionesUsuarios(String clausula) throws SQLException, UVException {
+	private List<TitulacionUsuario> listaTitulacionesUsuarios(String clausula, Boolean archivo) throws SQLException, UVException {
 		List<TitulacionUsuario> titulaciones = new ArrayList<>();
 		String consulta = "SELECT beptus.* FROM tbep_titulaciones_usuario beptus " + clausula;
 
@@ -117,7 +119,7 @@ public class ModeloMisTitulaciones {
 				PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
-					TitulacionUsuario tit = setTitulacionUsuarioFromResultSet(rs, true);
+					TitulacionUsuario tit = setTitulacionUsuarioFromResultSet(rs, archivo);
 					titulaciones.add(tit);
 				}
 			}
@@ -290,7 +292,7 @@ public class ModeloMisTitulaciones {
 		List<TitulacionUsuario> titulaciones = new ArrayList<>();
 		
 		for (int i = 0; i < ids.length; i++) {
-			titulaciones.add(this.getTitulacionUsuarioById(ids[i]));
+			titulaciones.add(this.getTitulacionUsuarioById(ids[i], false));
 	    }
 		
 		return titulaciones;
@@ -429,7 +431,7 @@ public class ModeloMisTitulaciones {
 			stmt.setInt(parameterIndex++, usuario);
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
-					TitulacionUsuario tit = setTitulacionUsuarioFromResultSet(rs, true);
+					TitulacionUsuario tit = setTitulacionUsuarioFromResultSet(rs, false);
 					titulaciones.add(tit);
 				}
 			}

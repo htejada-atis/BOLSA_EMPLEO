@@ -558,7 +558,7 @@ public class ControladorDescargaFicheros extends HttpServlet {
 	private void descargaTitulacionPersonal(VistaDescargaFicheros bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
 			throws SQLException, UVException {
 		Integer idTitulacion = Formateador.leeParametroInteger(request.getParameter(PARAM_TITULACION));
-		TitulacionUsuario titulacion = ModeloMisTitulaciones.obtenerInstancia().getTitulacionUsuarioById(idTitulacion);
+		TitulacionUsuario titulacion = ModeloMisTitulaciones.obtenerInstancia().getTitulacionUsuarioById(idTitulacion, true);
 		bean.setTitulacion(titulacion);
 		descargarPDF(datos, response, titulacion.getArchivo());
 	}
