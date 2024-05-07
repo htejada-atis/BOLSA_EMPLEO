@@ -1,7 +1,6 @@
 package es.ujaen.uvirtual.modulo.bolsaempleo.beans;
 
 import java.io.Serializable;
-import java.util.Date;
 
 /**
  * Clase historial mérito .
