@@ -634,11 +634,11 @@ public class ModeloArea {
 							}
 							
 							conexionUvirtual.commit();
-							conexionUvirtual.setAutoCommit(true);
 						} catch (SQLException e) {
 							conexionUvirtual.rollback();
-							conexionUvirtual.setAutoCommit(true);
 							throw e;
+						} finally {
+							conexionUvirtual.setAutoCommit(true);
 						}
 					}
 				}
@@ -668,11 +668,11 @@ public class ModeloArea {
 				total += actualizaAreasPorDepartamento(conexionUxxiRrhh, areasInternas, departamentosInternos, usuario);
 				
 				conexionUxxiRrhh.commit();
-				conexionUxxiRrhh.setAutoCommit(true);
 			} catch (SQLException e) {
 				conexionUxxiRrhh.rollback();
-				conexionUxxiRrhh.setAutoCommit(true);
 				throw e;
+			} finally {
+				conexionUxxiRrhh.setAutoCommit(true);
 			}
 		}
 		
@@ -776,11 +776,11 @@ public class ModeloArea {
 							}
 							
 							conexionUvirtual.commit();
-							conexionUvirtual.setAutoCommit(true);
 						} catch (SQLException e) {
 							conexionUvirtual.rollback();
-							conexionUvirtual.setAutoCommit(true);
 							throw e;
+						} finally {
+							conexionUvirtual.setAutoCommit(true);
 						}
 					}
 				}
