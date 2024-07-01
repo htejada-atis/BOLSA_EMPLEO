@@ -80,6 +80,7 @@ $(document).ready(function() {
 	    "filterable": true,
 	    "stateSave": true,
 	    "pageSize": 10,
+	    "defaultOrderBy": 1,
 	    "action": "<%=ControladorMisTitulaciones.ACCION_DATATABLE_TITULACIONES_USUARIO%>",
 	    "columns": [
 	    	{'data': 'codNum', 'selectable': true},

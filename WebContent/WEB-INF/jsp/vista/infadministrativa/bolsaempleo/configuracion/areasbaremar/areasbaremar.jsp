@@ -48,6 +48,8 @@ $(document).ready(function() {
 		"pageSize": 20,
 		"pageSizeOptions": [10, 20, 100, 200],
 		"action": "<%= ControladorAreasABaremar.ACCION_DATATABLE %>",
+		"defaultOrderBy": 2,
+		"defaultOrderDirection": 'asc',
 		"filterable": true,
 		"stateSave": true,
 		"columns": [

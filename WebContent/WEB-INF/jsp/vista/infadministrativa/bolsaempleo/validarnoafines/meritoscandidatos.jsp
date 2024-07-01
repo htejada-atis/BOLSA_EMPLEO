@@ -272,6 +272,8 @@ $(document).ready(function() {
 			"pageSize": 10,
 			"filterable": true,
 			"stateSave": true,
+			"defaultOrderBy": 0,
+			"defaultOrderDirection": 'desc',
 			"action": "<%= ControladorValidarNoAfines.ACCION_DATATABLE_MERITOS %>",
 			"title": 'MÉRITOS PARA EL USUARIO: <%=EscapaHTML.escapa(candidato.getIdNif() + " - " + candidato.getNombre() + " " + candidato.getPrimerApellido() + " " + candidato.getSegundoApellido())%>',
 			"dropdown": true,

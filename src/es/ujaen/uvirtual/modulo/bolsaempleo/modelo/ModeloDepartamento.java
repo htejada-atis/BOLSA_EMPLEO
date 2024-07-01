@@ -107,7 +107,7 @@ public class ModeloDepartamento {
 		BolsaEmpleoDataTable<Departamento> dataTable = new BolsaEmpleoDataTable<>(params);
 		
 		String consulta = "SELECT * FROM UXXIRRHH.VUJA_NET_BEP_RH_DEP_DIR"
-				+ " WHERE PRSNIF = ?";
+				+ " WHERE PRSNIF = ? ORDER BY ID_DEPARTAMENTO ";
 		
 		dataTable.setQuery(consulta);
 				

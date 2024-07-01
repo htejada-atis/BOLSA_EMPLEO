@@ -68,6 +68,8 @@ $(document).ready(function() {
 	    "pageSize": 10,
 	    "filterable": true,
 	    "stateSave": true,
+	    "defaultOrderBy": 0,
+	    "defaultOrderDirection": 'asc',
 	    "clickable": {'onClick': function(row) {
 	    	var params = {
     				'a': '<%= ControladorUsuarioBolsaEmpleo.ACCION_SELECCIONAR_USUARIO %>',

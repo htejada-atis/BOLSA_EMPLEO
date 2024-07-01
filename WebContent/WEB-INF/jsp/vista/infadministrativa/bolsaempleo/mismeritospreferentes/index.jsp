@@ -66,6 +66,7 @@ VistaMeritosPreferentesCandidato bean = (VistaMeritosPreferentesCandidato) uvdat
 		    "selectable": true,
 		    "filterable": true,
 		    "stateSave": true,
+		    "defaultOrderBy": 1,
 		    "columns": [
 		    	{'data': 'codNum', 'selectable': true},
 		    	{'data': 'codNum', 'filter': {'type': 'number'}},

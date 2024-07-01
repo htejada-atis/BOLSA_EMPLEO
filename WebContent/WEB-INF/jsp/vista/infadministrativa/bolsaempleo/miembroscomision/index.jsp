@@ -60,6 +60,7 @@ Area areaSeleccionada = bean.getArea();
 			var tableEvaluadores = new Atis.DataTable('#tableEvaluadores', {
 				"ajax": { url: "<%= ControladorMiembrosComision.URL_PATTERN_AJAX %>", async: false },
 				"pageSize": 10,
+				"defaultOrderBy": 0,
 				"action": "<%= ControladorMiembrosComision.ACCION_DATATABLE_EVALUADORES %>",
 				"params": {"<%= ControladorMiembrosComision.PARAM_AREA %>": '<%= areaSeleccionada.getCodNum() %>'},
 				"title": "EVALUADORES DEL AREA: <%= areaSeleccionada.getDescripcion() %>",				

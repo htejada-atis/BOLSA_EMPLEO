@@ -160,6 +160,8 @@ boolean showExportar = departamento == null || departamento.getCodNum() == 0;
 				"pageSize": 10,
 				"title": "EVALUADORES DEL ÁREA: <%= area.getDescripcion() %>",
 				"filterable": true,
+				"defaultOrderBy": 0,
+				"defaultOrderDirection": 'asc',
 				"action": "<%=ControladorGestionEvaluadores.ACCION_DATATABLE_EVALUADORES%>",
 				"columns": [
 					{'data': 'prsnif', 'filter': true},

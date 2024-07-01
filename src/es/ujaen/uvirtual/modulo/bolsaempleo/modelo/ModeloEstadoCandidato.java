@@ -544,6 +544,7 @@ public class ModeloEstadoCandidato {
 				+ " ) bepcts ON bepcts.BEPUSU_CODNUM = bepusu.CODNUM"
 				+ " WHERE bepplo.CODNUM = ?" 
 				+ "     AND bepusu.ROL = " + ModeloRol.ID_ROL_CANDIDATO
-				+ "     AND bepusu.FLGBORRADO = 'N'";
+				+ "     AND bepusu.FLGBORRADO = 'N' "
+				+ " ORDER BY bepusu.CODNUM ";
 	}
 }
