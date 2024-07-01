@@ -65,6 +65,7 @@ $(document).ready(function() {
 		"pageSize": 10,
 		"filterable": true,
 		"stateSave": true,
+		"defaultOrderBy": 0,
 		"action": "<%= ControladorMisResultados.ACCION_DATATABLE_BOLSAS %>",
 		"params": {'<%= ControladorMisResultados.PARAM_CONVOCATORIA %>': '<%= bean.getConvocatoria().getCodNum() %>'},
 		"columns": [

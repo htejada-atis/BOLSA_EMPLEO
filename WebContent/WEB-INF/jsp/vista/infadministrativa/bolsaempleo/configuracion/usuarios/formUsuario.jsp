@@ -419,6 +419,8 @@ VistaUsuarioBolsaEmpleo bean = (VistaUsuarioBolsaEmpleo) uvdatos.getVistas().get
 				    "params": {"<%=ControladorUsuarioBolsaEmpleo.PARAM_USUARIO%>": <%= bean.getUsuario().getCodNum() %>},
 				    "pageSize": 10,
 				    "filterable": true,
+				    "defaultOrderBy": 1,
+					"defaultOrderDirection": 'asc',
 				    "title": 'LISTADO DE ÁREAS EVALUABLES',
 				    "action": "<%= ControladorUsuarioBolsaEmpleo.ACCION_DATATABLE_AREAS_EVALUABLES_USUARIO %>",
 				    "columns": [

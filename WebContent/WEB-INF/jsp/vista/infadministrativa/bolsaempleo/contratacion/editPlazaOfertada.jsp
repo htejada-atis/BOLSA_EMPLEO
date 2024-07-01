@@ -446,6 +446,7 @@ $(document).ready(function() {
 			"params": {'<%=ControladorContratacion.PARAM_PLAZA_OFERTADA%>': '<%= plaza.getCodNum() %>'},
 			"pageSize": 10,
 			"filterable": true,
+			"defaultOrderBy": 0,
 			"title": 'Candidatos con contratación',
 			"columns": [
 				{'data': 'candidato.prsnif', 'filter': true, 'render': function(row) {

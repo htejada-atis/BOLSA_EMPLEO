@@ -219,6 +219,8 @@ $(document).ready(function() {
 		"params": {"<%=ControladorMensajes.PARAM_MENSAJE_ID%>": <%= mensaje.getCodNum() %>},
 		"pageSize": 5,
 		"filterable": true,
+		"defaultOrderBy": 1,
+		"defaultOrderDirection": 'asc',
 		"action": "<%= ControladorMensajes.ACCION_DATATABLE_DESTINATARIOS %>",
 		"columns": [
 			{'data': 'codNum', 'order': false},
@@ -273,6 +275,8 @@ $(document).ready(function() {
 			"params": {"<%= ControladorMensajes.PARAM_MENSAJE_ID%>": <%= mensaje.getCodNum() %>},
 			"pageSize": 10,
 			"filterable": true,
+			"defaultOrderBy": 1,
+			"defaultOrderDirection": 'asc',
 			"action": "<%= ControladorMensajes.ACCION_DATATABLE_DESTINATARIOS_DISPONIBLES %>",
 			"columns": [
 				{'data': 'codNum', 'order': false},

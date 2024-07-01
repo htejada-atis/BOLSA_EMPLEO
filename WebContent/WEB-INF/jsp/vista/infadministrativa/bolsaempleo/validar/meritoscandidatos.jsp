@@ -416,6 +416,8 @@ $(document).ready(function() {
 			"ajax": { url: "<%= ControladorValidar.URL_PATTERN_AJAX %>", async: false },
 			"pageSize": 10,
 			"filterable": true,
+			"defaultOrderBy": 0,
+			"defaultOrderDirection": 'desc',
 			"action": "<%= ControladorValidar.ACCION_DATATABLE_MERITOS %>",
 			"title": 'MÉRITOS PARA EL USUARIO: <%=EscapaHTML.escapa(candidato.getIdNif() + " - " + candidato.getNombre() + " " + candidato.getPrimerApellido() + " " + candidato.getSegundoApellido())%>',
 			"dropdown": true,

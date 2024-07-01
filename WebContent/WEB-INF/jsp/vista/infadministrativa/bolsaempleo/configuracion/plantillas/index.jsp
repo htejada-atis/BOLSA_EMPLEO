@@ -53,6 +53,8 @@ $(document).ready(function() {
 	var table = new Atis.DataTable('#tablePlantillasPLA', {
 		"ajax": { url: '<%= ControladorPlantillas.URL_PATTERN_AJAX %>' },
 		"pageSize": 10,
+		"defaultOrderBy": 0,
+		"defaultOrderDirection": 'asc',
 		"stateSave": true,
 		"action": "<%= ControladorPlantillas.ACCION_DATATABLE_PLANTILLAS %>",
 		"clickable": {'onClick': clickRow},

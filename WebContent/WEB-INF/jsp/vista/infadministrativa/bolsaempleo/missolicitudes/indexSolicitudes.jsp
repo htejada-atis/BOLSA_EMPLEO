@@ -27,8 +27,8 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 		<tr>
 			<th scope="col"	style="width:30%">Descripción</th>
 			<th scope="col"	style="width:10%">Fecha cierre</th>
-			<th scope="col"	style="width:10%">Estado convocatoria</th>			
-			<th scope="col"	style="width:50%">Solicitud</th>			
+			<th scope="col"	style="width:10%">Estado convocatoria</th>
+			<th scope="col"	style="width:50%">Solicitud</th>
 		</tr>
 		<tbody>
 		</tbody>
@@ -148,7 +148,7 @@ VistaSolicitudes bean = (VistaSolicitudes) uvdatos.getVistas().get(VistaSolicitu
 		        {'data': 'convocatoria.estado', order: {'active': false}, render: renderEstado},
 		        {'data': 'codNum', order: {'active': false}, render: renderSolicitud},		        
 		    ],
-		});		
+		});
 	});
 	
 </script>

@@ -590,6 +590,8 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 				"action": "<%=ControladorUsuarioCandidato.ACCION_DATATABLE_TITULACIONES_CANDIDATO%>",
 				"params": {"<%=ControladorUsuarioCandidato.PARAM_CANDIDATO%>": <%=candidato.getCodNum()%>},
 				"filterable": true,
+				"defaultOrderBy": 0,
+				"defaultOrderDirection": 'desc',
 				"columns": [
 					{'data': 'codNum', 'filter': {'type': 'number'}},
 					{'data': 'titulacion.nombre', 'filter': true, 'render': function(row) {
@@ -621,6 +623,8 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 				"action": "<%= ControladorUsuarioCandidato.ACCION_DATATABLE_ACREDITACIONES_CANDIDATO %>",
 				"params": {"<%=ControladorUsuarioCandidato.PARAM_CANDIDATO%>": <%= candidato.getCodNum() %>},
 				"filterable": true,
+				"defaultOrderBy": 0,
+				"defaultOrderDirection": 'desc',
 				"title": 'ACREDITACIONES: <%=candidato.getNombre() + " " + candidato.getPrimerApellido() + " " + candidato.getSegundoApellido()%>',
 				"columns": [
 					{'data': 'codNum', 'filter': {'type': 'number'}},
@@ -663,6 +667,8 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 				"selectable": true,
 				"pageSize": 10,
 				"filterable": true,
+				"defaultOrderBy": 2,
+				"defaultOrderDirection": 'desc',
 				"title": 'ÁREAS EXCLUIDAS PARA EL USUARIO',
 				"action": "<%=ControladorUsuarioCandidato.ACCION_DATATABLE_AREAS_EXCLUIDAS_CANDIDATO%>",
 				"columns": [
@@ -682,6 +688,8 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 				"selectable": true,
 				"pageSize": 10,
 				"filterable": true,
+				"defaultOrderBy": 2,
+				"defaultOrderDirection": 'asc',
 				"title": 'LISTADO DE ÁREAS',
 				"action": "<%= ControladorUsuarioCandidato.ACCION_DATATABLE_AREAS_NO_EXCLUIDAS_CANDIDATO %>",
 				"columns": [
@@ -770,6 +778,8 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 				"selectable": true,
 				"pageSize": 10,
 				"filterable": true,
+				"defaultOrderBy": 1,
+				"defaultOrderDirection": 'asc',
 				"title": 'LISTADO DE ESTADOS DEL CANDIDATO',
 				"columns": [
 					{'data': 'bolsa.codNum', 'selectable': true},

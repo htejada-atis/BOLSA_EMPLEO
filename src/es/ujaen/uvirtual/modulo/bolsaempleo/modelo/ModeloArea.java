@@ -238,13 +238,13 @@ public class ModeloArea {
 					bolsa.setCodNum(rs.getInt(CODNUM));
 					bolsa.setArea(modeloArea.getAreaById(rs.getInt(BEPARE_CODNUM)));
 					bolsa.setEstado(rs.getString(ESTADO));
-					bolsa.setBaremable("S".equals(rs.getString("FLGBAREMABLE")));		
+					bolsa.setBaremable("S".equals(rs.getString("FLGBAREMABLE")));
 					bolsa.setFechaActualizacion(rs.getTimestamp("FECHAACTUALIZACION"));
 					bolsa.setFechaBloqueo(rs.getTimestamp("FECHABLOQUEO"));
 					bolsa.setFechaDesBloqueo(rs.getTimestamp("FECHADEBLOQUEO"));
 					
-					bolsas.add(bolsa);					
-				}				
+					bolsas.add(bolsa);
+				}
 			}	
 			
 			dataTable.setRecordsTotalFromQuery(stmtCount);

@@ -51,6 +51,8 @@ VistaFicheros bean = (VistaFicheros) uvdatos.getVistas().get(VistaFicheros.class
 			"selectable": true,
 			"filterable": true,
 			"stateSave": true,
+			"defaultOrderBy": 1,
+			"defaultOrderDirection": 'asc',
 			"columns": [
 				{'data': 'codNum', 'selectable': true},
 				{'data': 'nombre', 'filter': true, 'overflow': 'auto'},

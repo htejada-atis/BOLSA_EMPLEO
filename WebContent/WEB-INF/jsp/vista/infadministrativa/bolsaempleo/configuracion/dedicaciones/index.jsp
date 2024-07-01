@@ -49,6 +49,8 @@ $(document).ready(function() {
 		"pageSize": 10,
 		"filterable": true,
 		"stateSave": true,
+		"defaultOrderBy": 0,
+		"defaultOrderDirection": 'asc',
 		"action": "<%=ControladorDedicaciones.ACCION_DATATABLE_DEDICACIONES%>",
 		"columns": [
 			{'data': 'codNum', 'filter': {'type': 'number'}},

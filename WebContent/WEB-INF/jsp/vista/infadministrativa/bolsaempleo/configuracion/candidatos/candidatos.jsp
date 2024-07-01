@@ -50,6 +50,8 @@ $(document).ready(function() {
 		"pageSize": 10,
 		"filterable": true,
 		"stateSave": true,
+		"defaultOrderBy": 0,
+		"defaultOrderDirection": 'asc',
 		"clickable": {'onClick': function(row) {
 			var params = {
 					'a': '<%= ControladorUsuarioCandidato.ACCION_SELECCIONAR_CANDIDATO %>', 

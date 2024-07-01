@@ -64,6 +64,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 			"pageSize": 10,
 			"filterable": true,
 			"stateSave": true,
+			"defaultOrderBy": 0,
 			"title": 'CANDIDATOS',
 			"clickable": {'onClick': function(row) {
 				var params = {
@@ -94,6 +95,7 @@ UsuarioBolsaEmpleo candidato = bean.getCandidato();
 				"selectable": {'all': false},
 				"selected": acreditaiconesValidadas,
 				"filterable": true,
+				"defaultOrderBy": 1,
 				"title": 'ACREDITACIONES: <%=candidato.getNombre() + " " + candidato.getPrimerApellido() + " " + candidato.getSegundoApellido()%>',
 				"columns": [
 					{'data': 'codNum', 'selectable': {'onChange': function(row, checkbox) {
