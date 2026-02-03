@@ -191,6 +191,8 @@ String justificacion = BolsaEmpleoUtils.getParamForm(request, ControladorContrat
 						<button id="plaza_estado_aprobacion" style="float:right; margin-right: 12px;" <%= personal ? "" : "disabled" %>>Aprobación</button>
 				<%	} else if (estadoAprobacion) { %>
 						<button id="plaza_estado_abierta" style="float:right; margin-right: 12px;" <%= personal ? "" : "disabled" %>>Abrir plaza</button>
+				<%	} else if (estadoAbierta && personal) { %>
+						<button id="cancelar_oferta_abierta" style="float:right; margin-right: 12px;" <%= personal ? "" : "disabled" %>>Eliminar plaza</button>
 				<%	} %>
 			</div>
 		</div>
@@ -772,6 +774,25 @@ $(document).ready(function() {
 			'Si': function() {
 				var params = {
 					"<%= ControladorContratacion.PARAM_ACCION %>": "<%=ControladorContratacion.ACCION_REABRIR_PLAZA_OFERTADA%>",
+					"<%= ControladorContratacion.PARAM_PLAZA_OFERTADA %>": <%= bean.getPlazaOfertada().getCodNum() %>
+				};
+				Atis.sendForm("<%= request.getRequestURI() %>", params);
+				$(this).dialog("close");
+			},
+			'No': function() {
+				$(this).dialog("close");
+			}
+		});
+	});
+<% } %>
+
+<% if (estadoAbierta && personal) { %>
+	document.getElementById("cancelar_oferta_abierta").addEventListener("click", function(e) {
+		e.preventDefault();
+		Atis.confirmDialog("Eliminar plaza", "¡¡¡ Atención !!!.<br/><br/>Se va a eliminar la plaza que está abierta.<br/><br/>¿Continuar?", {
+			'Si': function() {
+				var params = {
+					"<%= ControladorContratacion.PARAM_ACCION %>": "<%= ControladorContratacion.ACCION_FORZAR_ELIMINACION_ABIERTA %>",
 					"<%= ControladorContratacion.PARAM_PLAZA_OFERTADA %>": <%= bean.getPlazaOfertada().getCodNum() %>
 				};
 				Atis.sendForm("<%= request.getRequestURI() %>", params);
