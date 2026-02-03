@@ -93,6 +93,7 @@ public class ControladorContratacion extends HttpServlet {
 	public static final String ACCION_RESTAURAR_PLAZA_OFERTADA = "restaurarplazaofertada";
 	public static final String ACCION_SELECCIONAR_PLAZA_OFERTADA = "seleccionarplazaofertada";
 	public static final String ACCION_REABRIR_PLAZA_OFERTADA = "reabrirplazaofertada";
+	public static final String ACCION_FORZAR_ELIMINACION_ABIERTA = "forzareliminacionabierta";
 
 	// parámetros
 	public static final String PARAM_ACCION = "a";
@@ -131,6 +132,7 @@ public class ControladorContratacion extends HttpServlet {
 	public static final String MENSAJE_ERROR_ESTADO_CONTRATACION_REQUERIDO = "Es requerido estado de contratación para la plaza";
 	public static final String MENSAJE_ERROR_SOLICITUD_ENCONTRADA = "Solicitud del usuario no encontrada para la convocatoria %s";
 	public static final String MENSAJE_ERROR_ESTADO_CERRADA_REQUERIDO = "Es requerido estado de cerrada para la plaza";
+	public static final String MENSAJE_ERROR_ESTADO_ABIERTA_REQUERIDO = "Es requerido estado de abierta para la plaza";
 	public static final String MENSAJE_ERROR_ESTADO_CREACION_REQUERIDO = "Es requerido estado de creación para la plaza";
 	public static final String MENSAJE_ERROR_ESTADO_APROBACION_REQUERIDO = "Es requerido estado de aprobación para la plaza";
 	public static final String MENSAJE_ERROR_FECHA_FIN_OFERTA_VACIA_ABRIR_PLAZA = "La fecha fin de la oferta no puede estar vacía para abrir una plaza";
@@ -248,6 +250,7 @@ public class ControladorContratacion extends HttpServlet {
 			case ACCION_REENVIAR_CITA_CONTRATACION:
 			case ACCION_SELECCIONAR_PLAZA_OFERTADA:
 			case ACCION_REABRIR_PLAZA_OFERTADA:
+			case ACCION_FORZAR_ELIMINACION_ABIERTA:
 				seleccionarPlazaOfertada(bean, datos, request, response, nombreAccion, parametros);
 				break;
 			case ACCION_DATATABLE_PLAZAS_OFERTADAS:
@@ -406,6 +409,8 @@ public class ControladorContratacion extends HttpServlet {
 		case ACCION_REABRIR_PLAZA_OFERTADA:
 			reabrirPlaza(bean, datos, request, response);
 			break;
+		case ACCION_FORZAR_ELIMINACION_ABIERTA:
+			forzarEliminacionPlaza(bean, datos, request, response);
 		default:
 			errorFatal(bean, MENSAJE_ERROR_ACCION_NO_CONTEMPLADA);
 		}
@@ -537,6 +542,28 @@ public class ControladorContratacion extends HttpServlet {
 
 		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_REABRIR_PLAZA, bean, request);
 		redireccionConPlazaSeleccionada(bean, datos, request, response, ACCION_SELECCIONAR_PLAZA_OFERTADA);
+	}
+	
+	private void forzarEliminacionPlaza(VistaContratacion bean, UVDatos datos, HttpServletRequest request,
+			HttpServletResponse response) throws SQLException, UVException, IOException {
+		if (!bean.getUsuarioLogeado().isServicioPersonal()) {
+			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, MENSAJE_ERROR_SIN_PERMISO);
+		}
+		
+		PlazaOfertada plaza = bean.getPlazaOfertada();
+		if (!plaza.getEstado().equals(ModeloPlazaOfertada.PLAZA_ESTADO_ABIERTA)) {
+			throw new UVException(MENSAJE_ERROR_ESTADO_ABIERTA_REQUERIDO);
+		}
+		
+		ModeloPlazaOfertada modelo = ModeloPlazaOfertada.obtenerInstancia();
+
+		plaza.setActiva(false);
+		modelo.actualizaActivaPlazaOfertada(plaza, bean.getUsuarioLogeado());
+		modelo.cerrarPlazaOfertada(plaza, bean.getUsuarioLogeado());
+
+		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_ELIMINADA, bean, request);
+		datos.setRespuestaEnviada(true);
+		response.sendRedirect(request.getServletPath());
 	}
 
 	private void comprobarContratacionPlaza(VistaContratacion bean, UVDatos datos, HttpServletResponse response)
