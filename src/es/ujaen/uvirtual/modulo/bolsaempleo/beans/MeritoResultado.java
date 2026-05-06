@@ -23,9 +23,8 @@ public class MeritoResultado extends Merito implements Serializable {
 	private Boolean validado;
 	private ItemBaremacion itemMeritoSolicitud;
 	private String nombreMerito;
-	private String codigoMerito;
-	
-	
+	private String codigoMerito;	
+	private boolean tieneAlegacion;
 	
 	/**
 	 * Constructor por defecto.
@@ -152,6 +151,14 @@ public class MeritoResultado extends Merito implements Serializable {
 	public void setCodigoMerito(String codigo) {
 		this.codigoMerito = codigo;
 	}
+	
+	public boolean tieneAlegacion() {
+        return tieneAlegacion;
+    }
+	
+    public void setTieneAlegacion(boolean tieneAlegacion) {
+        this.tieneAlegacion = tieneAlegacion;
+    }
 
 	public static long getSerialversionuid() {
 		return serialVersionUID;

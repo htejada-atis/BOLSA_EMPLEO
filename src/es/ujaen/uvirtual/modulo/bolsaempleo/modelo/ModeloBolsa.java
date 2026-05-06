@@ -25,11 +25,11 @@ import es.ujaen.uvirtual.utilidades.UVException;
  * Clase de modelo para la gestión de bolsas Modelo - Operaciones con nombres:
  * lista, actualiza, borra, inserta Controlador - Opers. con nombres: obtener,
  * cambiar, eliminar, agregar
- * 
+ *
  * @author ATISoluciones 2021
  */
 public class ModeloBolsa {
-	
+
 	public static final int ORDER_COLUMN_INDEX_ID = 1;
 	public static final int ORDER_COLUMN_INDEX_AREA = 2;
 	public static final int ORDER_COLUMN_INDEX_ESTADO = 3;
@@ -38,12 +38,12 @@ public class ModeloBolsa {
 	public static final int ORDER_COLUMN_INDEX_DESBLOQUEO = 6;
 	public static final int ORDER_COLUMN_INDEX_BAREMACION = 7;
 	public static final int ORDER_COLUMN_INDEX_BAREMALE = 8;
-	
+
 	public static final int ORDER_COLUMN_INDEX_ID_RESULTADOS = 0;
 	public static final int ORDER_COLUMN_INDEX_COD_AREA_RESULTADOS = 1;
 	public static final int ORDER_COLUMN_INDEX_DESC_AREA_RESULTADOS = 2;
 	public static final int ORDER_COLUMN_INDEX_FECHA_BAREMACION_RESULTADOS = 3;
-	
+
 	public static final String MENSAJE_ERROR_BOLSA_NULL = "Bolsa no puede estar vacía";
 	public static final String MENSAJE_ERROR_BAREMAR_BOLSA_NO_BLOQUEADA = "Para baremar una bolsa su estado debe ser 'BLOQUEADA'";
 	public static final String MENSAJE_ERROR_BAREMAR_BOLSA_NO_BAREMABLE = "Para baremar una bolsa debe ser baremable";
@@ -56,7 +56,7 @@ public class ModeloBolsa {
 
 	public static final String BOLSA_BAREMABLE = "S";
 	public static final String BOLSA_NO_BAREMABLE = "N";
-	
+
 	private static final String TOTAL = "total";
 
 	protected static ModeloBolsa eInstancia;
@@ -73,7 +73,7 @@ public class ModeloBolsa {
 
 	/**
 	 * Obtiene una instancia de la conexión.
-	 * 
+	 *
 	 * @return instancia
 	 */
 	public static ModeloBolsa obtenerInstancia() {
@@ -85,7 +85,7 @@ public class ModeloBolsa {
 
 	/**
 	 * Listado de bolsas de empleo.
-	 * 
+	 *
 	 * @param params para leer los parametros de paginación, ordenacion, etc
 	 * @return listado de bolsas de empleo
 	 * @throws SQLException en caso de error de base de datos
@@ -127,10 +127,10 @@ public class ModeloBolsa {
 			dataTable.setRecordsTotalFromQuery(stmtCount);
 			dataTable.setData(bolsas);
 		}
-		
+
 		return dataTable;
 	}
-	
+
 	/** Listado de bolsas para resultados .
 	 * @param params para leer los parametros de paginación, ordenacion, etc .
 	 * @param usuario .
@@ -143,10 +143,10 @@ public class ModeloBolsa {
 			throws SQLException, UVException {
 		List<BolsaResultado> bolsas = new ArrayList<>();
 		BolsaEmpleoDataTable<BolsaResultado> dataTable = new BolsaEmpleoDataTable<>(params);
-		
-		boolean evaluador = usuario.getRol().getValor().equals(ModeloRol.ROL_MIEMBRO_COMISION) 
+
+		boolean evaluador = usuario.getRol().getValor().equals(ModeloRol.ROL_MIEMBRO_COMISION)
 				|| usuario.getRol().getValor().equals(ModeloRol.ROL_DIRECTOR_DEPARTAMENTO);
-		
+
 		String consulta = ""
 				+ " SELECT bepbol.*, "
 				+ "		(SELECT CASE "
@@ -159,12 +159,12 @@ public class ModeloBolsa {
 				+ (evaluador ? " INNER JOIN TBEP_EVALUADORES bepeva ON bepeva.BEPARE_CODNUM = bepare.CODNUM AND bepeva.FLGACTIVO = 'S'" : "")
 				+ "	WHERE"
 				+ (evaluador ? " bepeva.BEPUSU_CODNUM = ?" : " 1=1");
-		
+
 		dataTable.setColumn(ORDER_COLUMN_INDEX_ID_RESULTADOS, "bepbol.CODNUM", DataTableColumn.COLUMN_TYPE_NUMBER);
 		dataTable.setColumn(ORDER_COLUMN_INDEX_COD_AREA_RESULTADOS, "bepare.ID_AREA_CONOCIMIENTO");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_DESC_AREA_RESULTADOS, "bepare.DES_AREA_CONOCIMIENTO");
 		dataTable.setQuery(consulta);
-		
+
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmtCount = conexion.prepareStatement(dataTable.getQueryCount());
 				PreparedStatement stmt = conexion.prepareStatement(dataTable.getQuery())) {
@@ -176,23 +176,23 @@ public class ModeloBolsa {
 				stmtCount.setInt(indexParam++, usuario.getCodNum());
 			}
 			dataTable.setFiltersParams(stmt, stmtCount, indexParam);
-			
+
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
 					bolsas.add(new BolsaResultado(this.createFromResultSet(rs), rs.getBoolean("RESULTADOS_ACTUALES")));
 				}
 			}
-			
+
 			dataTable.setRecordsTotalFromQuery(stmtCount);
 			dataTable.setData(bolsas);
 		}
-		
+
 		return dataTable;
 	}
-	
+
 	/**
 	 * Devuelve todas las bolsas del sistema.
-	 * 
+	 *
 	 * @return bolsas
 	 * @throws SQLException en caso de error en la BD
 	 * @throws UVException  si bolsa no es existe
@@ -210,7 +210,7 @@ public class ModeloBolsa {
 		}
 		return bolsas;
 	}
-	
+
 	/** Devuelve las bolsas pendientes de baremación .
 	 * @return bolsas .
 	 * @throws SQLException en caso de error en la BD .
@@ -229,7 +229,7 @@ public class ModeloBolsa {
 		}
 		return bolsas;
 	}
-	
+
 	/**
 	 * Devuelve las areas del departamento de un área .
 	 * @param area .
@@ -250,25 +250,25 @@ public class ModeloBolsa {
 				+ "     SELECT bepade.BEPDEP_CODNUM FROM TBEP_AREAS_DEPARTAMENTOS bepade"
 				+ "     WHERE bepade.BEPARE_CODNUM = ?"
 				+ " )";
-		
+
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			int indexParam = 1;
 			stmt.setInt(indexParam++, solicitud.getCodNum());
 			stmt.setInt(indexParam++, area.getCodNum());
-			
+
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
 					bolsas.add(this.createFromResultSet(rs));
 				}
 			}
 		}
-		
+
 		return bolsas;
 	}
 
 	/**
 	 * Devuelve una bolsa por su id.
-	 * 
+	 *
 	 * @param codNum id de bolsa
 	 * @return bolsa
 	 * @throws SQLException en caso de error en la BD
@@ -293,7 +293,7 @@ public class ModeloBolsa {
 
 	/**
 	 * Devuelve un listado de bolsas por su id.
-	 * 
+	 *
 	 * @param ids codnum de la bolsa
 	 * @return listado de bolsas leidas
 	 * @throws UVException  .
@@ -308,7 +308,7 @@ public class ModeloBolsa {
 
 		return bolsas;
 	}
-	
+
 	/**
 	 * Devuleve la bolsa asociada a la bolsa.
 	 * @param area .
@@ -328,10 +328,10 @@ public class ModeloBolsa {
 			}
 		}
 	}
-	
+
 	/**
 	 * Devuelve el total de bolsas .
-	 * 
+	 *
 	 * @return num bolsas
 	 * @throws SQLException en caso de error en la BD
 	 */
@@ -351,7 +351,7 @@ public class ModeloBolsa {
 
 	/**
 	 * Devuelve el total de bolsas bloqueadas .
-	 * 
+	 *
 	 * @return num bolsas
 	 * @throws SQLException en caso de error en la BD
 	 */
@@ -370,7 +370,7 @@ public class ModeloBolsa {
 
 	/**
 	 * Devuelve el total de bolsas revisadas .
-	 * 
+	 *
 	 * @return num bolsas
 	 * @throws SQLException en caso de error en la BD
 	 */
@@ -389,7 +389,7 @@ public class ModeloBolsa {
 
 	/**
 	 * Devuelve el total de bolsas baremables .
-	 * 
+	 *
 	 * @return num bolsas
 	 * @throws SQLException en caso de error en la BD
 	 */
@@ -407,8 +407,29 @@ public class ModeloBolsa {
 	}
 
 	/**
+	 * Obtiene el estado de una bolsa a partir de su código numérico.
+	 *
+	 * @param codNum Código numérico de la bolsa.
+	 * @return El estado de la bolsa, o null si no se encuentra.
+	 */
+	public String getEstadoPorCodNum(int codNum) throws SQLException {
+		String estado = null;
+		String sql = "SELECT estado FROM TBEP_BOLSAS WHERE CODNUM = ?";
+		try (Connection connection = ConexionUvirtual.obtenerInstancia();
+				PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+			preparedStatement.setInt(1, codNum);
+			try (ResultSet resultSet = preparedStatement.executeQuery()) {
+				if (resultSet.next()) {
+					estado = resultSet.getString(ModeloArea.ESTADO);
+				}
+			}
+		}
+		return estado;
+	}
+
+	/**
 	 * Bloquea bolsas.
-	 * 
+	 *
 	 * @param bolsas  .
 	 * @param usuario .
 	 * @throws SQLException .
@@ -423,7 +444,7 @@ public class ModeloBolsa {
 
 	/**
 	 * Pone bolsas en revisión.
-	 * 
+	 *
 	 * @param bolsas  .
 	 * @param usuario .
 	 * @throws SQLException .
@@ -439,7 +460,7 @@ public class ModeloBolsa {
 
 	/**
 	 * Pone bolsa en baremación.
-	 * 
+	 *
 	 * @param bolsas  .
 	 * @param usuario .
 	 * @throws SQLException .
@@ -453,22 +474,118 @@ public class ModeloBolsa {
 
 	/**
 	 * Pone bolsa en alegaciones.
-	 * 
+	 *
 	 * @param bolsas  .
 	 * @param usuario .
+	 * @param fechaFinAlegaciones Fecha límite para presentar alegaciones
 	 * @throws SQLException .
 	 */
-	public void ponerBolsasEnAlegaciones(List<Bolsa> bolsas, UsuarioBolsaEmpleo usuario) throws SQLException {
-		/*
-		 * Evaluar méritos después del proceso de evaluación. Se resuelven las
-		 * alegaciones. Las comisiones no pueden acceder a evaluar méritos.
-		 */
+	public void ponerBolsasEnAlegaciones(List<Bolsa> bolsas, UsuarioBolsaEmpleo usuario, Date fechaFinAlegaciones) throws SQLException {
 		this.cambiarEstadoBolsas(bolsas, BOLSA_ESTADO_ALEGACIONES, usuario);
+		this.actualizarFechaFinAlegaciones(bolsas, fechaFinAlegaciones, usuario);
+	}
+
+	/**
+	 * Sobrecarga que acepta la fecha como String en formato `dd/MM/yyyy HH:mm` o `dd/MM/yyyy HH:mm:ss`.
+	 * Si faltan los segundos, añade `:59` antes de parsear.
+	 */
+	public void ponerBolsasEnAlegaciones(List<Bolsa> bolsas, UsuarioBolsaEmpleo usuario, String fechaFinAlegacionesStr) throws SQLException, UVException {
+		if (fechaFinAlegacionesStr == null || fechaFinAlegacionesStr.trim().isEmpty()) {
+			throw new UVException("Debe indicar fecha de fin de alegaciones");
+		}
+		try {
+			String fechaAjustada = fechaFinAlegacionesStr.trim();
+			if (fechaAjustada.matches("\\d{2}/\\d{2}/\\d{4} \\d{2}:\\d{2}")) {
+				fechaAjustada += ":59";
+			}
+			java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+			sdf.setLenient(false);
+			Date fechaFinAlegaciones = sdf.parse(fechaAjustada);
+			this.ponerBolsasEnAlegaciones(bolsas, usuario, fechaFinAlegaciones);
+		} catch (java.text.ParseException ex) {
+			throw new UVException("Formato de fecha inválido. Utilice dd/MM/yyyy HH:mm");
+		}
+	}
+
+	/**
+	 * Actualiza la fecha de fin de alegaciones de las bolsas indicadas.
+	 */
+	private void actualizarFechaFinAlegaciones(List<Bolsa> bolsas, Date fechaFinAlegaciones, UsuarioBolsaEmpleo usuario) throws SQLException {
+		String params = BolsaEmpleoUtils.consultaMultiplesParametros(bolsas.size());
+		String query = "UPDATE TBEP_BOLSAS SET FECHAFINALEGACIONES = ?, UID_USUARIO = ? WHERE CODNUM IN (" + params + ")";
+
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+				PreparedStatement stmt = conexion.prepareStatement(query)) {
+			int indexParam = 1;
+			if (fechaFinAlegaciones != null) {
+				stmt.setTimestamp(indexParam++, new java.sql.Timestamp(fechaFinAlegaciones.getTime()));
+			} else {
+				stmt.setNull(indexParam++, Types.TIMESTAMP);
+			}
+			stmt.setString(indexParam++, usuario.getCodCuenta());
+			for (Bolsa bolsa : bolsas) {
+				stmt.setInt(indexParam++, bolsa.getCodNum());
+			}
+			stmt.executeUpdate();
+		}
+	}
+
+	/**
+	 * Devuelve las bolsas en estado ALEGACIONES cuya fecha de fin de alegaciones ha expirado.
+	 * @return bolsas con alegaciones expiradas
+	 * @throws SQLException en caso de error en la BD
+	 * @throws UVException si no se puede leer la bolsa
+	 */
+	public List<Bolsa> getBolsasAlegacionesExpiradas() throws SQLException, UVException {
+		List<Bolsa> bolsas = new ArrayList<>();
+		String consulta = "SELECT bepbol.* FROM TBEP_BOLSAS bepbol"
+				+ " WHERE bepbol.ESTADO = ?"
+				+ " AND bepbol.FECHAFINALEGACIONES IS NOT NULL"
+				+ " AND bepbol.FECHAFINALEGACIONES <= SYSDATE";
+
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+				PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+			stmt.setString(1, BOLSA_ESTADO_ALEGACIONES);
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					bolsas.add(this.createFromResultSet(rs));
+				}
+			}
+		}
+		return bolsas;
+	}
+
+	/**
+	 * Bloquea una bolsa desde el estado ALEGACIONES (tarea programada).
+	 * Cambia el estado a BLOQUEADA y establece la fecha de bloqueo.
+	 *
+	 * @param bolsa Bolsa a bloquear
+	 * @throws SQLException en caso de error en BD
+	 * @throws UVException  si la bolsa no está en estado ALEGACIONES
+	 */
+	public void bloquearBolsaDesdeAlegaciones(Bolsa bolsa) throws SQLException, UVException {
+		if (bolsa == null) {
+			throw new UVException(MENSAJE_ERROR_BOLSA_NULL);
+		}
+		if (!BOLSA_ESTADO_ALEGACIONES.equals(bolsa.getEstado())) {
+			throw new UVException("La bolsa no está en estado ALEGACIONES");
+		}
+
+		String query = "UPDATE TBEP_BOLSAS SET ESTADO = ?, FECHABLOQUEO = ?, FECHADEBLOQUEO = NULL, UID_USUARIO = ? WHERE CODNUM = ?";
+		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+				PreparedStatement stmt = conexion.prepareStatement(query)) {
+			int indexParam = 1;
+			stmt.setString(indexParam++, BOLSA_ESTADO_BLOQUEADA);
+			stmt.setDate(indexParam++, new java.sql.Date(BolsaEmpleoUtils.getCurrentDateTime().getTime()));
+			stmt.setString(indexParam++, "TAREA_PROGRAMADA");
+			stmt.setInt(indexParam++, bolsa.getCodNum());
+			stmt.executeUpdate();
+		}
 	}
 
 	/**
 	 * Desbloquea bolsas.
-	 * 
+	 *
 	 * @param bolsas  .
 	 * @param usuario .
 	 * @throws SQLException .
@@ -480,8 +597,8 @@ public class ModeloBolsa {
 		 */
 		this.cambiarEstadoBolsas(bolsas, BOLSA_ESTADO_DESBLOQUEADA, usuario);
 	}
-	
-	
+
+
 	/** Establece las bolsas como pendientes de baremación .
 	 * @param bolsas .
 	 * @param usuarioUpdate .
@@ -497,20 +614,20 @@ public class ModeloBolsa {
 	/** Establece la bolsa como pendiente de baremación .
 	 * @param bolsa .
 	 * @param usuarioUpdate .
-	 * @throws UVException . 
+	 * @throws UVException .
 	 * @throws SQLException .
 	 */
 	public void ponerBolsaComoPendienteBaremacion(Bolsa bolsa, UsuarioBolsaEmpleo usuarioUpdate) throws SQLException, UVException {
 		if (!bolsa.getEstado().equals(BOLSA_ESTADO_BLOQUEADA)) {
 			throw new UVException(MENSAJE_ERROR_BAREMAR_BOLSA_NO_BLOQUEADA);
 		}
-		
+
 		if (!bolsa.getBaremable()) {
 			throw new UVException(MENSAJE_ERROR_BAREMAR_BOLSA_NO_BAREMABLE);
 		}
-		
+
 		String query = "UPDATE TBEP_BOLSAS SET FLGPENBAREMACION = 'S', UID_USUARIO = ? WHERE CODNUM = ?";
-		
+
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
 				PreparedStatement stmt = conexion.prepareStatement(query)) {
 			int indexParam = 1;
@@ -519,7 +636,7 @@ public class ModeloBolsa {
 			stmt.executeUpdate();
 		}
 	}
-	
+
 	/** Baremar bolsa .
 	 * @param bolsa .
 	 * @param usuarioUpdate .
@@ -531,26 +648,26 @@ public class ModeloBolsa {
 		if (bolsa == null) {
 			throw new UVException(MENSAJE_ERROR_BOLSA_NULL);
 		}
-		
+
 		if (!bolsa.getEstado().equals(BOLSA_ESTADO_BLOQUEADA)) {
 			throw new UVException(MENSAJE_ERROR_BAREMAR_BOLSA_NO_BLOQUEADA);
 		}
-		
+
 		if (!bolsa.getBaremable()) {
 			throw new UVException(MENSAJE_ERROR_BAREMAR_BOLSA_NO_BAREMABLE);
 		}
-		
+
 		String usuarioUp = usuarioUpdate != null ? usuarioUpdate.getCodCuenta() : "TAREA_PROGRAMADA";
 		String query = " UPDATE TBEP_BOLSAS SET FLGPENBAREMACION = 'N', UID_USUARIO = ?, ";
-		
+
 		if (definitiva) {
 			query += " FECHABAREMACIONFIN = ? ";
 		} else {
 			query += " FECHABAREMACION = ?, FECHABAREMACIONFIN = NULL ";
 		}
-		
+
 		query += " WHERE CODNUM = ? ";
-		
+
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(query)) {
 			int indexParam = 1;
 			stmt.setString(indexParam++, usuarioUp);
@@ -563,7 +680,7 @@ public class ModeloBolsa {
 	/**
 	 * Indica si la bolsa está marcada para contratación.
 	 * @param bolsa .
-	 * @param usuario . 
+	 * @param usuario .
 	 * @throws UVException .
 	 * @throws SQLException .
 	 */
@@ -571,21 +688,21 @@ public class ModeloBolsa {
 		if (bolsa == null) {
 			throw new UVException(MENSAJE_ERROR_BOLSA_NULL);
 		}
-		
+
 		if (!bolsa.getEstado().equals(BOLSA_ESTADO_BLOQUEADA)) {
 			throw new UVException(MENSAJE_ERROR_BAREMAR_BOLSA_NO_BLOQUEADA);
 		}
-		
+
 		if (!bolsa.getBaremable()) {
 			throw new UVException(MENSAJE_ERROR_BAREMAR_BOLSA_NO_BAREMABLE);
 		}
-		
+
 		if (bolsa.getFechaBaremacionDefinitiva() == null) {
 			throw new UVException("La bolsa no tiene fecha de baremación definitiva");
 		}
-		
+
 		String query = "UPDATE TBEP_BOLSAS SET FECHAHABCONTRATOS = ?, UID_USUARIO = ? WHERE CODNUM = ?";
-		
+
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(query)) {
 			int indexParam = 1;
 			stmt.setDate(indexParam++, new java.sql.Date(BolsaEmpleoUtils.getCurrentDateTime().getTime()));
@@ -594,10 +711,10 @@ public class ModeloBolsa {
 			stmt.executeUpdate();
 		}
 	}
-	
+
 	/**
 	 * Establece la area asociada a la bolsa como baremable.
-	 * 
+	 *
 	 * @param bolsas  .
 	 * @param usuario .
 	 * @throws SQLException .
@@ -608,7 +725,7 @@ public class ModeloBolsa {
 
 	/**
 	 * Establece la area asociada a la bolsa como baremable.
-	 * 
+	 *
 	 * @param bolsas  .
 	 * @param usuario .
 	 * @throws SQLException .
@@ -670,7 +787,7 @@ public class ModeloBolsa {
 
 	/**
 	 * Comprueba si hay bolsas baremables.
-	 * 
+	 *
 	 * @return .
 	 * @throws SQLException .
 	 */
@@ -682,7 +799,7 @@ public class ModeloBolsa {
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			try (ResultSet rs = stmt.executeQuery()) {
 				if (rs.next() && rs.getInt("numero_bolsas_abiertas") > 0) {
-					return true;					
+					return true;
 				}
 			}
 		}
@@ -692,7 +809,7 @@ public class ModeloBolsa {
 
 	/**
 	 * Crea una una bolsa a partir de un ResultSet.
-	 * 
+	 *
 	 * @param rs .
 	 * @return .
 	 * @throws UVException  .
@@ -710,10 +827,11 @@ public class ModeloBolsa {
 		bolsa.setFechaBaremacion(rs.getDate("FECHABAREMACION"));
 		bolsa.setFechaBaremacionDefinitiva(rs.getDate("FECHABAREMACIONFIN"));
 		bolsa.setFechaHabilitarContratos(rs.getDate("FECHAHABCONTRATOS"));
+		bolsa.setFechaFinAlegaciones(rs.getTimestamp("FECHAFINALEGACIONES"));
 
 		return bolsa;
 	}
-	
+
 	/**
 	 * Listado de bolsas para csv.
 	 * @param separator .
@@ -727,12 +845,12 @@ public class ModeloBolsa {
 				+ "		bepbol.FECHABLOQUEO, bepbol.FECHADEBLOQUEO, bepbol.FECHABAREMACION, bepbol.FECHABAREMACIONFIN, bepbol.FECHAHABCONTRATOS "
 				+ " FROM TBEP_BOLSAS bepbol"
 				+ "	LEFT JOIN TBEP_AREAS bepare ON bepare.CODNUM = bepbol.BEPARE_CODNUM";
-		
+
 		List<String[]> rows = new ArrayList<>();
-		
-		rows.add(new String[] {"COD.AREA", "AREA", "ESTADO", "BAREMABLE", "FECHA BLOQUEO", "FECHA DESBLOQUEO", "FECHA BAREMACION PROVISIONAL", 
+
+		rows.add(new String[] {"COD.AREA", "AREA", "ESTADO", "BAREMABLE", "FECHA BLOQUEO", "FECHA DESBLOQUEO", "FECHA BAREMACION PROVISIONAL",
 				"FECHA BAREMACION DEFINITIVA", "FECHA HABILITAR CONTRATACION"});
-		
+
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia(); PreparedStatement stmt = conexion.prepareStatement(consulta)) {
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
@@ -746,12 +864,12 @@ public class ModeloBolsa {
 					String fechaBaremacionDefinitiva = BolsaEmpleoUtils.date2csv((Date) rs.getTimestamp("FECHABAREMACIONFIN"), separator);
 					String fechaContratacion = BolsaEmpleoUtils.date2csv((Date) rs.getTimestamp("FECHAHABCONTRATOS"), separator);
 
-					rows.add(new String[] {codigo, area, estado, baremable, fechaBloqueo, fechaDesBloqueo, fechaBaremacion, fechaBaremacionDefinitiva, 
+					rows.add(new String[] {codigo, area, estado, baremable, fechaBloqueo, fechaDesBloqueo, fechaBaremacion, fechaBaremacionDefinitiva,
 							fechaContratacion});
 				}
 			}
 		}
-		
+
 		return rows;
 	}
 }

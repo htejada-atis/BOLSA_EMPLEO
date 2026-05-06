@@ -164,7 +164,7 @@ public class TestBEPModeloBolsa {
 		bolsas.remove(1);
 		bolsas.remove(2);
 		Bolsa bolsaCont = bolsas.get(0);
-		modelo.ponerBolsasEnAlegaciones(bolsas, UtilsTestBolsaEmpleo.getUsuario("personal1"));
+		modelo.ponerBolsasEnAlegaciones(bolsas, UtilsTestBolsaEmpleo.getUsuario("personal1"), new java.util.Date());
 
 		Boolean eje = false;
 

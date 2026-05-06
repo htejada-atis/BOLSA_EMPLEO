@@ -22,6 +22,7 @@ import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Afinidad;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Alegacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Area;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaSolicitud;
@@ -39,6 +40,7 @@ import es.ujaen.uvirtual.modulo.bolsaempleo.beans.TitulacionUsuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.informes.GenerarSolicitudPDF;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloAfinidad;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloAlegaciones;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloArea;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBaremacionApartados;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBolsa;
@@ -63,13 +65,13 @@ import es.ujaen.uvirtual.utilidades.UVException;
  * Gestión de los usuarios CANDIDATOS de UVIRTUAL.
  */
 @WebServlet(
-	name = "informacionadministrativa.bolsaempleo.configuracion.candidatos", 
-	description = "Gestión de usuarios candidatos", 
+	name = "informacionadministrativa.bolsaempleo.configuracion.candidatos",
+	description = "Gestión de usuarios candidatos",
 	urlPatterns = {
 		"/srv/es/informacionadministrativa/bolsaempleo/configuracion/candidatos",
 		"/srv/en/informacionadministrativa/bolsaempleo/configuracion/candidatos",
 		"/srv/es/ajax/informacionadministrativa/bolsaempleo/configuracion/candidatos",
-		"/srv/en/ajax/informacionadministrativa/bolsaempleo/configuracion/candidatos" 
+		"/srv/en/ajax/informacionadministrativa/bolsaempleo/configuracion/candidatos"
 	})
 public class ControladorUsuarioCandidato extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -79,6 +81,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 	// parámetros
 	public static final String PARAM_ACCION = "a";
 	public static final String PARAM_ACCION_USUARIO = "aa";
+	public static final String PARAM_BOLSA = "bolsa";
 	public static final String PARAM_AREAS_SELECCIONADAS = "usuariosselected";
 	public static final String PARAM_BOLSAS = "bolsas";
 	public static final String PARAM_CANDIDATO = "candidato";
@@ -172,6 +175,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 	public static final String MENSAJE_EXITO_SOLICITUD_CONFIRMADA = "La solicitud ha sido confirmada correctamente";
 	public static final String MENSAJE_EXITO_USUARIO_MODIFICADO_CORRECTAMENTE = "Usuario/s modificado/s correctamente";
 	public static final String MENSAJE_EXITO_EXCLUSION_SOLICITUD = "Solicitud excluida correctamente";
+	public static final String MENSAJE_EXITO_REABRIR_ALEGACION = "Alegacion reabierta para el área de: %s";
 	public static final String MENSAJE_EXITO_INCLUSION_SOLICITUD = "Solicitud incluida correctamente";
 	public static final String MENSAJE_EXITO_CANDIDATOS_SIN_SOLICITUDES_DADOS_DE_BAJA = "Candidatos sin solicitudes dados de baja";
 	public static final String MENSAJE_EXITO_EDITAR_AFINIDAD = "Afinidad actualizada correctamente";
@@ -198,7 +202,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 
 	/**
 	 * Peticion GET.
-	 * 
+	 *
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
 	 *      response)
 	 */
@@ -296,7 +300,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 
 	/**
 	 * Redireccion de do post.
-	 * 
+	 *
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
 	 *      response)
 	 */
@@ -516,7 +520,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 
 	/**
 	 * Confirmar la solicitud del candidato .
-	 * 
+	 *
 	 * @param bean     .
 	 * @param datos    .
 	 * @param request  .
@@ -746,7 +750,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 
 	/**
 	 * edita un candidato .
-	 * 
+	 *
 	 * @param datos    .
 	 * @param request  .
 	 * @param response .
@@ -787,7 +791,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 	private void excluirUsuarioArea(VistaCandidatos bean, UVDatos datos, HttpServletRequest request,
 			HttpServletResponse response, boolean excluir) throws SQLException, UVException, IOException {
 		ModeloUsuarioBolsaEmpleo modeloUsuario = ModeloUsuarioBolsaEmpleo.obtenerInstancia();
-		
+
 		int[] idsAreas = (new Gson()).fromJson(request.getParameter(PARAM_AREAS_SELECCIONADAS), new TypeToken<int[]>() { }.getType());
 		List<Area> areas = ModeloArea.obtenerInstancia().getAreasByIds(idsAreas);
 		bean.setListaAreas(areas);
@@ -893,12 +897,17 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 	private void resumenSolicitudCandidato(VistaCandidatos bean) throws SQLException, UVException {
 		List<BolsaSolicitud> listaBolsas = ModeloSolicitud.obtenerInstancia().getBolsasSolicitudMeritos(bean.getSolicitud());
 		bean.setListaBolsasSolicitud(listaBolsas);
+		ModeloAlegaciones modelo = ModeloAlegaciones.obtenerInstancia();
+		for (BolsaSolicitud bolsa: bean.getListaBolsasSolicitud()) {
+			Alegacion alegacion = modelo.getAlegacion(bolsa, bean.getCandidato(), bean.getSolicitud().getConvocatoria());
+			bolsa.setAlegacion(alegacion);
+		}
 		bean.setVista(JSP_RESUMEN_SOLICITUD);
 	}
 
 	/**
 	 * Lista de acreditaciones .
-	 * 
+	 *
 	 * @param bean     .
 	 * @param datos    .
 	 * @param request  .
@@ -937,7 +946,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 
 	/**
 	 * AJAX para devolver listado de usuarios con rol CANDIDATO.
-	 * 
+	 *
 	 * @param bean     .
 	 * @param datos    .
 	 * @param request  .
@@ -975,7 +984,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 
 	/**
 	 * AJAX para devolver listado de areas excluidas de un usuario.
-	 * 
+	 *
 	 * @param bean     .
 	 * @param datos    .
 	 * @param request  .
@@ -1014,7 +1023,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 
 	/**
 	 * AJAX para devolver listado de areas no excluidas de un usuario(bolsas).
-	 * 
+	 *
 	 * @param bean     .
 	 * @param datos    .
 	 * @param request  .
@@ -1052,7 +1061,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 
 	/**
 	 * Lista de méritos del candidato .
-	 * 
+	 *
 	 * @param bean     .
 	 * @param datos    .
 	 * @param request  .
@@ -1091,7 +1100,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 
 	/**
 	 * Lista de solicitudes .
-	 * 
+	 *
 	 * @param bean     .
 	 * @param datos    .
 	 * @param request  .
@@ -1130,7 +1139,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 
 	/**
 	 * Lista de titulaciones .
-	 * 
+	 *
 	 * @param bean     .
 	 * @param datos    .
 	 * @param request  .
@@ -1347,7 +1356,7 @@ public class ControladorUsuarioCandidato extends HttpServlet {
 
 	/**
 	 * Devuelve una url de. detalle de un candidato.
-	 * 
+	 *
 	 * @param codnum .
 	 * @return .
 	 */

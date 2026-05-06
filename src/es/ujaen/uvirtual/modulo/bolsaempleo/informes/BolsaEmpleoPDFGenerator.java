@@ -28,6 +28,7 @@ public class BolsaEmpleoPDFGenerator {
 	protected static final int PDF_TABLE_BORDER_WIDTH = 1;
 	protected static final int PDF_TABLE_COLUMNS_2 = 2;
 	protected static final int PDF_TABLE_COLUMNS_3 = 3;
+	protected static final int PDF_TABLE_COLUMNS_4 = 4;
 	protected static final int PDF_TABLE_COLUMNS_5 = 5;
 	protected static final int PDF_TABLE_COLUMNS_6 = 6;
 	protected static final int PDF_TABLE_PADDING = 5;
@@ -75,6 +76,8 @@ public class BolsaEmpleoPDFGenerator {
 	protected static Font fontTitle2 = FontFactory.getFont(FontFactory.HELVETICA, SIZE_40, Font.BOLDITALIC);
 	protected static Font fontH8 = new Font(Font.HELVETICA, SIZE_8);
 	protected static Font fontH10 = new Font(Font.HELVETICA, SIZE_10);
+	protected static Font fontH10Bold = new Font(Font.BOLD, SIZE_10);
+	protected static Font fontH12Bold = new Font(Font.BOLD, SIZE_12);
 	
 	// mensajes
 	public static final String MENSAJE_ERROR_GENERANDO_PDF = "Error generando pdf, consulte con los administradores";

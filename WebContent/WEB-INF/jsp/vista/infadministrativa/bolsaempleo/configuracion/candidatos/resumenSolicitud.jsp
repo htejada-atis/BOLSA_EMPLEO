@@ -1,15 +1,19 @@
-<%@page import="es.ujaen.uvirtual.utilidades.Formateador"%>
-<%@page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.TitulacionUsuario"%>
-<%@ page trimDirectiveWhitespaces="true" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" trimDirectiveWhitespaces="true" %>
 <%@ page import="es.ujaen.uvirtual.beans.UVDatos" %>
+<%@ page import="es.ujaen.uvirtual.utilidades.Formateador"%>
+<%@ page import="es.ujaen.uvirtual.utilidades.EscapaHTML" %>
+<%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorAlegaciones"%>
+<%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaSolicitud"%>
+<%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBolsa"%>
+<%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.TitulacionUsuario"%>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorDescargaFicheros"%>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.configuracion.ControladorUsuarioCandidato"%>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.controlador.candidato.ControladorMisSolicitudes" %>
+<%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.Alegacion" %>
+<%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloAlegaciones" %>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloConvocatoria" %>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloSolicitud" %>
 <%@ page import="es.ujaen.uvirtual.modulo.bolsaempleo.vistas.VistaCandidatos" %>
-<%@ page import="es.ujaen.uvirtual.utilidades.EscapaHTML" %>
-<%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaSolicitud" %>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitudTable" %>
 <%@	page import="es.ujaen.uvirtual.modulo.bolsaempleo.beans.MeritoSolicitudValoracion" %>
 
@@ -19,63 +23,71 @@ VistaCandidatos bean = (VistaCandidatos) uvdatos.getVistas().get(VistaCandidatos
 %>
 
 <div class="bolsa-empleo">
-	
+
 	<jsp:include page="/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/mensajes.jsp" />
-	
+
 	<h2>Resumen solicitud - <%= bean.getCandidato().getCodCuenta() %></h2>
-	
+
 	<h4>Convocatoria: <%= bean.getSolicitud().getConvocatoria().getDescripcion() %>&nbsp;(<%= bean.getSolicitud().getConvocatoria().getEstado() %>)</h4>
 	<h4>Nombre: <%= bean.getCandidato().getNombre() + " " + bean.getCandidato().getPrimerApellido() + " " + bean.getCandidato().getSegundoApellido() %></h4>
-	<h4>N∫ de documento: <%= bean.getCandidato().getPrsNif() %></h4>
+	<h4>N¬∫ de documento: <%= bean.getCandidato().getPrsNif() %></h4>
 	<h4>Estado solicitud: <%= bean.getSolicitud().getEstado() %></h4>
-	
+
 	<% if (bean.getSolicitud().getExcluido()) { %>
 		<h4>EXCLUIDA: <%= Formateador.formatoFecha(bean.getSolicitud().getFechaExclusion(), Formateador.FORMATO_FECHA_DDMMYYYY_HHMMSS) %> - <%= bean.getSolicitud().getRazonExclusion() %></h4>
 	<% } %>
-	
+
 	<div class="row">
-		<button class="link-btn" id="candidato_volver" style="float:left;max-height: 25px">
-	    	 Volver
-	    </button>
+		<button class="link-btn" id="candidato_volver" style="float:left;max-height: 25px">Volver</button>
+
 		<div class="col">
-	
-	<%	if (bean.getSolicitud().getConvocatoria().getEstado().equals(ModeloConvocatoria.CONVOCATORIA_ESTADO_ABIERTA) &&
-			bean.getSolicitud().getEstado().equals(ModeloSolicitud.SOLICITUD_ESTADO_CERRADA)) { %>
-		    <button class="link-btn" id="reabrir_solicitud" style="float:right; margin-left: 6px;">
-		    	 Reabrir solicitud
-		    </button>
-	<%	} else if (bean.getSolicitud().getEstado().equals(ModeloSolicitud.SOLICITUD_ESTADO_ABIERTA)){ %>
-			<button class="link-btn" id="cerrar_solicitud" style="float:right; margin-left: 6px;">
-		    	 Cerrar solicitud
-		    </button>
-	<%	} %>
-	
-	<%  if (bean.getSolicitud().getExcluido()) { %>
-			<button class="link-btn" id="incluir_solicitud" style="float:right; margin-left: 6px;">
-		    	 Incluir solicitud
-		    </button>
-	<%  } else { %>
-			<button class="link-btn" id="excluir_solicitud" style="float:right; margin-left: 6px;">
-		    	 Excluir solicitud
-		    </button>
-	<%	} %>
-		
-	<%	if (bean.getSolicitud().getEstado().equals(ModeloSolicitud.SOLICITUD_ESTADO_CERRADA)) { %>
-			<button class="link-btn icon icon-download" id="descargar_solicitud" style="float:right; padding: 1.5px 6px;">Descargar solicitud</button>
-	<%	} %>
+			<%	if (bean.getSolicitud().getConvocatoria().getEstado().equals(ModeloConvocatoria.CONVOCATORIA_ESTADO_ABIERTA) && bean.getSolicitud().getEstado().equals(ModeloSolicitud.SOLICITUD_ESTADO_CERRADA)) { %>
+			    <button class="link-btn" id="reabrir_solicitud" style="float:right; margin-left: 6px;">
+			    	 Reabrir solicitud
+			    </button>
+			<%	} else if (bean.getSolicitud().getEstado().equals(ModeloSolicitud.SOLICITUD_ESTADO_ABIERTA)){ %>
+				<button class="link-btn" id="cerrar_solicitud" style="float:right; margin-left: 6px;">
+			    	 Cerrar solicitud
+			    </button>
+			<%	} %>
+
+			<%  if (bean.getSolicitud().getExcluido()) { %>
+				<button class="link-btn" id="incluir_solicitud" style="float:right; margin-left: 6px;">
+			    	 Incluir solicitud
+			    </button>
+			<%  } else { %>
+				<button class="link-btn" id="excluir_solicitud" style="float:right; margin-left: 6px;">
+			    	 Excluir solicitud
+			    </button>
+			<%	} %>
+
+			<%	if (bean.getSolicitud().getEstado().equals(ModeloSolicitud.SOLICITUD_ESTADO_CERRADA)) { %>
+				<button class="link-btn icon icon-download" id="descargar_solicitud" style="float:right; padding: 1.5px 6px;">Descargar solicitud</button>
+			<%	} %>
 		</div>
 	</div>
-	
+
+	<hr/>
+
+	<h4>√Åreas en la solicitud</h4>
+
 <%	for (BolsaSolicitud bolsa: bean.getListaBolsasSolicitud()) { %>
-		
-		<h4>¡rea - <%= bolsa.getArea().getDescripcion() %></h4>
+		<div style="display:flex;justify-content: space-between;">
+			<h5>√Årea - <%= bolsa.getArea().getDescripcion() %></h5>
+			<% if (bean.getSolicitud().getEstado().equals(ModeloSolicitud.SOLICITUD_ESTADO_CERRADA) && bolsa.getAlegacion() != null) { %>
+				<button class="link-btn ver-aleagcion-btn" data-url="<%= request.getContextPath() %>/srv/es/informacionadministrativa/bolsaempleo/alegaciones?a=<%= ControladorAlegaciones.ACCION_VER_DETALLE_ALEGACION %>&<%= ControladorAlegaciones.PARAM_ALEGACIONES_ID %>=<%= bolsa.getAlegacion().getCodNum() %>">
+					Ver alegaci√≥n
+				</button>
+			<% } %>				
+		</div>
+
 		<table class="bluetable bolsaempleo table-solicitud">
 			<tr>
 				<th scope="col" style="width:8%">Id</th>
-				<th scope="col"	style="width:15%">Cod. mÈrito</th>
-				<th scope="col"	style="width:30">MÈrito</th>
+				<th scope="col"	style="width:15%">Cod. m√©rito</th>
+				<th scope="col"	style="width:30">M√©rito</th>
 				<th scope="col"	style="width:10%">Valor</th>
-				<th scope="col"	style="width:12%">DescripciÛn</th>
+				<th scope="col" style="width:12%">Descripci√≥n</th>
 				<th scope="col" style="width:15%">Afinidad</th>
 				<th scope="col" style="width:10%"></th>
 			</tr>
@@ -106,12 +118,12 @@ VistaCandidatos bean = (VistaCandidatos) uvdatos.getVistas().get(VistaCandidatos
 							</td>
 							<td>
 								<button class="btn only-icon icon-search detalle-merito"
-										title="Detalle mÈrito"
+										title="Detalle m√©rito"
 										type="button"
 										data-merito="<%= merito.getMeritoSolicitud().getCodNum() %>"></button>
-										
+
 								<button class="btn only-icon icon-download fichero-merito"
-										title="Descargar fichero del mÈrito"
+										title="Descargar fichero del m√©rito"
 										type="button"
 										data-merito="<%= merito.getMerito().getCodNum() %>"></button>
 							</td>
@@ -123,19 +135,19 @@ VistaCandidatos bean = (VistaCandidatos) uvdatos.getVistas().get(VistaCandidatos
 			</tbody>
 		</table>
 <%	} %>
-	
+
 </div>
 
 <script>
 
 	$(document).ready(function() {
-		
+
 		$('.table-solicitud').on('click', '.fichero-merito', function() {
 			var idMerito = $(this).data('merito');
 			window.open("<%= ControladorDescargaFicheros.URL_DESCARGA_FICHEROS %>"
 				+ "?a=<%= ControladorDescargaFicheros.ACCION_DESCARGAR_MERITO_PERSONAL %>&<%= ControladorDescargaFicheros.PARAM_MERITO %>=" + idMerito);
 		});
-		
+
 		$('.table-solicitud').on('click', '.detalle-merito', function() {
 			var idMerito = $(this).data('merito');
 			var params = {
@@ -146,17 +158,16 @@ VistaCandidatos bean = (VistaCandidatos) uvdatos.getVistas().get(VistaCandidatos
    			};
     		Atis.sendForm("<%= request.getRequestURI() %>", params);
 		});
-		
+
 	<%	if (bean.getSolicitud().getEstado().equals(ModeloSolicitud.SOLICITUD_ESTADO_CERRADA)) { %>
-		
 			document.getElementById("descargar_solicitud").addEventListener("click", function() {
-				window.open("<%= ControladorDescargaFicheros.URL_DESCARGA_FICHEROS %>"
-			        	+ "?a=<%= ControladorDescargaFicheros.ACCION_DESCARGAR_SOLICITUD_PERSONAL + "&" + ControladorDescargaFicheros.PARAM_SOLICITUD + "=" + bean.getSolicitud().getCodNum() %>");
+				window.open("<%= ControladorDescargaFicheros.URL_DESCARGA_FICHEROS %>" +
+					"?a=<%= ControladorDescargaFicheros.ACCION_DESCARGAR_SOLICITUD_PERSONAL %>&" +
+					"<%= ControladorDescargaFicheros.PARAM_SOLICITUD %>=<%= bean.getSolicitud().getCodNum() %>");
 			});
-		
 	<%	} else { %>
 			document.getElementById("cerrar_solicitud").addEventListener("click", function() {
-				Atis.confirmDialog("Confirmar solicitud", "øDesea confirmar la solicitud del candidato?<br/>(Se generar· de nuevo el pdf con el resumen de la solicitud)", {
+				Atis.confirmDialog("Confirmar solicitud", "¬øDesea confirmar la solicitud del candidato?<br/>(Se generar√° de nuevo el pdf con el resumen de la solicitud)", {
 			    	Si: function() {
 			    		var params = {
 	            				'<%= ControladorUsuarioCandidato.PARAM_ACCION %>': '<%= ControladorUsuarioCandidato.ACCION_CONFIRMAR_SOLICITUD %>',
@@ -172,18 +183,18 @@ VistaCandidatos bean = (VistaCandidatos) uvdatos.getVistas().get(VistaCandidatos
 			    });
 			});
 	<%	} %>
-		
+
 		document.getElementById("candidato_volver").addEventListener("click", function() {
 			Atis.sendForm("<%= request.getRequestURI() %>", {
 				'<%=ControladorUsuarioCandidato.PARAM_ACCION%>': '<%=ControladorUsuarioCandidato.ACCION_VOLVER_CANDIDATO%>',
 				'<%=ControladorUsuarioCandidato.PARAM_CANDIDATO%>': '<%=bean.getCandidato().getCodNum()%>'
 			});
 		});
-		
+
 	<%	if (bean.getSolicitud().getConvocatoria().getEstado().equals(ModeloConvocatoria.CONVOCATORIA_ESTADO_ABIERTA) &&
 			bean.getSolicitud().getEstado().equals(ModeloSolicitud.SOLICITUD_ESTADO_CERRADA)) { %>
 			document.getElementById("reabrir_solicitud").addEventListener("click", function() {
-				Atis.confirmDialog("Reabrir solicitud", "øDesea reabrir la solicitud del candidato?", {
+				Atis.confirmDialog("Reabrir solicitud", "¬øDesea reabrir la solicitud del candidato?", {
 			    	Si: function() {
 			    		Atis.sendForm("<%= request.getRequestURI() %>", {
 							'<%=ControladorUsuarioCandidato.PARAM_ACCION%>': '<%=ControladorUsuarioCandidato.ACCION_REABRIR_SOLICITUD%>',
@@ -198,11 +209,11 @@ VistaCandidatos bean = (VistaCandidatos) uvdatos.getVistas().get(VistaCandidatos
 			    });
 			});
 	<%	} %>
-	
-	<%  if (bean.getSolicitud().getExcluido()) { %>	
+
+	<%  if (bean.getSolicitud().getExcluido()) { %>
 			document.getElementById("incluir_solicitud").addEventListener("click", function() {
-				var message = "<h3>øDesea incluir la solicitud del candidato de esta convocatoria?</h3>";
-				
+				var message = "<h3>¬øDesea incluir la solicitud del candidato de esta convocatoria?</h3>";
+
 				Atis.confirmDialog("Incluir solicitud", message, {
 			    	Si: function() {
 		    			Atis.sendForm("<%= request.getRequestURI() %>", {
@@ -217,20 +228,20 @@ VistaCandidatos bean = (VistaCandidatos) uvdatos.getVistas().get(VistaCandidatos
 			        }
 			    });
 			});
-	
+
 	<%  } else { %>
 			document.getElementById("excluir_solicitud").addEventListener("click", function() {
-				var message = 
-					"<h3>øDesea excluir la solicitud del candidato de esta convocatoria?</h3>" +
-					"<p>Esta solicitud no entrar· en el c·lculo.</p><br/>" +
+				var message =
+					"<h3>¬øDesea excluir la solicitud del candidato de esta convocatoria?</h3>" +
+					"<p>Esta solicitud no entrar√° en el c√°lculo.</p><br/>" +
 					"<div class='form-group-dialog'>" +
-					"	<label for='razon_exclusion'>RazÛn de exclusiÛn: </label>" +
+					"	<label for='razon_exclusion'>Raz√≥n de exclusi√≥n: </label>" +
 					"	<textarea id='razon_exclusion' name='razonexclusion' rows='2' required='required'></textarea>" +
 					"</div>";
-				
+
 				Atis.confirmDialog("Excluir solicitud", message, {
 			    	Si: function() {
-			    		var inputRazon = this.querySelector('#razon_exclusion');			    		
+			    		var inputRazon = this.querySelector('#razon_exclusion');
 			    		if (inputRazon.value != '') {
 				    		Atis.sendForm("<%= request.getRequestURI() %>", {
 								'<%=ControladorUsuarioCandidato.PARAM_ACCION%>': '<%=ControladorUsuarioCandidato.ACCION_EXCLUIR_SOLICITUD%>',
@@ -240,7 +251,7 @@ VistaCandidatos bean = (VistaCandidatos) uvdatos.getVistas().get(VistaCandidatos
 							});
 				          	$(this).dialog("close");
 			    		} else {
-			    			inputRazon.setCustomValidity("La razÛn de exclusiÛn no puede estar vacÌa");
+			    			inputRazon.setCustomValidity("La raz√≥n de exclusi√≥n no puede estar vac√≠a");
 			    			inputRazon.reportValidity();
 			    		}
 			        },
@@ -250,7 +261,15 @@ VistaCandidatos bean = (VistaCandidatos) uvdatos.getVistas().get(VistaCandidatos
 			    });
 			});
 	<%	} %>
-	
+
+		$(document).on("click", ".ver-aleagcion-btn", function(event) {
+			event.preventDefault();
+			var url = $(this).data("url");
+			if (url) {
+				window.location.href = url;
+			}
+		});
+
 	});
 
 </script>

@@ -3,6 +3,7 @@ package es.ujaen.uvirtual.modulo.bolsaempleo.controlador;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.logging.Logger;
 import java.util.List;
 import java.util.logging.Level;
@@ -23,6 +24,7 @@ import es.ujaen.uvirtual.beans.Usuario;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Solicitud;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.UsuarioBolsaEmpleo;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloConvocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloParametrosConfiguracion;
@@ -36,14 +38,17 @@ import es.ujaen.uvirtual.utilidades.EscapaHTML;
 import es.ujaen.uvirtual.utilidades.Formateador;
 import es.ujaen.uvirtual.utilidades.UVException;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+
 /**
  * Listado de bolsas y su estado.
  */
 @WebServlet(
-		name = "informacionadministrativa.bolsaempleo.bolsas", 
-		description = "Gestión de estados de bolsas", 
-		urlPatterns = { 
-				"/srv/es/informacionadministrativa/bolsaempleo/bolsas", 
+		name = "informacionadministrativa.bolsaempleo.bolsas",
+		description = "Gestión de estados de bolsas",
+		urlPatterns = {
+				"/srv/es/informacionadministrativa/bolsaempleo/bolsas",
 				"/srv/en/informacionadministrativa/bolsaempleo/bolsas",
 				"/srv/es/ajax/informacionadministrativa/bolsaempleo/bolsas",
 				"/srv/en/ajax/informacionadministrativa/bolsaempleo/bolsas"
@@ -56,7 +61,8 @@ public class ControladorBolsas extends HttpServlet {
 	public static final String PARAM_ACCION_BOLSA = "ab";
 	public static final String PARAM_BOLSAS_SELECCIONADAS = "bolsasselected";
 	public static final String PARAM_ACCION_TIPO_BAREMACION = "tipobaremacion";
-	
+	public static final String PARAM_FECHA_FIN_ALEGACIONES = "fechafinalegaciones";
+
 	// acciones
 	public static final String ACCION_INDEX = "listar";
 	public static final String ACCION_DATATABLE = "datatable";
@@ -71,18 +77,18 @@ public class ControladorBolsas extends HttpServlet {
 	public static final String ACCION_BOLSAS_BAREMAR_PROVISIONAL = "baremarprovisional";
 	public static final String ACCION_BOLSAS_BAREMAR_DEFINITIVA = "baremardefinitiva";
 	public static final String ACCION_EXPORTAR = "exportar";
-	
+
 	// mensajes
 	public static final String MENSAJE_ERROR_ACCION_BOLSA_NO_VALIDA = "Acción no válida";
 	public static final String MENSAJE_ERROR_BOLSAS_SELECCIONADAS_INCORRECTAS = "No hay bolsas seleccionadas válidas";
 	public static final String MENSAJE_EXITO_BOLSA_MODIFICADA_CORRECTAMENTE = "Bolsa/s modificada/s correctamente";
-	
+
 	// ajax
 	public static final String RESPONSE_AJAX_CONTENTTYPE = "application/json";
 	public static final String RESPONSE_AJAX_ENCODING = "UTF-8";
 	public static final String RESPONSE_AJAX_ERROR = "error";
 	public static final int RESPONSE_AJAX_HTTP_CODE_ERROR = 400;
-	
+
 	// csv
 	public static final String RESPONSE_CSV_CONTENTTYPE = "text/csv";
 	public static final String RESPONSE_CSV_ENCODING = "UTF-8";
@@ -95,17 +101,17 @@ public class ControladorBolsas extends HttpServlet {
 		UVDatos datos = (UVDatos) request.getAttribute(UVDatos.NOMBRE_ATRIBUTO);
 		datos.setDocType("<!DOCTYPE html>");
 		datos.setContentType("text/html");
-		
-		VistaEstadoBolsas bean = new VistaEstadoBolsas();		
-		Usuario usuario = datos.getUsuario();		
+
+		VistaEstadoBolsas bean = new VistaEstadoBolsas();
+		Usuario usuario = datos.getUsuario();
 		LOGGER.log(Level.FINEST, "usuario que ha entrado en el servlet es {0}", usuario.getUid());
-		
-		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));		
+
+		String nombreAccion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION));
 		if (nombreAccion == null) {
 			nombreAccion = ACCION_INDEX;
 		}
-		
-		try {			
+
+		try {
 			if (!init(bean, datos, request, response)) {
 				return;
 			}
@@ -124,7 +130,7 @@ public class ControladorBolsas extends HttpServlet {
 					break;
 				default:
 					errorFatal(bean, "Acción no contemplada");
-			}			
+			}
 		} catch (UVException e) {
 			LOGGER.log(Level.WARNING, e.toString());
 			bean.getMensajesDeError().add(e.getMessage());
@@ -144,41 +150,41 @@ public class ControladorBolsas extends HttpServlet {
 			datos.getFicherosCSS().add("/css/jqueryujaen/jquery-ui-1.8.16.custom.css");
 		}
 	}
-	
+
 	private boolean init(VistaEstadoBolsas bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws SQLException, UVException, IOException {
 		ModeloBolsa modeloBolsa = ModeloBolsa.obtenerInstancia();
-		
+
 		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/bolsas/index.jsp");
 		bean.setTotalBolsasBloqueadas(modeloBolsa.getBolsasBloqueadas());
 		bean.setTotalBolsasRevisadas(modeloBolsa.getBolsasRevisadas());
 		bean.setTotalBolsasBaremables(modeloBolsa.getBolsasBaremables());
 		bean.setTotalBolsas(modeloBolsa.getTotalBolsas());
 		bean.setConvocatoria(ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoria());
-		
+
 		BolsaEmpleoUtils.readMensajeSession(bean, request);
-		
+
 		try {
 			bean.setUsuarioLogeado(ModeloUsuarioBolsaEmpleo.obtenerInstancia().getAndRefreshUsuario(datos));
-			
+
 			if (!bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRol.ID_ROL_SERVICIO_PERSONAL)) {
 				throw new UVException("No tienes permiso de personal");
 			}
 		} catch (UVException e) {
 			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
 			LOGGER.log(Level.SEVERE, e.toString());
-			
+
 			BolsaEmpleoUtils.redirectToError(bean, datos, request, response, e.getMessage());
 			return false;
 		}
-		
+
 		return true;
 	}
-	
+
 	private void errorFatal(VistaEstadoBolsas bean, String mensaje) {
 		bean.setVista("/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/error.jsp");
 		bean.getMensajesDeError().add(mensaje);
 	}
-	
+
 	/** redireccion de do post.
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
@@ -186,20 +192,20 @@ public class ControladorBolsas extends HttpServlet {
 	public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		doGet(request, response);
 	}
-		
+
 	private void listado(VistaEstadoBolsas bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException {
 		ModeloBolsa modelo = ModeloBolsa.obtenerInstancia();
-		
+
 		datos.setRespuestaEnviada(true);
-		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);		
+		datos.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		response.setContentType(RESPONSE_AJAX_CONTENTTYPE);
 		response.setCharacterEncoding(RESPONSE_AJAX_ENCODING);
-		
+
 		try (PrintWriter writer = response.getWriter()) {
 			try {
 				BolsaEmpleoDataTable<Bolsa> dataTable = modelo.listaBolsaEmpleoDatatable(request.getParameterMap());
 				bean.setDatatableBolsas(dataTable);
-				writer.write(dataTable.toJson());
+					writer.write(dataTable.toJson("dd/M/yyyy HH:mm"));
 			} catch (UVException | SQLException e) {
 				if (e instanceof SQLException) {
 					LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
@@ -214,21 +220,21 @@ public class ControladorBolsas extends HttpServlet {
 			}
 		}
 	}
-	
+
 	private void accionSobreBolsas(VistaEstadoBolsas bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
 			throws UVException, SQLException, IOException {
-		ModeloBolsa modelo = ModeloBolsa.obtenerInstancia();		
+		ModeloBolsa modelo = ModeloBolsa.obtenerInstancia();
 		String selectedJson = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_BOLSAS_SELECCIONADAS));
 		int[] selected;
 		List<Bolsa> bolsas;
-		
+
 		try {
 			selected = (new Gson()).fromJson(selectedJson, new TypeToken<int[]>() { }.getType());
 			bolsas = modelo.getBolsasByIds(selected);
 		} catch (Exception ex) {
 			throw new UVException(MENSAJE_ERROR_BOLSAS_SELECCIONADAS_INCORRECTAS);
 		}
-		
+
 		String nombreAccionBolsa = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION_BOLSA));
 		switch (nombreAccionBolsa) {
 			case ACCION_BOLSAS_BLOQUEAR:
@@ -241,7 +247,7 @@ public class ControladorBolsas extends HttpServlet {
 				modelo.ponerBolsasEnBaremacion(bolsas, bean.getUsuarioLogeado());
 				break;
 			case ACCION_BOLSAS_ALEGACION:
-				modelo.ponerBolsasEnAlegaciones(bolsas, bean.getUsuarioLogeado());
+				manejarPonerBolsasEnAlegaciones(bean, bolsas, bean.getUsuarioLogeado(), request);
 				break;
 			case ACCION_BOLSAS_DESBLOQUEAR:
 				modelo.desbloquearBolsas(bolsas, bean.getUsuarioLogeado());
@@ -253,7 +259,7 @@ public class ControladorBolsas extends HttpServlet {
 				if (bolsas.size() > 1) {
 					throw new UVException("Solo se puede baremar una bolsa a la vez");
 				}
-				
+
 				String paramTipoBaremacion = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_ACCION_TIPO_BAREMACION));
 				if (paramTipoBaremacion.equals(ACCION_BOLSAS_BAREMAR_PROVISIONAL) || paramTipoBaremacion.equals(ACCION_BOLSAS_BAREMAR_DEFINITIVA)) {
 					this.baremarBolsas(bean, bolsas, paramTipoBaremacion);
@@ -267,59 +273,105 @@ public class ControladorBolsas extends HttpServlet {
 				response.sendRedirect(request.getServletPath());
 				return;
 		}
-		
+
 		BolsaEmpleoUtils.addMensajeDeExito(MENSAJE_EXITO_BOLSA_MODIFICADA_CORRECTAMENTE, bean, request);
 		datos.setRespuestaEnviada(true);
 		response.sendRedirect(request.getServletPath());
 	}
-	
+
+	/**
+	 * Maneja la acción de poner bolsas en ALEGACIONES: lee y valida el parámetro
+	 * de fecha desde el request, parsea y llama al modelo.
+	 */
+	private void manejarPonerBolsasEnAlegaciones(VistaEstadoBolsas bean, List<Bolsa> bolsas, UsuarioBolsaEmpleo usuario, HttpServletRequest request)
+			throws SQLException, UVException {
+		String fechaParam = EscapaHTML.ajustaCodificacion(request.getParameter(PARAM_FECHA_FIN_ALEGACIONES));
+		if (fechaParam == null || fechaParam.trim().isEmpty()) {
+			throw new UVException("Debe indicar fecha de fin de alegaciones");
+		}
+
+		// Esperamos formato 'dd/MM/yyyy HH:mm' o 'dd/MM/yyyy HH:mm:ss'
+		String[] partes = fechaParam.trim().split(" ");
+		if (partes.length < 2) {
+			throw new UVException("Formato de fecha inválido. Utilice dd/MM/yyyy HH:mm");
+		}
+
+		Date fechaDia = Formateador.leeParametroFecha(partes[0], Formateador.FORMATO_FECHA_DDMMYYYY, "/");
+		if (fechaDia == null) {
+			throw new UVException("Formato de fecha inválido. Utilice dd/MM/yyyy HH:mm");
+		}
+
+		String horaPart = partes[1];
+		String[] horaCampos = horaPart.split(":");
+		int hh;
+		int mm;
+		try {
+			hh = Integer.parseInt(horaCampos[0]);
+			mm = horaCampos.length > 1 ? Integer.parseInt(horaCampos[1]) : 0;
+		} catch (Exception e) {
+			throw new UVException("Formato de hora inválido. Utilice HH:mm");
+		}
+
+		java.util.Calendar cal = java.util.Calendar.getInstance();
+		cal.setTime(fechaDia);
+		cal.set(java.util.Calendar.HOUR_OF_DAY, hh);
+		cal.set(java.util.Calendar.MINUTE, mm);
+		cal.set(java.util.Calendar.SECOND, 59);
+		cal.set(java.util.Calendar.MILLISECOND, 0);
+
+		Date fechaFin = cal.getTime();
+
+		ModeloBolsa modelo = ModeloBolsa.obtenerInstancia();
+		modelo.ponerBolsasEnAlegaciones(bolsas, usuario, fechaFin);
+	}
+
 	private void baremarBolsas(VistaEstadoBolsas bean, List<Bolsa> bolsas, String tipoBaremacion) throws SQLException, UVException {
 		Convocatoria convocatoria = ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoria();
-		
+
 		if (!convocatoria.getEstado().equals(ModeloConvocatoria.CONVOCATORIA_ESTADO_CERRADA)) {
 			throw new UVException("La convocatoria [" + convocatoria.getDescripcion() + "] no está cerrada");
 		}
-		
+
 		ModeloBolsa modeloBolsa = ModeloBolsa.obtenerInstancia();
 		ModeloResultados modeloResultados = ModeloResultados.obtenerInstancia();
 		for (Bolsa bolsa: bolsas) {
 			List<Solicitud> solicitudes = modeloResultados.listaSolicitudesBolsa(bolsa, convocatoria);
-			
+
 			for (Solicitud solicitud: solicitudes) {
 				modeloResultados.calcularSolicitud(solicitud, bolsa);
 			}
-			
+
 			boolean definitiva = tipoBaremacion.equals(ACCION_BOLSAS_BAREMAR_DEFINITIVA);
 			modeloBolsa.baremarBolsa(bolsa, definitiva, bean.getUsuarioLogeado());
 		}
 	}
-	
+
 	private void habilitarContratacion(VistaEstadoBolsas bean, List<Bolsa> bolsas) throws SQLException, UVException {
 		Convocatoria convocatoria = ModeloConvocatoria.obtenerInstancia().getUltimaConvocatoria();
-		
+
 		if (!convocatoria.getEstado().equals(ModeloConvocatoria.CONVOCATORIA_ESTADO_CERRADA)) {
 			throw new UVException("La convocatoria [" + convocatoria.getDescripcion() + "] no está cerrada");
 		}
-		
+
 		ModeloBolsa modeloBolsa = ModeloBolsa.obtenerInstancia();
 		for (Bolsa bolsa: bolsas) {
 			modeloBolsa.habilitarBolsaParaContratacion(bolsa, bean.getUsuarioLogeado());
 		}
 	}
-	
-	private void exportar(VistaEstadoBolsas bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response) 
+
+	private void exportar(VistaEstadoBolsas bean, UVDatos datos, HttpServletRequest request, HttpServletResponse response)
 			throws SQLException, UVException, IOException {
 		datos.setRespuestaEnviada(true);
 		datos.setContentType(RESPONSE_CSV_CONTENTTYPE);
 		response.setContentType(RESPONSE_CSV_CONTENTTYPE);
 		response.setCharacterEncoding(RESPONSE_CSV_ENCODING);
 		response.setHeader("Content-Disposition", "attachment; filename=\"bolsas.csv\"");
-		
+
 		ModeloBolsa modelo = ModeloBolsa.obtenerInstancia();
-		
+
 		String separator = ";";
-		List<String[]> rows = modelo.exportarBolsasCsv(separator); 
-		
+		List<String[]> rows = modelo.exportarBolsasCsv(separator);
+
 		try (ServletOutputStream stream = response.getOutputStream()) {
 			try (PrintWriter printer = new PrintWriter(stream)) {
 				for (String[] row : rows) {

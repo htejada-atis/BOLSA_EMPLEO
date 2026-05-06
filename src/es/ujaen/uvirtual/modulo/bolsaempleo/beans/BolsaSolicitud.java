@@ -10,13 +10,14 @@ public class BolsaSolicitud extends Bolsa implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	private List<MeritoSolicitudTable> listaMeritos;
-	
+	private Alegacion alegacion;
+
 	/** Constructor por defecto.
 	 */
 	public BolsaSolicitud() {
 		//este contructor esta vacio intencionadamente
 	}
-	
+
 	/** Constructor con parametros.
 	 * @param pbolsa .
 	 * @param plistaMeritos .
@@ -25,24 +26,32 @@ public class BolsaSolicitud extends Bolsa implements Serializable {
 		super(pbolsa);
 		this.listaMeritos = plistaMeritos;
 	}
-	
+
 	public List<MeritoSolicitudTable> getListaMeritos() {
 		return listaMeritos;
 	}
-	
+
 	public Integer getNumeroMeritos() {
-		return listaMeritos.size();
+		return listaMeritos != null ? listaMeritos.size() : 0;
 	}
-	
+
 	public void setListaMeritos(List<MeritoSolicitudTable> meritos) {
 		this.listaMeritos = meritos;
 	}
-	
+
+	public Alegacion getAlegacion() {
+		return alegacion;
+	}
+
+	public void setAlegacion(Alegacion alegacion) {
+		this.alegacion = alegacion;
+	}
+
 	@Override
 	public String toString() {
 		return "BolsaSolicitud [meritos=" + listaMeritos + "]";
 	}
-	
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -63,7 +72,7 @@ public class BolsaSolicitud extends Bolsa implements Serializable {
 		}
 		if (getClass() != obj.getClass()) {
 			return false;
-		}		
+		}
 		BolsaSolicitud other = (BolsaSolicitud) obj;
 		if (!super.equals(other)) {
 			return false;
@@ -75,7 +84,7 @@ public class BolsaSolicitud extends Bolsa implements Serializable {
 		} else if (!listaMeritos.equals(other.listaMeritos)) {
 			return false;
 		}
-		
+
 		return true;
 	}
 }

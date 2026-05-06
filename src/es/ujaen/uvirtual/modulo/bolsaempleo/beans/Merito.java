@@ -2,6 +2,7 @@ package es.ujaen.uvirtual.modulo.bolsaempleo.beans;
 
 import java.io.InputStream;
 import java.io.Serializable;
+import java.util.List;
 
 
 /** Clase mérito de bolsa empleo.
@@ -15,9 +16,11 @@ public class Merito implements Serializable {
 	private Double valor;
 	private String descripcion;
 	private String observacion;
+	private String descripcionAlegacion;
 	private ItemBaremacion item;
 	private UsuarioBolsaEmpleo user;
 	private transient InputStream archivo;
+	private List<ArchivoAlegacionMerito> archivosAlegacion;
 	
 	/** Constructor por defecto.
 	 */
@@ -93,6 +96,21 @@ public class Merito implements Serializable {
 	
 	public void setValor(Double valor) {
 		this.valor = valor;
+	}
+	
+	public String getDescripcionAlegacion() {
+		return descripcionAlegacion;
+	}
+	
+	public List<ArchivoAlegacionMerito> getArchivosAlegacion() {
+		return archivosAlegacion;
+	}
+	public void setArchivosAlegacion(List<ArchivoAlegacionMerito> archivosAlegacion) {
+		this.archivosAlegacion = archivosAlegacion;
+	}
+	
+	public void setDescripcionAlegacion(String descripcionAlegacion) {
+		this.descripcionAlegacion = descripcionAlegacion;
 	}
 	
 	public String getDescripcion() {

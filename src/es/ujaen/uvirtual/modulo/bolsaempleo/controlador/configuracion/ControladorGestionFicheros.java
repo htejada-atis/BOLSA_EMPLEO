@@ -49,8 +49,7 @@ public class ControladorGestionFicheros extends HttpServlet {
 	private static final String NOMBREDEESTACLASE = ControladorGestionFicheros.class.getName();
 	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
 	
-	// Acciones
-	
+	// Acciones	
 	public static final String ACCION_BORRAR_FICHEROS = "borrarficheros";
 	public static final String ACCION_DATATABLE = "datatable";
 	public static final String ACCION_HACER_FICHEROS_PUBLICOS = "ficherospublicos";

@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import es.ujaen.uvirtual.modelo.conexion.ConexionUvirtual;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Alegacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Contratacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Plantilla;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.PlazaOfertada;
@@ -304,6 +305,47 @@ public class ModeloPlantilla {
 				usuario.getNombre() + " " + usuario.getPrimerApellido() + " " + usuario.getSegundoApellido());
 		texto = texto.replaceAll(left + "NIF" + right, usuario.getPrsNif());
 		texto = texto.replaceAll(left + "email" + right, usuario.getEmail());
+		return texto;
+	}
+	
+	/**
+	 * Reemplaza las variables en la plantilla con los datos de la alegación.
+	 * 
+	 * @param alegacion La alegación a usar en la plantilla.
+	 * @param texto     El texto de la plantilla con las variables.
+	 * @param isXML     Indica si se está procesando como XML.
+	 * @return Texto con las variables reemplazadas.
+	 */
+	public String reemplazaAlegacionEnviadaADepartamentoEnPlantilla(Alegacion alegacion, String texto, boolean isXML) {
+		String left = SEPARATOR_LEFT;
+		String right = SEPARATOR_RIGHT;
+		if (isXML) {
+			left = SEPARATOR_LEFT_XML;
+			right = SEPARATOR_RIGHT_XML;
+		}
+		texto = texto.replaceAll(left + "idalegacion" + right, alegacion.getCodNum().toString());
+		texto = texto.replaceAll(left + "nombre_area" + right, alegacion.getArea().getDescripcion());
+		texto = texto.replaceAll(left + "nombre_candidato" + right, alegacion.getCandidato().getNombre());
+		return texto;
+	}
+	
+	/**
+	 * Reemplaza las variables en la plantilla con los datos de la alegación.
+	 * 
+	 * @param alegacion La alegación a usar en la plantilla.
+	 * @param texto     El texto de la plantilla con las variables.
+	 * @param isXML     Indica si se está procesando como XML.
+	 * @return Texto con las variables reemplazadas.
+	 */
+	public String reemplazaAlegacionResolucionEnPlantilla(Alegacion alegacion, String texto, boolean isXML) {
+		String left = SEPARATOR_LEFT;
+		String right = SEPARATOR_RIGHT;
+		if (isXML) {
+			left = SEPARATOR_LEFT_XML;
+			right = SEPARATOR_RIGHT_XML;
+		}
+		texto = texto.replaceAll(left + "idalegacion" + right, alegacion.getCodNum().toString());
+		texto = texto.replaceAll(left + "nombre_area" + right, alegacion.getArea().getDescripcion());
 		return texto;
 	}
 

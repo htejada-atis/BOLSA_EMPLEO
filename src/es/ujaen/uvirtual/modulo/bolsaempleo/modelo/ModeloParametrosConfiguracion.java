@@ -31,6 +31,8 @@ public class ModeloParametrosConfiguracion {
 	public static final String PARAMETRO_PLANTILLA_CITA_CONTRATACION = "bolsaempleo.local.idPlantillaCitaContratacion";
 	public static final String PARAMETRO_PLANTILLA_CIERRE_PLAZA = "bolsaempleo.local.idPlantillaCierrePlaza";
 	public static final String PARAMETRO_PLANTILLA_CREACION_PLAZA = "bolsaempleo.local.idPlantillaCreacionPlaza";
+	public static final String PARAMETRO_PLANTILLA_RESOLUCION_ALEGACION = "bolsaempleo.local.idPlantillaAlegacionResuelta";
+	public static final String PARAMETRO_PLANTILLA_ENVIADA_DEPARTAMENTO_ALEGACION = "bolsaempleo.local.idPlantillaAlegacionEnviadaDepartamento";
 	public static final String PARAMETRO_EMAILS_CIERRE_PLAZA = "bolsaempleo.local.emailsCierrePlaza";
 	public static final String PARAMETRO_EMAILS_CREACION_PLAZA = "bolsaempleo.local.emailsCreacionPlaza";
 	public static final String PARAMETRO_REMITENTE = "bolsaempleo.local.remitente";

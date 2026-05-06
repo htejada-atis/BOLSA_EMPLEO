@@ -19,6 +19,7 @@ public class Bolsa implements Serializable {
 	private Date fechaBaremacion;
 	private Date fechaBaremacionDefinitiva;
 	private Date fechaHabilitarContratos;
+	private Date fechaFinAlegaciones;
 
 	/** Constructor por defecto.
 	 */
@@ -69,6 +70,7 @@ public class Bolsa implements Serializable {
 		this.fechaBaremacion = copia.fechaBaremacion;
 		this.fechaBaremacionDefinitiva = copia.fechaBaremacionDefinitiva;
 		this.fechaHabilitarContratos = copia.fechaHabilitarContratos;
+		this.fechaFinAlegaciones = copia.fechaFinAlegaciones;
 	}
 	
 	public Integer getCodNum() {
@@ -151,12 +153,21 @@ public class Bolsa implements Serializable {
 		this.fechaHabilitarContratos = fechaHabilitarContratos;
 	}
 	
+	public Date getFechaFinAlegaciones() {
+		return fechaFinAlegaciones;
+	}
+
+	public void setFechaFinAlegaciones(Date fechaFinAlegaciones) {
+		this.fechaFinAlegaciones = fechaFinAlegaciones;
+	}	
+	
 	@Override
 	public String toString() {
 		return "BolsaEmpleo [idBolsaEmpleo=" + codNum + ", area=" + area.getDescripcion()
 				+ ", estado=" + estado + ", baremable=" + baremable + ", fechaActualizacion=" + fechaActualizacion
 				+ ", fechaBloqueo=" + fechaBloqueo + ", fechaDesBloqueo=" + fechaDesBloqueo + ", fechaBaremacion=" + fechaBaremacion 
-				+ ", fechaBaremacionDefinitiva=" + fechaBaremacionDefinitiva + ", fechaHabilitarContratos=" + fechaHabilitarContratos + "]";
+				+ ", fechaBaremacionDefinitiva=" + fechaBaremacionDefinitiva + ", fechaHabilitarContratos=" + fechaHabilitarContratos
+				+ ", fechaFinAlegaciones=" + fechaFinAlegaciones + "]";
 	}
 	
 	@Override
@@ -173,6 +184,7 @@ public class Bolsa implements Serializable {
 		result = prime * result + ((fechaBaremacion == null) ? 0 : fechaBaremacion.hashCode());
 		result = prime * result + ((fechaBaremacionDefinitiva == null) ? 0 : fechaBaremacionDefinitiva.hashCode());
 		result = prime * result + ((fechaHabilitarContratos == null) ? 0 : fechaHabilitarContratos.hashCode());
+		result = prime * result + ((fechaFinAlegaciones == null) ? 0 : fechaFinAlegaciones.hashCode());
 		return result;
 	}
 

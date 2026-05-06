@@ -13,9 +13,13 @@ import com.google.gson.Gson;
 import es.ujaen.uvirtual.beans.CodigoDescripcion;
 import es.ujaen.uvirtual.beans.UVDatos;
 import es.ujaen.uvirtual.beans.Usuario;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Alegacion;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Bolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.BolsaResultado;
 import es.ujaen.uvirtual.modulo.bolsaempleo.beans.CandidatoResultadoTable;
+import es.ujaen.uvirtual.modulo.bolsaempleo.beans.Convocatoria;
+import es.ujaen.uvirtual.modulo.bolsaempleo.controlador.ControladorAlegaciones;
+import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloAlegaciones;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloBolsa;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloConvocatoria;
 import es.ujaen.uvirtual.modulo.bolsaempleo.modelo.ModeloMeritosPreferentes;
@@ -56,6 +60,7 @@ public class ControladorMisResultados extends HttpServlet {
 	public static final String ACCION_INDEX = "listarbolsas";
 	public static final String ACCION_MIS_RESULTADOS = "misresultados";
 	public static final String ACCION_SELECCIONAR_BOLSA = "seleccionarbolsa";
+	public static final String ACCION_CREAR_ALEGACION = "craeralegacion";
 	
 	// Parámetros
 	public static final String PARAM_ACCION = "a";
@@ -80,6 +85,7 @@ public class ControladorMisResultados extends HttpServlet {
 	
 	// urls
 	public static final String URL_PATTERN_AJAX = "/srv/es/ajax/informacionadministrativa/bolsaempleo/misresultados";
+	public static final String URL_MIS_ALEGACIONES = "/srv/es/informacionadministrativa/bolsaempleo/misalegaciones";
 	
 	// ajax
 	public static final String RESPONSE_AJAX_CONTENTTYPE = "application/json";
@@ -119,8 +125,9 @@ public class ControladorMisResultados extends HttpServlet {
 				case ACCION_DETALLE_RESULTADOS_BOLSA:
 				case ACCION_MIS_RESULTADOS:
 				case ACCION_SELECCIONAR_BOLSA:
+				case ACCION_CREAR_ALEGACION:
 					accionesBolsa(bean, datos, request, response, nombreAccion);
-					break;
+					break;					
 				default:
 					errorFatal(bean, MENSAJE_ERROR_ACCION_NO_CONTEMPLADA);
 			}
@@ -204,6 +211,9 @@ public class ControladorMisResultados extends HttpServlet {
 			case ACCION_MIS_RESULTADOS:
 				resultadosCandidato(bean);
 				break;
+			case ACCION_CREAR_ALEGACION:
+				crearAlegacion(bean, datos, request, response);
+				break;
 			case ACCION_SELECCIONAR_BOLSA:
 				break;
 			default:
@@ -215,8 +225,20 @@ public class ControladorMisResultados extends HttpServlet {
 		ModeloResultados modeloResultados = ModeloResultados.obtenerInstancia();
 		
 		bean.setVista(JSP_RESULTADO_DETALLE);
+		
 		BolsaResultado bolsaResultado = modeloResultados.getBolsaResultado(bean.getBolsa(), bean.getUsuarioLogeado(), bean.getConvocatoria());
 		bean.setBolsaResultado(bolsaResultado);
+		
+		Alegacion alegacion = ModeloAlegaciones.obtenerInstancia().getAlegacion(bean.getBolsa(), bean.getUsuarioLogeado(), bean.getConvocatoria());
+		bean.setAlegacion(alegacion);
+		
+		if (alegacion != null && alegacion.getCodNum() != null) {
+			bean.setUrlAlegaciones(ControladorMisAlegaciones.URL_MIS_ALEGACIONES
+				+ "?" + ControladorMisAlegaciones.PARAM_ACCION + "=" + ControladorMisAlegaciones.ACCION_VER_DETALLE_ALEGACION
+				+ "&" + ControladorMisAlegaciones.PARAM_ALEGACIONES_ID + "=" + alegacion.getCodNum());
+		} else {
+			bean.setUrlAlegaciones(null);
+		}
 		
 		bean.setMeritoPreferente(ModeloMeritosPreferentes.obtenerInstancia().getMeritoPreferenteTipoMerito());
 	}
@@ -277,5 +299,29 @@ public class ControladorMisResultados extends HttpServlet {
 				response.setStatus(RESPONSE_AJAX_HTTP_CODE_ERROR);
 			}
 		}
+	}
+	
+	private void crearAlegacion(VistaMisResultados bean, UVDatos datos, HttpServletRequest request,
+				HttpServletResponse response) throws IOException, SQLException, UVException {
+		if (bean.getBolsa() == null) {
+			throw new UVException("No se puede crear una alegación sin una bolsa seleccionada.");
+		}
+		ModeloAlegaciones modeloAlegaciones = ModeloAlegaciones.obtenerInstancia();
+		if (!modeloAlegaciones.esBolsaEnEstadoAlegaciones(bean.getBolsa().getCodNum())) {
+			throw new UVException("No se puede crear una alegación: la bolsa no está en estado ALEGACIONES.");
+		}
+		Alegacion alegacion = modeloAlegaciones.crearAlegacion(bean.getBolsa(), bean.getUsuarioLogeado(), bean.getConvocatoria());
+		if (alegacion == null) {
+			throw new UVException("Error creando alegación");
+		}
+		
+		BolsaEmpleoUtils.addMensajeDeExito("Alegación creada correctamente", bean, request);
+		datos.setRespuestaEnviada(true);
+		
+		String nuevaUrl = ControladorMisResultados.URL_MIS_ALEGACIONES
+	            + "?" + ControladorMisAlegaciones.PARAM_ACCION + "=" + ControladorMisAlegaciones.ACCION_VER_DETALLE_ALEGACION
+	            + "&" + ControladorMisAlegaciones.PARAM_ALEGACIONES_ID + "=" + alegacion.getCodNum();
+		
+		response.sendRedirect(nuevaUrl);
 	}
 }
