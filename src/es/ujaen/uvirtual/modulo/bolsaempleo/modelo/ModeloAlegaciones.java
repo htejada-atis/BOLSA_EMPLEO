@@ -46,12 +46,14 @@ public class ModeloAlegaciones {
 	private static final String NOMBREDEESTACLASE = ModeloAlegaciones.class.getName();
 	private static final Logger LOGGER = Logger.getLogger(NOMBREDEESTACLASE);
 
-	public static final int ORDER_COLUMN_INDEX_CONVOCATORIA = 0;
-	public static final int ORDER_COLUMN_INDEX_AREA = 1;
-	public static final int ORDER_COLUMN_INDEX_DOCUMENTO = 2;
-	public static final int ORDER_COLUMN_INDEX_CANDIDATO = 3;
-	public static final int ORDER_COLUMN_INDEX_ESTADO = 4;
-	public static final int ORDER_COLUMN_INDEX_ID = 5;
+	public static final int ORDER_COLUMN_INDEX_ID = 0;
+	public static final int ORDER_COLUMN_INDEX_CONVOCATORIA = 1;
+	public static final int ORDER_COLUMN_INDEX_AREA = 2;
+	public static final int ORDER_COLUMN_INDEX_DOCUMENTO = 3;
+	public static final int ORDER_COLUMN_INDEX_CANDIDATO = 4;
+	public static final int ORDER_COLUMN_INDEX_ESTADO = 5;
+	public static final int ORDER_COLUMN_INDEX_FECHA_ENVIO_DEPARTAMENTO = 6;
+	public static final int ORDER_COLUMN_INDEX_ACCION = 7;
 
 	public static final int MIS_ORDER_COLUMN_INDEX_CONVOCATORIA = 0;
 	public static final int MIS_ORDER_COLUMN_INDEX_AREA = 1;
@@ -66,6 +68,7 @@ public class ModeloAlegaciones {
 	public static final String ESTADO_ENVIADAALDEPARTAMENTO_ALEGACION = "ENDEPARTAMENTO";
 	public static final String ESTADO_INFORMADA_ALEGACION = "INFORMADA";
 	public static final String ESTADO_RESUELTA_ALEGACION = "RESUELTA";
+	public static final String ESTADO_EN_TRAMITACION_CANDIDATO = "EN_TRAMITACION";
 
 	public static final String MENSAJE_ERROR_USUARIO_CON_ID_NO_EXISTE = "No existe el usuario con el id indicando";
 
@@ -262,12 +265,14 @@ public class ModeloAlegaciones {
 			consulta += " AND bepcon.CODNUM = " + convocatoria.getCodNum();
 		}
 
+		dataTable.setColumn(ORDER_COLUMN_INDEX_ID, "bepale.CODNUM");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_CONVOCATORIA, "bepcon.CURSO", DataTableColumn.COLUMN_TYPE_OPTION);
 		dataTable.setColumn(ORDER_COLUMN_INDEX_AREA, "bepare.DES_AREA_CONOCIMIENTO");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_DOCUMENTO, "bepusu.VUAJA_PRSNIF");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_CANDIDATO, "bepusu.VUAJA_STRAPELLIDO1");
 		dataTable.setColumn(ORDER_COLUMN_INDEX_ESTADO, "bepale.ESTADO", DataTableColumn.COLUMN_TYPE_OPTION);
-		dataTable.setColumn(ORDER_COLUMN_INDEX_ID, "bepale.CODNUM", DataTableColumn.COLUMN_TYPE_IGNORE);
+		dataTable.setColumn(ORDER_COLUMN_INDEX_FECHA_ENVIO_DEPARTAMENTO, "bepale.FECHAENVIODEPARTAMENTO", DataTableColumn.COLUMN_TYPE_DATE);
+		dataTable.setColumn(ORDER_COLUMN_INDEX_ACCION, "bepale.CODNUM", DataTableColumn.COLUMN_TYPE_IGNORE);
 		dataTable.setQuery(consulta);
 
 		try (Connection conexion = ConexionUvirtual.obtenerInstancia();
@@ -380,6 +385,39 @@ public class ModeloAlegaciones {
 		}
 
 		throw new UVException("No se encontró la alegación con id " + codNum);
+	}
+	
+	/**
+	 * Obtiene la bolsa asociada a una alegación.
+	 *
+	 * @param alegacion Alegación de la que se quiere obtener la bolsa asociada
+	 * @return Bolsa asociada a la alegación
+	 * @throws SQLException Si ocurre un error de acceso a base de datos
+	 * @throws UVException Si la alegación no es válida o no se encuentra la bolsa
+	 */
+	public Bolsa getBolsaByAlegacion(Alegacion alegacion) throws SQLException, UVException {
+	    if (alegacion == null || alegacion.getCodNum() == null) {
+	        throw new UVException("La alegación es obligatoria.");
+	    }
+
+	    String consulta = "SELECT bepbol.CODNUM"
+	            + " FROM TBEP_ALEGACIONES bepale"
+	            + " INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbo.CODNUM = bepale.BEPSBO_CODNUM"
+	            + " INNER JOIN TBEP_BOLSAS bepbol ON bepbol.CODNUM = bepsbo.BEPBOL_CODNUM"
+	            + " WHERE bepale.CODNUM = ?";
+
+	    try (Connection conexion = ConexionUvirtual.obtenerInstancia();
+	            PreparedStatement stmt = conexion.prepareStatement(consulta)) {
+	        stmt.setInt(1, alegacion.getCodNum());
+
+	        try (ResultSet rs = stmt.executeQuery()) {
+	            if (rs.next()) {
+	                return ModeloBolsa.obtenerInstancia().getBolsaById(rs.getInt("CODNUM"));
+	            }
+	        }
+	    }
+
+	    throw new UVException("No se encontró la bolsa asociada a la alegación.");
 	}
 
 	/**
@@ -998,10 +1036,16 @@ public class ModeloAlegaciones {
 		List<Alegacion> alegaciones = new ArrayList<>();
 		BolsaEmpleoDataTable<Alegacion> dataTable = new BolsaEmpleoDataTable<>(params);
 
-		String consulta = "SELECT bepale.CODNUM, bepale.ESTADO, bepale.FECHACREACION, bepale.FECHACONFIRMACION,"
-				+ " bepare.DES_AREA_CONOCIMIENTO AS AREA_DESCRIPCION, bepare.CODNUM AS AREA_CODNUM,"
-				+ " bepcon.CODNUM AS CONVOCATORIA_CODNUM, bepcon.DESCRIPCION AS CONVOCATORIA_DESCRIPCION"
-				+ " FROM TBEP_ALEGACIONES bepale"
+		String consulta = "SELECT bepale.CODNUM,"
+		        + " CASE"
+		        + "     WHEN bepale.ESTADO = '" + ESTADO_PENDIENTE_ALEGACION + "' THEN '" + ESTADO_PENDIENTE_ALEGACION + "'"
+		        + "     WHEN bepale.ESTADO = '" + ESTADO_RESUELTA_ALEGACION + "' THEN '" + ESTADO_RESUELTA_ALEGACION + "'"
+		        + "     ELSE '" + ESTADO_EN_TRAMITACION_CANDIDATO + "'"
+		        + " END AS ESTADO_CANDIDATO,"
+		        + " bepale.FECHACREACION, bepale.FECHACONFIRMACION,"
+		        + " bepare.DES_AREA_CONOCIMIENTO AS AREA_DESCRIPCION, bepare.CODNUM AS AREA_CODNUM,"
+		        + " bepcon.CODNUM AS CONVOCATORIA_CODNUM, bepcon.DESCRIPCION AS CONVOCATORIA_DESCRIPCION"
+		        + " FROM TBEP_ALEGACIONES bepale"
 				+ " INNER JOIN TBEP_SOLICITUD_BOLSAS bepsbo ON bepsbo.CODNUM = bepale.BEPSBO_CODNUM"
 				+ " INNER JOIN TBEP_SOLICITUDES bepsol ON bepsol.CODNUM = bepsbo.BEPSOL_CODNUM"
 				+ " INNER JOIN TBEP_BOLSAS bepbol ON bepbol.CODNUM = bepsbo.BEPBOL_CODNUM"
@@ -1011,7 +1055,13 @@ public class ModeloAlegaciones {
 
 		dataTable.setColumn(MIS_ORDER_COLUMN_INDEX_CONVOCATORIA, "bepcon.DESCRIPCION");
 		dataTable.setColumn(MIS_ORDER_COLUMN_INDEX_AREA, "bepare.DES_AREA_CONOCIMIENTO");
-		dataTable.setColumn(MIS_ORDER_COLUMN_INDEX_ESTADO, "bepale.ESTADO", DataTableColumn.COLUMN_TYPE_OPTION);
+		dataTable.setColumn(MIS_ORDER_COLUMN_INDEX_ESTADO,
+		        "CASE"
+		        + " WHEN bepale.ESTADO = '" + ESTADO_PENDIENTE_ALEGACION + "' THEN '" + ESTADO_PENDIENTE_ALEGACION + "'"
+		        + " WHEN bepale.ESTADO = '" + ESTADO_RESUELTA_ALEGACION + "' THEN '" + ESTADO_RESUELTA_ALEGACION + "'"
+		        + " ELSE '" + ESTADO_EN_TRAMITACION_CANDIDATO + "'"
+		        + " END",
+		        DataTableColumn.COLUMN_TYPE_OPTION);
 		dataTable.setColumn(MIS_ORDER_COLUMN_INDEX_FECHA_CREACION, "bepale.FECHACREACION", DataTableColumn.COLUMN_TYPE_DATE);
 		dataTable.setColumn(MIS_ORDER_COLUMN_INDEX_FECHA_CONFIRMACION, "bepale.FECHACONFIRMACION", DataTableColumn.COLUMN_TYPE_DATE);
 		dataTable.setColumn(MIS_ORDER_COLUMN_INDEX_ID, "bepale.CODNUM", DataTableColumn.COLUMN_TYPE_IGNORE);
@@ -1029,7 +1079,7 @@ public class ModeloAlegaciones {
 				while (rs.next()) {
 					Alegacion ale = new Alegacion();
 					ale.setCodNum(rs.getInt("CODNUM"));
-					ale.setEstado(rs.getString("ESTADO"));
+					ale.setEstado(rs.getString("ESTADO_CANDIDATO"));
 					ale.setFechaCreacion(rs.getTimestamp("FECHACREACION"));
 					ale.setFechaConfirmacion(rs.getTimestamp("FECHACONFIRMACION"));
 

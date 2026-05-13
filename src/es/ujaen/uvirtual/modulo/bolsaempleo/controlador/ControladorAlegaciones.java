@@ -348,35 +348,49 @@ public class ControladorAlegaciones extends HttpServlet {
 	}
 
 	private void agregarDescripcionDepartamento(VistaAlegaciones bean, VistaMisResultados beanResultados, UVDatos datos, HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException, UVException {
-		if (!bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRol.ID_ROL_DIRECTOR_DEPARTAMENTO)) {
+		boolean isDirector = bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRol.ID_ROL_DIRECTOR_DEPARTAMENTO);
+		boolean isPersonal = bean.getUsuarioLogeado().getRol().getCodNum().equals(ModeloRol.ID_ROL_SERVICIO_PERSONAL);
+
+		if (!isDirector && !isPersonal) {
 			throw new UVException("No tienes permiso");
 		}
+
 		ModeloAlegaciones modeloMisAlegaciones = ModeloAlegaciones.obtenerInstancia();
 		String descripcionDepartamento = BolsaEmpleoUtils.getParamRequestOrSession(request, PARAM_DESCRIPCION_RESOLUCION_DEPARTAMENTO);
 		Integer codNumAlegacion = Formateador.leeParametroInteger(BolsaEmpleoUtils.getParamRequestOrSession(request, PARAM_ALEGACIONES_ID));
-		// Validar que el director gestiona el area
+
 		Alegacion alegacion = modeloMisAlegaciones.getAlegacionByCodNum(codNumAlegacion);
-		Integer areaCodNum = alegacion.getArea().getCodNum();
-		ModeloEvaluador modeloEval = ModeloEvaluador.obtenerInstancia();
-		if (modeloEval.getEvaluadorById(bean.getUsuarioLogeado().getCodNum(), areaCodNum) == null) {
-			throw new UVException("No tienes permiso para modificar alegaciones de esta area");
+
+		// Si es director, validamos que gestione el área.
+		// Servicio de Personal puede editar la resolución de departamento de cualquier alegación.
+		if (isDirector) {
+			Integer areaCodNum = alegacion.getArea().getCodNum();
+			ModeloEvaluador modeloEval = ModeloEvaluador.obtenerInstancia();
+
+			if (modeloEval.getEvaluadorById(bean.getUsuarioLogeado().getCodNum(), areaCodNum) == null) {
+				throw new UVException("No tienes permiso para modificar alegaciones de esta área");
+			}
 		}
-	    if (descripcionDepartamento != null && descripcionDepartamento.length() > LIMITE_CLOB_ORACLE) {
-	        // Enviar un error o mensaje adecuado al usuario
-	    	response.sendError(HttpServletResponse.SC_BAD_REQUEST,
-	                "La descripción no puede superar los " + LIMITE_CLOB_ORACLE + " caracteres.");
-	        return;
-	    }
-	    modeloMisAlegaciones.insertarDescripcionResolucionDepartamento(codNumAlegacion, descripcionDepartamento, bean.getUsuarioLogeado().getCodCuenta());
 
-        // Paso 6: Añadimos el mensaje de éxito a la interfaz
-        BolsaEmpleoUtils.addMensajeDeExito("Resolución del departamento guardada correctamente", bean, request);
-        datos.setRespuestaEnviada(true);
-	    String nuevaUrl = request.getServletPath()
-                + "?" + ControladorAlegaciones.PARAM_ACCION + "=" + ACCION_VER_DETALLE_ALEGACION
-                + "&" + ControladorAlegaciones.PARAM_ALEGACIONES_ID + "=" + codNumAlegacion;
+		if (descripcionDepartamento != null && descripcionDepartamento.length() > LIMITE_CLOB_ORACLE) {
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST,
+					"La descripción no puede superar los " + LIMITE_CLOB_ORACLE + " caracteres.");
+			return;
+		}
 
-		// Redirigir a la nueva URL
+		modeloMisAlegaciones.insertarDescripcionResolucionDepartamento(
+				codNumAlegacion,
+				descripcionDepartamento,
+				bean.getUsuarioLogeado().getCodCuenta()
+		);
+
+		BolsaEmpleoUtils.addMensajeDeExito("Resolución del departamento guardada correctamente", bean, request);
+		datos.setRespuestaEnviada(true);
+
+		String nuevaUrl = request.getServletPath()
+				+ "?" + ControladorAlegaciones.PARAM_ACCION + "=" + ACCION_VER_DETALLE_ALEGACION
+				+ "&" + ControladorAlegaciones.PARAM_ALEGACIONES_ID + "=" + codNumAlegacion;
+
 		response.sendRedirect(nuevaUrl);
 	}
 

@@ -41,7 +41,7 @@ public class GenerarAlegacionesPDF extends BolsaEmpleoPDFGenerator {
 
     private static final String PDF_NOMBRE = "RS%sC%s U%s";
     private static final String PDF_TITULO_ALEGACIONES = "Informe de alegaciones del área: %s";
-    private static final String PDF_TITULO_RESOLUCION = "Informe de resolución de alegaciones del área: %s";
+    private static final String PDF_TITULO_RESOLUCION = "Contestación a la alegación presentada en el área de: %s";
 
     /**
      * Generar PDF de alegaciones de los resultados de una solicitud para una bolsa.
@@ -68,7 +68,7 @@ public class GenerarAlegacionesPDF extends BolsaEmpleoPDFGenerator {
 
             document.add(new Paragraph("\n"));
 
-            addCommonHeader(document, candidato, bolsa, convocatoria, alegacion);
+            addCommonHeader(document, candidato, bolsa, convocatoria, alegacion, false);
 
             document.add(new Paragraph("\n"));
 
@@ -116,26 +116,23 @@ public class GenerarAlegacionesPDF extends BolsaEmpleoPDFGenerator {
 
             document.add(new Paragraph("\n"));
 
-            addCommonHeader(document, candidato, bolsa, convocatoria, alegacion);
+            addCommonHeader(document, candidato, bolsa, convocatoria, alegacion, true);
 
-            document.add(new Paragraph("\n"));
-
-            // Resolución del Departamento
-            document.add(new Paragraph("Resolución del Departamento", fontH12Bold));
-            String resolucionDepartamento = "No se ha proporcionado una resolución del departamento.";
-            if (alegacion != null && alegacion.getDesResolucionDep() != null && !alegacion.getDesResolucionDep().trim().isEmpty()) {
-                resolucionDepartamento = alegacion.getDesResolucionDep();
-            }
-            document.add(new Paragraph(resolucionDepartamento, fontH10));
             document.add(new Paragraph("\n"));
 
             // Resolución Final
-            document.add(new Paragraph("Resolución Final", fontH12Bold));
-            String resolucionFinal = "No se ha proporcionado una resolución final.";
-            if (alegacion != null && alegacion.getDesResolucionFinal() != null && !alegacion.getDesResolucionFinal().trim().isEmpty()) {
-                resolucionFinal = alegacion.getDesResolucionFinal();
+            document.add(new Paragraph("Contestación a la alegación", fontH12Bold));
+
+            String contestacionAlegacion = "No se ha proporcionado una contestación a la alegación.";
+            if (alegacion != null && alegacion.getDesResolucionFinal() != null
+                    && !alegacion.getDesResolucionFinal().trim().isEmpty()) {
+                contestacionAlegacion = alegacion.getDesResolucionFinal();
             }
-            document.add(new Paragraph(resolucionFinal, fontH10));
+
+            document.add(new Paragraph(contestacionAlegacion, fontH10));
+            document.add(new Paragraph("\n"));
+
+            document.add(new Paragraph("Jefe de Servicio de Personal", fontH10));
             document.add(new Paragraph("\n"));
 
         } catch (Exception e) {
@@ -148,7 +145,8 @@ public class GenerarAlegacionesPDF extends BolsaEmpleoPDFGenerator {
     }
 
     private static void addCommonHeader(Document document, UsuarioBolsaEmpleo candidato, BolsaResultado bolsa,
-            Convocatoria convocatoria, Alegacion alegacion) throws DocumentException {
+            Convocatoria convocatoria, Alegacion alegacion, boolean esResolucion) throws DocumentException {
+
         document.add(new Paragraph("Convocatoria: " + convocatoria.getDescripcion(), fontBold));
         document.add(new Paragraph("Actualizado a fecha de: "
                 + Formateador.formatoFecha(bolsa.getFechaBaremacionDefinitiva() != null
@@ -162,12 +160,8 @@ public class GenerarAlegacionesPDF extends BolsaEmpleoPDFGenerator {
                 + Formateador.leeParametroString(candidato.getPrimerApellido()) + " "
                 + Formateador.leeParametroString(candidato.getSegundoApellido()), fontBold));
 
-        document.add(new Paragraph("Dirección: "
-                + Formateador.leeParametroString(candidato.getDireccion()) + " "
-                + Formateador.leeParametroString(candidato.getCodigoPostal()) + " "
-                + Formateador.leeParametroString(candidato.getLocalidad()) + " "
-                + Formateador.leeParametroString(candidato.getProvincia()) + " "
-                + Formateador.leeParametroString(candidato.getTelefono()), fontBold));
+        document.add(new Paragraph("Email: "
+                + Formateador.leeParametroString(candidato.getEmail()), fontBold));
 
         if (alegacion != null) {
             if (alegacion.getFechaCreacion() != null) {
@@ -176,30 +170,20 @@ public class GenerarAlegacionesPDF extends BolsaEmpleoPDFGenerator {
                                 Formateador.FORMATO_FECHA_DDMMYYYY_HHMMSS),
                         fontBold));
             }
+
             if (alegacion.getFechaConfirmacion() != null) {
-                document.add(new Paragraph("Fecha Confirmación Alegación: "
+                document.add(new Paragraph("Fecha de presentación: "
                         + Formateador.formatoFecha(alegacion.getFechaConfirmacion(),
                                 Formateador.FORMATO_FECHA_DDMMYYYY_HHMMSS),
                         fontBold));
             }
 
-//            String fechaEnvioDepartamento = alegacion.getFechaEnvioDepartamento() != null
-//                    ? Formateador.formatoFecha(alegacion.getFechaEnvioDepartamento(),
-//                            Formateador.FORMATO_FECHA_DDMMYYYY_HHMMSS)
-//                    : "Sin enviar";
-//            document.add(new Paragraph("Fecha Envío a Departamento: " + fechaEnvioDepartamento, fontBold));
-//
-//            String fechaResolucionDepartamento = alegacion.getFechaResolucionDepartamento() != null
-//                    ? Formateador.formatoFecha(alegacion.getFechaResolucionDepartamento(),
-//                            Formateador.FORMATO_FECHA_DDMMYYYY_HHMMSS)
-//                    : "Sin resolver";
-//            document.add(new Paragraph("Fecha Resolución Departamento: " + fechaResolucionDepartamento, fontBold));
-//
-//            String fechaResolucionFinal = alegacion.getFechaResolucionFinal() != null
-//                    ? Formateador.formatoFecha(alegacion.getFechaResolucionFinal(),
-//                            Formateador.FORMATO_FECHA_DDMMYYYY_HHMMSS)
-//                    : "Sin resolver";
-//            document.add(new Paragraph("Fecha Resolución Final: " + fechaResolucionFinal, fontBold));
+            if (esResolucion && alegacion.getFechaResolucionFinal() != null) {
+                document.add(new Paragraph("Fecha Contestación: "
+                        + Formateador.formatoFecha(alegacion.getFechaResolucionFinal(),
+                                Formateador.FORMATO_FECHA_DDMMYYYY_HHMMSS),
+                        fontBold));
+            }
         }
     }
 

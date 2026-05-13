@@ -17,6 +17,100 @@ VistaAlegaciones bean = (VistaAlegaciones) uvdatos.getVistas().get(VistaAlegacio
 boolean isPersonal = ModeloRol.ID_ROL_SERVICIO_PERSONAL.equals(bean.getUsuarioLogeado().getRol().getCodNum());
 %>
 
+<style>
+	#tableAlegaciones {
+		width: 100%;
+		table-layout: fixed;
+	}
+
+	#tableAlegaciones th,
+	#tableAlegaciones td {
+		box-sizing: border-box;
+		vertical-align: top;
+		word-wrap: break-word;
+		overflow-wrap: break-word;
+	}
+
+	#tableAlegaciones th {
+		line-height: 1.2em;
+	}
+
+	#tableAlegaciones input,
+	#tableAlegaciones select {
+		max-width: 100%;
+		box-sizing: border-box;
+	}
+
+	#tableAlegaciones .col-id {
+	width: 8%;
+}
+
+#tableAlegaciones .col-curso {
+	width: 10%;
+}
+
+#tableAlegaciones .col-area {
+	width: 12%;
+}
+
+#tableAlegaciones .col-documento {
+	width: 13%;
+}
+
+#tableAlegaciones .col-candidato {
+	width: 17%;
+}
+
+#tableAlegaciones .col-estado {
+	width: 15%;
+}
+
+#tableAlegaciones .col-fecha-envio {
+	width: 13%;
+}
+
+#tableAlegaciones .col-accion {
+	width: 12%;
+	text-align: center;
+}
+
+	#tableAlegaciones td:nth-child(1),
+	#tableAlegaciones td:nth-child(2),
+	#tableAlegaciones td:nth-child(3),
+	#tableAlegaciones td:nth-child(4),
+	#tableAlegaciones td:nth-child(5),
+	#tableAlegaciones td:nth-child(7),
+	#tableAlegaciones td:nth-child(8) {
+    	white-space: normal;
+	}
+
+	#tableAlegaciones td:nth-child(8) button,
+	#tableAlegaciones td:nth-child(8) input[type="button"] {
+		max-width: 100%;
+		white-space: normal;
+	}
+	#tableAlegaciones td:nth-child(5) {
+		white-space: normal;
+		word-break: normal;
+		overflow-wrap: break-word;
+		line-height: 1.25em;
+	}
+	#tableAlegaciones td:nth-child(3) {
+    	white-space: normal;
+    	word-break: normal;
+    	overflow-wrap: break-word;
+    	line-height: 1.25em;
+    	overflow: visible;
+	}
+	#tableAlegaciones td:nth-child(8) button,
+#tableAlegaciones td:nth-child(8) input[type="button"] {
+	min-width: 70px;
+	max-width: 100%;
+	white-space: normal;
+	line-height: 1.1em;
+}
+</style>
+
 <div class='bolsa-empleo'>
 	<jsp:include page="/WEB-INF/jsp/vista/infadministrativa/bolsaempleo/mensajes.jsp" />
 
@@ -36,19 +130,31 @@ boolean isPersonal = ModeloRol.ID_ROL_SERVICIO_PERSONAL.equals(bean.getUsuarioLo
 	<% } %>
 
 	<table class="bluetable bolsaempleo tablebolsas" id="tableAlegaciones">
+		<colgroup>
+			<col class="col-id">
+			<col class="col-curso">
+			<col class="col-area">
+			<col class="col-documento">
+			<col class="col-candidato">
+			<col class="col-estado">
+			<col class="col-fecha-envio">
+			<col class="col-accion">
+		</colgroup>
 		<tr>
-			<th scope="col" style="width: 15%;">Curso</th>
-			<th scope="col" class="area">Area</th>
-			<th scope="col">Documento</th>
-			<th scope="col" style="width: 28%;">Candidato</th>
-			<th scope="col">Estado de la Alegación</th>
-			<th scope="col">Acción</th>
+			<th scope="col" class="col-id">ID</th>
+			<th scope="col" class="col-curso">Curso</th>
+			<th scope="col" class="col-area">Área</th>
+			<th scope="col" class="col-documento">Documento</th>
+			<th scope="col" class="col-candidato">Candidato</th>
+			<th scope="col" class="col-estado">Estado de la<br/>Alegación</th>
+			<th scope="col" class="col-fecha-envio">Fecha envío<br/>departamento</th>
+			<th scope="col" class="col-accion">Acción</th>
 		</tr>
 		<tbody>
 		</tbody>
 		<tfoot>
 			<tr>
-				<th colSpan="6" style="width:100%"></th>
+				<th colSpan="8" style="width:100%"></th>
 			</tr>
 		</tfoot>
 	</table>
@@ -72,10 +178,13 @@ $(document).ready(function() {
 		"pageSizeOptions": [10, 100, 200],
 		"filterable": true,
 	    "action": "<%= ControladorAlegaciones.ACCION_DATATABLE_ALEGACIONES %>",
-		"defaultOrderBy": 3,
+		"defaultOrderBy": 4,
 		"defaultOrderDirection": 'desc',
 		"stateSave": true,
 	    "columns": [
+	    	{
+	            'data': 'codNum',
+	        },
 	    	{
                 'data': 'convocatoria.curso',
                 'filter': {
@@ -84,14 +193,27 @@ $(document).ready(function() {
                     'optionDefault': '<%= bean.getCursos() != null && !bean.getCursos().isEmpty() ? bean.getCursos().get(0) : "" %>'
                  }
             },
-	        { 'data': 'area.descripcion', 'filter': true },
-            { 'data': 'candidato.prsnif', 'filter': true },
+	        {
+	        	'data': 'area.descripcion',
+	        	'filter': true,
+	        },
+            {
+            	'data': 'candidato.prsnif',
+            	'filter': true
+            },
             {
                 'data': 'candidato',
                 'order': false,
-                'overflow': 'auto',
                 'render': function(row) {
-                    return row.candidato.nombre + " " + row.candidato.apellido1 + " " + row.candidato.apellido2;
+                    if (!row.candidato) {
+                        return '';
+                    }
+
+                    return [
+                        row.candidato.nombre,
+                        row.candidato.apellido1,
+                        row.candidato.apellido2
+                    ].filter(Boolean).join(' ');
                 },
                 'filter': true
             },
@@ -110,7 +232,7 @@ $(document).ready(function() {
 	                    case '<%= ModeloAlegaciones.ESTADO_RESUELTA_ALEGACION %>':
 	                        return 'RESUELTA';
 	                    default:
-	                        return row.estado; // En caso de valor inesperado
+	                        return row.estado || '';
 	                }
 	            },
 	            'filter': {
@@ -122,6 +244,13 @@ $(document).ready(function() {
 	                    '<%= ModeloAlegaciones.ESTADO_INFORMADA_ALEGACION %>': 'INFORMADA',
 	                    '<%= ModeloAlegaciones.ESTADO_RESUELTA_ALEGACION %>': 'RESUELTA'
 	                }
+	            }
+	        },
+	        {
+	            'data': 'fechaEnvioDepartamento',
+	            'filter': false,
+	            'render': function(row) {
+	                return row.fechaEnvioDepartamento ? row.fechaEnvioDepartamento : '-';
 	            }
 	        },
 	        {
@@ -141,7 +270,7 @@ $(document).ready(function() {
 	                }
 	            ]
 	        }
-	    ],
+	    ]
 	});
 
 	if (document.getElementById("filter_curso")) {

@@ -242,11 +242,94 @@ INSERT INTO ADM_MENU_ROL (MNU_CODNUM, ROL_CODNUM, FLG_DESACT, FLG_ADMIN) VALUES 
 -- Plantillas
 --/////////////////////
 INSERT INTO TBEP_PLANTILLAS (NOMBRE,TITULO,CUERPO,UID_USUARIO)
-VALUES ('Plantilla alegación resuelta', 'Alegación resuelta de la plaza – <<idalegacion>> - <<nombre_area>>', '<!DOCTYPE html><html><head></head><body><div class="comment-container"><div class="action-comment can-view-video markeddown js-comment" dir="auto"><div class="current-comment js-friendly-links js-open-card"><p>Su alegaci&oacute;n ha sido resuelta.</p><ul><li><strong>IdAlegaci&oacute;n</strong>: &lt;&lt;idalegacion&gt;&gt;</li><li><strong>&Aacute;rea</strong>: &lt;&lt;nombre_area&gt;&gt;</li></ul><p>Atentamente.</p></div></div></div></body></html>', 'CARGA_INICIAL');
+VALUES (
+    'Plantilla alegación resuelta',
+    'Contestación a la alegación – <<idalegacion>> - <<nombre_area>>',
+    '<!DOCTYPE html>
+<html>
+<head></head>
+<body>
+<div class="comment-container">
+<div class="action-comment can-view-video markeddown js-comment" dir="auto">
+<div class="current-comment js-friendly-links js-open-card">
+
+<p>Estimado/a &lt;&lt;nombre_candidato&gt;&gt; &lt;&lt;apellidos_candidato&gt;&gt;</p>
+
+<p>
+Se informa que ya puede consultar el PDF con la contestación a su alegación con identificador
+<strong>&lt;&lt;idalegacion&gt;&gt;</strong>, presentada por usted el
+<strong>&lt;&lt;fecha_confirmacion&gt;&gt;</strong>, contra los resultados provisionales del
+área de conocimiento de <strong>&lt;&lt;nombre_area&gt;&gt;</strong>.
+</p>
+
+<p>
+Tras la publicación de la Resolución del Vicerrectorado de Personal Docente e Investigador por
+la que se eleven a definitivos los resultados de la bolsa de sustitución del profesorado en el área
+de conocimiento de <strong>&lt;&lt;nombre_area&gt;&gt;</strong>, podrá consultar los mismos en la
+aplicación informática a la que se puede acceder desde la página web del Servicio de Personal:
+</p>
+
+<p>
+<a href="https://www.ujaen.es/servicios/servpod/bolsa-de-sustitucion-pdi">
+https://www.ujaen.es/servicios/servpod/bolsa-de-sustitucion-pdi
+</a>
+</p>
+
+<p>
+Contra la mencionada Resolución, podrá interponer recurso de alzada, en el plazo de un mes,
+ante el Rector de la Universidad de Jaén, conforme a lo dispuesto en los artículos 121 y 122 de
+la Ley 39/2015, de 1 de octubre, de Procedimiento Administrativo Común de las Administraciones Públicas.
+</p>
+
+<p>Un saludo</p>
+
+<p>Jefe del Servicio de Personal</p>
+
+</div>
+</div>
+</div>
+</body>
+</html>',
+    'CARGA_INICIAL'
+);
 --/////////////////////
 INSERT INTO TBEP_PLANTILLAS (NOMBRE,TITULO,CUERPO,UID_USUARIO)
-VALUES ('Plantilla alegación enviada a departamento', 'Alegación nueva – <<idalegacion>> - <<nombre_area>> - <<nombre_candidato>>', '<!DOCTYPE html><html><head></head><body><div class="comment-container"><div class="action-comment can-view-video markeddown js-comment" dir="auto"><div class="current-comment js-friendly-links js-open-card"><p>Hay un nueva alegaci&oacute;n pendiente:</p><ul><li><strong>IdAlegaci&oacute;n</strong>: &lt;&lt;idalegacion&gt;&gt;</li><li><strong>&Aacute;rea</strong>: &lt;&lt;nombre_area&gt;&gt;</li><li><strong>Candidato</strong>: &lt;&lt;nombre_candidato&gt;&gt;</li></ul><p>Atentamente.</p></div></div></div></body></html>', 'CARGA_INICIAL');
---/////////////////////
+VALUES (
+    'Plantilla alegación enviada a departamento',
+    'Alegación presentada – <<idalegacion>> - <<nombre_area>> - <<nombre_candidato>>',
+    '<!DOCTYPE html>
+<html>
+<head></head>
+<body>
+<div class="comment-container">
+<div class="action-comment can-view-video markeddown js-comment" dir="auto">
+<div class="current-comment js-friendly-links js-open-card">
+
+<p>Estimado/a Director/a</p>
+
+<p>
+Se adjunta alegación presentada por D./Dª.
+<strong>&lt;&lt;nombre_candidato&gt;&gt; &lt;&lt;apellidos_candidato&gt;&gt;</strong>
+contra los resultados provisionales del área de conocimiento
+<strong>&lt;&lt;nombre_area&gt;&gt;</strong>.
+</p>
+
+<p>
+Te ruego que con la mayor celeridad que sea posible emitas informe, a través de la plataforma
+de la bolsa de sustituciones del profesorado, acerca de los méritos alegados.
+</p>
+
+<p>Un saludo</p>
+
+<p>Jefe del Servicio de Personal</p>
+
+</div>
+</div>
+</div>
+</body>
+</html>',
+    'CARGA_INICIAL'
+);--/////////////////////
 INSERT INTO TBEP_PARAMETROS_CONFIG (NOMBRE,VALOR,DESCRIPCION,UID_USUARIO)
 SELECT 'bolsaempleo.local.idPlantillaAlegacionResuelta', CODNUM, 'Id de la plantilla para notificar al candidato que su alegación ha sido resuelta', 'CARGA_INICIAL'
 FROM TBEP_PLANTILLAS

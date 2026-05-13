@@ -226,36 +226,65 @@ public class BolsaEmpleoDataTable<T> {
 	 */
 	@SuppressWarnings({"checkstyle:CyclomaticComplexity"})
 	public void setFiltersParams(PreparedStatement stmt, PreparedStatement stmtCount, int index)
-			throws SQLException, UVException {
-		if (Boolean.TRUE.equals(this.isFilterable())) {
-			for (Map.Entry<Integer, String> filter : filters.entrySet()) {
-				Integer key = filter.getKey();
-				String value = filter.getValue();
+	        throws SQLException, UVException {
+	    if (Boolean.TRUE.equals(this.isFilterable())) {
+	        for (Map.Entry<Integer, String> filter : filters.entrySet()) {
+	            Integer key = filter.getKey();
+	            String value = filter.getValue();
 
-				if (this.columns.get(key).getType() == DataTableColumn.COLUMN_TYPE_DATE) {
-					stmt.setString(index, "%" + new Date(
-							Formateador.leeParametroFecha(value, Formateador.FORMATO_FECHA_DDMMYYYY, "/").getTime()));
-					stmtCount.setString(index++, "%" + new Date(
-							Formateador.leeParametroFecha(value, Formateador.FORMATO_FECHA_DDMMYYYY, "/").getTime()));
-				} else if (this.columns.get(key).getType() == DataTableColumn.COLUMN_TYPE_NUMBER) {
-					stmt.setInt(index, Integer.parseInt(value));
-					stmtCount.setInt(index++, Integer.parseInt(value));
-				} else if (this.columns.get(key).getType() == DataTableColumn.COLUMN_TYPE_BOOLEAN) {
-					stmt.setString(index, Boolean.parseBoolean(value) ? "S" : "N");
-					stmtCount.setString(index++, Boolean.parseBoolean(value) ? "S" : "N");
-				} else if (this.columns.get(key).getType() == DataTableColumn.COLUMN_TYPE_OPTION 
-						|| this.columns.get(key).getType() == DataTableColumn.COLUMN_TYPE_EXACT) {
-					stmt.setString(index, value);
-					stmtCount.setString(index++, value);
-				} else if (this.columns.get(key).getType() == DataTableColumn.COLUMN_TYPE_TEXT) {
-					stmt.setString(index, "%" + value + "%");
-					stmtCount.setString(index++, "%" + value + "%");
-				} else if (this.columns.get(key).getType() == DataTableColumn.COLUMN_TYPE_DOUBLE) {
-					stmt.setDouble(index, Double.parseDouble(value));
-					stmtCount.setDouble(index++, Double.parseDouble(value));
-				}
-			}
-		}
+	            DataTableColumn column = this.columns.get(key);
+	            if (column == null) {
+	                throw new UVException(ERROR_MSG_COLUMNA_FILTRADO_NO_VALIDA);
+	            }
+
+	            if (column.getType() == DataTableColumn.COLUMN_TYPE_DATE) {
+	                if ("true".equals(value) || "false".equals(value)) {
+	                    // En filterByQuery se genera IS NULL / IS NOT NULL, así que no hay ? que rellenar.
+	                    continue;
+	                }
+
+	                java.util.Date fechaParsed = Formateador.leeParametroFecha(
+	                        value,
+	                        Formateador.FORMATO_FECHA_DDMMYYYY,
+	                        "/"
+	                );
+
+	                if (fechaParsed == null) {
+	                    throw new UVException("Formato de fecha no válido para el filtro: " + value);
+	                }
+
+	                String fechaFormateada = new java.text.SimpleDateFormat("yyyy-MM-dd").format(fechaParsed);
+	                String parametro = "%" + fechaFormateada + "%";
+
+	                stmt.setString(index, parametro);
+	                stmtCount.setString(index++, parametro);
+
+	            } else if (column.getType() == DataTableColumn.COLUMN_TYPE_NUMBER) {
+	                stmt.setInt(index, Integer.parseInt(value));
+	                stmtCount.setInt(index++, Integer.parseInt(value));
+
+	            } else if (column.getType() == DataTableColumn.COLUMN_TYPE_BOOLEAN) {
+	                String boolVal = Boolean.parseBoolean(value) ? "S" : "N";
+	                stmt.setString(index, boolVal);
+	                stmtCount.setString(index++, boolVal);
+
+	            } else if (column.getType() == DataTableColumn.COLUMN_TYPE_OPTION
+	                    || column.getType() == DataTableColumn.COLUMN_TYPE_EXACT) {
+	                stmt.setString(index, value);
+	                stmtCount.setString(index++, value);
+
+	            } else if (column.getType() == DataTableColumn.COLUMN_TYPE_TEXT) {
+	                stmt.setString(index, "%" + value + "%");
+	                stmtCount.setString(index++, "%" + value + "%");
+
+	            } else if (column.getType() == DataTableColumn.COLUMN_TYPE_DOUBLE) {
+	                stmt.setDouble(index, Double.parseDouble(value));
+	                stmtCount.setDouble(index++, Double.parseDouble(value));
+	            }
+
+	            // COLUMN_TYPE_IS_NULL, COLUMN_TYPE_IGNORE y DATE true/false no necesitan parámetro.
+	        }
+	    }
 	}
 	
 	/**
@@ -436,8 +465,13 @@ public class BolsaEmpleoDataTable<T> {
 				case DataTableColumn.COLUMN_TYPE_IGNORE:
 					break;
 				case DataTableColumn.COLUMN_TYPE_DATE:
-					consultaResult.append(" AND TO_CHAR(" + columnName + ",'yyyy-mm-dd') LIKE ? ");
-					break;
+				    String dateVal = filter.getValue();
+				    if ("true".equals(dateVal) || "false".equals(dateVal)) {
+				        consultaResult.append(" AND " + columnName + " IS" + ("true".equals(dateVal) ? " NOT" : "") + " NULL");
+				    } else {
+				        consultaResult.append(" AND TO_CHAR(" + columnName + ",'yyyy-mm-dd') LIKE ? ");
+				    }
+				    break;
 				case DataTableColumn.COLUMN_TYPE_NUMBER:
 				case DataTableColumn.COLUMN_TYPE_BOOLEAN:
 				case DataTableColumn.COLUMN_TYPE_OPTION:

@@ -48,6 +48,7 @@ boolean estadoInformada = ModeloAlegaciones.ESTADO_INFORMADA_ALEGACION.equals(al
 boolean estadoResuelta = ModeloAlegaciones.ESTADO_RESUELTA_ALEGACION.equals(alegacion.getEstado());
 boolean estadoEnResulucion = ModeloAlegaciones.ESTADO_ENRESOLUCION_ALEGACION.equals(alegacion.getEstado());
 boolean verResolucionDepartamento = isPersonal || isDirector;
+boolean puedeEditarResolucionDepartamento = (isDirector && estadoEnviadaDepartamento) || (isPersonal && !estadoResuelta);
 String accionDescargarAlegacion = isDirector ? ControladorDescargaFicheros.ACCION_DESCARGAR_ALEGACION_MERITO_POR_DIRECTOR : ControladorDescargaFicheros.ACCION_DESCARGAR_ALEGACION_MERITO_POR_PERSONAL;
 String usuarioUltimaModificacion = alegacion.getCandidato() != null ? EscapaHTML.escapa(alegacion.getCandidato().getCodCuenta()) : "No disponible";
 %>
@@ -69,10 +70,17 @@ String usuarioUltimaModificacion = alegacion.getCandidato() != null ? EscapaHTML
     <h3>Área: <%= areaName %></h3>
 
     <div class="row">
-	    <button class="link-btn" id="volver_alegaciones" style="float:left">Volver</button>
-	    <% if (isPersonal && ModeloAlegaciones.ESTADO_PRESENTADA_ALEGACION.equals(alegacion.getEstado())) { %>
-		    <button class="link-btn" id="reabrir_alegacion" style="float:left; margin-left: 8px;">Reabrir alegación</button>
-	    <% } %>
+    	<button class="link-btn" id="volver_alegaciones" style="float:left">Volver</button>
+
+    	<% if (isPersonal && ModeloAlegaciones.ESTADO_PRESENTADA_ALEGACION.equals(alegacion.getEstado())) { %>
+        	<button class="link-btn" id="reabrir_alegacion" style="float:left; margin-left: 8px;">Reabrir alegación</button>
+    	<% } %>
+
+    	<% if (isDirector && estadoResuelta) { %>
+        	<button class="link-btn" id="descargar_pdf_resolucion" style="float:right">
+            	Descargar PDF Resolución
+        	</button>
+    	<% } %>
 	</div>
 
 	<br/>
@@ -404,24 +412,25 @@ String usuarioUltimaModificacion = alegacion.getCandidato() != null ? EscapaHTML
 		        <div class="form-group-container col1">
 		            <div class="form-group">
 		                <textarea class="form-input-custom" id="resolucion_departamento"
-		                          name="<%= ControladorAlegaciones.PARAM_DESCRIPCION_RESOLUCION_DEPARTAMENTO %>"
-		                          rows="8"
-		                          maxlength="4000"
-		                          <% if (!isDirector || !estadoEnviadaDepartamento) { %>
-				                      readonly
-				                  <% } %>
-		                          style="width: 100%; box-sizing: border-box;"><%= EscapaHTML.escapa(alegacion.getDesResolucionDep()) %></textarea>
+          					name="<%= ControladorAlegaciones.PARAM_DESCRIPCION_RESOLUCION_DEPARTAMENTO %>"
+          					rows="8"
+         					maxlength="4000"
+          					<% if (!puedeEditarResolucionDepartamento) { %>
+              					readonly
+          					<% } %>
+          					style="width: 100%; box-sizing: border-box;"><%= EscapaHTML.escapa(alegacion.getDesResolucionDep()) %></textarea>
 		            </div>
 		        </div>
 
-				<% if (estadoEnviadaDepartamento && isDirector) { %>
-		            <div class="form-btn">
-		                <input id="guardar_cambios_resolucion_final" type="submit"
-				                        name="<%= ControladorAlegaciones.PARAM_GUARDAR_CAMBIOS_RESOLUCION_DEPARTAMENTO %>"
-				                        class="btn-accion"
-				                        value="Guardar cambios"
-				        />
-		            </div>
+				<% if (puedeEditarResolucionDepartamento) { %>
+    				<div class="form-btn">
+        				<input id="guardar_cambios_resolucion_departamento" 
+               				type="submit"
+               					name="<%= ControladorAlegaciones.PARAM_GUARDAR_CAMBIOS_RESOLUCION_DEPARTAMENTO %>"
+               					class="btn-accion"
+               					value="Guardar cambios"
+        				/>
+    				</div>
 				<% } %>
 
 				<% if (!estadoInformada && !estadoEnviadaDepartamento && isDirector) { %>
@@ -510,6 +519,19 @@ $(document).ready(function() {
             '<%= ControladorAlegaciones.PARAM_ACCION %>': '<%= ControladorAlegaciones.ACCION_INDEX %>'
         });
     });
+    
+    <% if (isDirector && estadoResuelta) { %>
+    	var descargarPdfResolucion = document.getElementById("descargar_pdf_resolucion");
+    	if (descargarPdfResolucion) {
+        	descargarPdfResolucion.addEventListener("click", function() {
+            	var url = "<%= ControladorDescargaFicheros.URL_DESCARGA_FICHEROS %>" +
+                    	"?a=<%= ControladorDescargaFicheros.ACCION_DESCARGAR_RESOLUCION_ALEGACION_RESULTADOS_SOLICITUD_DIRECTOR %>" +
+                    	"&<%= ControladorDescargaFicheros.PARAM_ALEGACION %>=<%= alegacion.getCodNum() %>";
+
+            	window.open(url, "_blank");
+        	});
+    	}
+	<% } %>
 
     var reabrirAlegacionBtn = document.getElementById("reabrir_alegacion");
     if (reabrirAlegacionBtn) {

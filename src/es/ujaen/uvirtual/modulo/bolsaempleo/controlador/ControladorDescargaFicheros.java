@@ -87,6 +87,7 @@ public class ControladorDescargaFicheros extends HttpServlet {
 	public static final String ACCION_DESCARGAR_RESULTADOS_SOLICITUD_CANDIDATO = "descargarresultadossolicitudcandidato";
 	public static final String ACCION_DESCARGAR_ALEGACIONES_RESULTADOS_SOLICITUD_CANDIDATO = "descargaralegacionesresultadossolicitudcandidato";
 	public static final String ACCION_DESCARGAR_RESOLUCION_ALEGACION_RESULTADOS_SOLICITUD_CANDIDATO = "descargarresolucionalegacionresultadossolicitudcandidato";
+	public static final String ACCION_DESCARGAR_RESOLUCION_ALEGACION_RESULTADOS_SOLICITUD_DIRECTOR = "descargarresolucionalegacionresultadossolicituddirector";
 	public static final String ACCION_DESCARGAR_RESULTADOS_SOLICITUD_PERSONAL = "descargarresultadossolicitudpersonal";
 	public static final String ACCION_DESCARGAR_RESUMEN_ITEM_BAREMACION = "descargarresumenitemsbaremacion";
 	public static final String ACCION_DESCARGAR_SOLICITUD = "descargarsolicitud";
@@ -150,6 +151,9 @@ public class ControladorDescargaFicheros extends HttpServlet {
 				case ACCION_DESCARGAR_ALEGACION_MERITO_POR_DIRECTOR:
 					accionesFicherosDirectores(bean, datos, request, response, nombreAccion);
 					break;
+				case ACCION_DESCARGAR_RESOLUCION_ALEGACION_RESULTADOS_SOLICITUD_DIRECTOR:
+				    accionesFicherosDirectores(bean, datos, request, response, nombreAccion);
+				    break;
 				case ACCION_DESCARGAR_MERITO_EVALUADOR:
 					accionesFicherosEvaluador(bean, datos, request, response, nombreAccion);
 					break;
@@ -283,6 +287,9 @@ public class ControladorDescargaFicheros extends HttpServlet {
 			case ACCION_DESCARGAR_ALEGACION_MERITO_POR_DIRECTOR:
 				descargaAlegacionMeritoDirector(bean, datos, request, response);
 				break;
+			case ACCION_DESCARGAR_RESOLUCION_ALEGACION_RESULTADOS_SOLICITUD_DIRECTOR:
+		        descargaResolucionAlegacionResultadosSolicitudDirector(bean, datos, request, response);
+		        break;
 			default:
 				errorFatal(bean, datos, MENSAJE_ERROR_ACCION_NO_CONTEMPLADA);
 		}
@@ -597,6 +604,84 @@ public class ControladorDescargaFicheros extends HttpServlet {
 		}
 
 		descargarPDF(datos, response, GenerarAlegacionesPDF.generarPDFResolucionAlegacion(bean.getUsuarioLogeado(), bolsaResultado, convocatoria, solMerBolAlegacion, alegacion));
+	}
+	
+	public void descargaResolucionAlegacionResultadosSolicitudDirector(VistaDescargaFicheros bean, UVDatos datos,
+	        HttpServletRequest request, HttpServletResponse response)
+	        throws SQLException, UVException, IOException {
+
+	    Integer idAlegacion = Formateador.leeParametroInteger(request.getParameter(PARAM_ALEGACION));
+
+	    if (idAlegacion == null) {
+	        BolsaEmpleoUtils.redirectToError(bean, datos, request, response, MENSAJE_ERROR_SIN_PERMISO);
+	        return;
+	    }
+
+	    ModeloAlegaciones modeloAlegaciones = ModeloAlegaciones.obtenerInstancia();
+	    Alegacion alegacion = modeloAlegaciones.getAlegacionByCodNum(idAlegacion);
+
+	    if (alegacion == null || !ModeloAlegaciones.ESTADO_RESUELTA_ALEGACION.equals(alegacion.getEstado())) {
+	        BolsaEmpleoUtils.redirectToError(bean, datos, request, response, MENSAJE_ERROR_SIN_PERMISO);
+	        return;
+	    }
+
+	    ModeloEvaluador modeloEvaluador = ModeloEvaluador.obtenerInstancia();
+	    Evaluador evaluador = modeloEvaluador.getEvaluadorById(
+	            bean.getUsuarioLogeado().getCodNum(),
+	            alegacion.getArea().getCodNum()
+	    );
+
+	    if (evaluador == null) {
+	        BolsaEmpleoUtils.redirectToError(bean, datos, request, response, MENSAJE_ERROR_SIN_PERMISO);
+	        return;
+	    }
+
+	    UsuarioBolsaEmpleo candidato = alegacion.getCandidato();
+	    Convocatoria convocatoria = alegacion.getConvocatoria();
+	    Bolsa bolsa = modeloAlegaciones.getBolsaByAlegacion(alegacion);
+
+	    BolsaResultado bolsaResultado = ModeloResultados.obtenerInstancia().getBolsaResultado(
+	            bolsa,
+	            candidato,
+	            convocatoria
+	    );
+
+	    if (bolsaResultado == null) {
+	        BolsaEmpleoUtils.redirectToError(bean, datos, request, response, MENSAJE_ERROR_SIN_PERMISO);
+	        return;
+	    }
+
+	    bean.setBolsaResultado(bolsaResultado);
+
+	    VistaMisResultados beanResultados = new VistaMisResultados();
+	    beanResultados.setBolsa(bolsa);
+	    beanResultados.setConvocatoria(convocatoria);
+	    beanResultados.setBolsaResultado(bolsaResultado);
+	    beanResultados.setUsuarioLogeado(candidato);
+
+	    modeloAlegaciones.establecerDescripcionesSiExistenAlegacionesEnLosMeritos(
+	            beanResultados,
+	            convocatoria,
+	            candidato,
+	            bolsa.getCodNum()
+	    );
+
+	    SolMerBolAlegacion solMerBolAlegacion = modeloAlegaciones.obtenerSolMerBolAlegacionExistente(
+	            bolsa,
+	            convocatoria,
+	            candidato,
+	            null
+	    );
+
+	    modeloAlegaciones.asignarArchivosAlegacion(beanResultados, solMerBolAlegacion);
+
+	    descargarPDF(datos, response, GenerarAlegacionesPDF.generarPDFResolucionAlegacion(
+	            candidato,
+	            bolsaResultado,
+	            convocatoria,
+	            solMerBolAlegacion,
+	            alegacion
+	    ));
 	}
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////

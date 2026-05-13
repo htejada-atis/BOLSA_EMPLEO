@@ -317,16 +317,24 @@ public class ModeloPlantilla {
 	 * @return Texto con las variables reemplazadas.
 	 */
 	public String reemplazaAlegacionEnviadaADepartamentoEnPlantilla(Alegacion alegacion, String texto, boolean isXML) {
-		String left = SEPARATOR_LEFT;
-		String right = SEPARATOR_RIGHT;
-		if (isXML) {
-			left = SEPARATOR_LEFT_XML;
-			right = SEPARATOR_RIGHT_XML;
-		}
-		texto = texto.replaceAll(left + "idalegacion" + right, alegacion.getCodNum().toString());
-		texto = texto.replaceAll(left + "nombre_area" + right, alegacion.getArea().getDescripcion());
-		texto = texto.replaceAll(left + "nombre_candidato" + right, alegacion.getCandidato().getNombre());
-		return texto;
+	    String left = SEPARATOR_LEFT;
+	    String right = SEPARATOR_RIGHT;
+	    if (isXML) {
+	        left = SEPARATOR_LEFT_XML;
+	        right = SEPARATOR_RIGHT_XML;
+	    }
+
+	    UsuarioBolsaEmpleo candidato = alegacion.getCandidato();
+
+	    String apellidosCandidato = Formateador.leeParametroString(candidato.getPrimerApellido()) + " "
+	            + Formateador.leeParametroString(candidato.getSegundoApellido());
+
+	    texto = texto.replaceAll(left + "idalegacion" + right, alegacion.getCodNum().toString());
+	    texto = texto.replaceAll(left + "nombre_area" + right, alegacion.getArea().getDescripcion());
+	    texto = texto.replaceAll(left + "nombre_candidato" + right, candidato.getNombre());
+	    texto = texto.replaceAll(left + "apellidos_candidato" + right, apellidosCandidato.trim());
+
+	    return texto;
 	}
 	
 	/**
@@ -338,15 +346,29 @@ public class ModeloPlantilla {
 	 * @return Texto con las variables reemplazadas.
 	 */
 	public String reemplazaAlegacionResolucionEnPlantilla(Alegacion alegacion, String texto, boolean isXML) {
-		String left = SEPARATOR_LEFT;
-		String right = SEPARATOR_RIGHT;
-		if (isXML) {
-			left = SEPARATOR_LEFT_XML;
-			right = SEPARATOR_RIGHT_XML;
-		}
-		texto = texto.replaceAll(left + "idalegacion" + right, alegacion.getCodNum().toString());
-		texto = texto.replaceAll(left + "nombre_area" + right, alegacion.getArea().getDescripcion());
-		return texto;
+	    String left = SEPARATOR_LEFT;
+	    String right = SEPARATOR_RIGHT;
+	    if (isXML) {
+	        left = SEPARATOR_LEFT_XML;
+	        right = SEPARATOR_RIGHT_XML;
+	    }
+
+	    UsuarioBolsaEmpleo candidato = alegacion.getCandidato();
+
+	    String apellidosCandidato = Formateador.leeParametroString(candidato.getPrimerApellido()) + " "
+	            + Formateador.leeParametroString(candidato.getSegundoApellido());
+
+	    String fechaConfirmacion = alegacion.getFechaConfirmacion() != null
+	            ? Formateador.formatoFecha(alegacion.getFechaConfirmacion(), Formateador.FORMATO_FECHA_DDMMYYYY_HHMMSS)
+	            : "";
+
+	    texto = texto.replaceAll(left + "idalegacion" + right, alegacion.getCodNum().toString());
+	    texto = texto.replaceAll(left + "nombre_area" + right, alegacion.getArea().getDescripcion());
+	    texto = texto.replaceAll(left + "nombre_candidato" + right, candidato.getNombre());
+	    texto = texto.replaceAll(left + "apellidos_candidato" + right, apellidosCandidato.trim());
+	    texto = texto.replaceAll(left + "fecha_confirmacion" + right, fechaConfirmacion);
+
+	    return texto;
 	}
 
 	/** Crea una plantilla de un resultset .
