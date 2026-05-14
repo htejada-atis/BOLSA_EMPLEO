@@ -1,7 +1,6 @@
 package es.ujaen.uvirtual.modulo.bolsaempleo.tareas;
 
 import java.sql.SQLException;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -24,21 +23,15 @@ public final class CerrarAlegaciones {
 	}
 
 	/**
-	 * Ejecuta la tarea. Si hay bolsas en estado ALEGACIONES cuya fecha de fin
-	 * de alegaciones ha superado, las pasa a estado BLOQUEADA.
+	 * Ejecuta la tarea, si hay bolsas a cerrar por fecha fin de alegaciones, las
+	 * cierra.
 	 */
 	public static void run() {
 		try {
 			ModeloBolsa modelo = ModeloBolsa.obtenerInstancia();
-			List<Bolsa> bolsasExpiradas = modelo.getBolsasAlegacionesExpiradas();
 
-			for (Bolsa bolsa : bolsasExpiradas) {
-				try {
-					modelo.bloquearBolsaDesdeAlegaciones(bolsa);
-					LOGGER.log(Level.INFO, "Bolsa {0} cerrada por fin de alegaciones", bolsa.getCodNum());
-				} catch (SQLException | UVException e) {
-					LOGGER.log(Level.SEVERE, "Error al cerrar alegaciones de bolsa " + bolsa.getCodNum(), e);
-				}
+			for (Bolsa bolsa : modelo.getBolsasAlegacionesExpiradas()) {
+				modelo.bloquearBolsaDesdeAlegaciones(bolsa);
 			}
 		} catch (SQLException | UVException e) {
 			LOGGER.log(Level.SEVERE, Formateador.getStackTrace(e));
